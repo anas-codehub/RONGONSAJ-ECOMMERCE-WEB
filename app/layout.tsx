@@ -24,7 +24,7 @@ export default async function RootLayout({
   const session = await auth();
 
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body className={`${geist.variable} antialiased min-h-screen`}>
         <SessionProvider session={session}>
           <Navbar />

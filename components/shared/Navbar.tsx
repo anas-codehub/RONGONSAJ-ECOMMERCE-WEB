@@ -23,11 +23,11 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="border-b bg-background sticky top-0 z-50">
+    <nav className="border-b bg-background backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
         {/* Logo */}
         <Link href="/" className="font-bold text-xl shrink-0">
-          MyShop
+          RONGONSAAJ
         </Link>
 
         {/* Search */}
