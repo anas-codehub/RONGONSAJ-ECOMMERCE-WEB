@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, X } from "lucide-react";
+import ImageUpload from "./ImageUpload";
 
 interface Category {
   id: string;
@@ -48,9 +49,11 @@ export default function ProductForm({ categories, product }: Props) {
     stock: product?.stock?.toString() || "",
     categoryId: product?.categoryId || "",
     isFeatured: product?.isFeatured || false,
-    images: product?.images?.join(", ") || "",
   });
 
+  const [uploadedImages, setUploadedImages] = useState<string[]>(
+    product?.images || [],
+  );
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -92,10 +95,7 @@ export default function ProductForm({ categories, product }: Props) {
         stock: parseInt(form.stock),
         categoryId: form.categoryId,
         isFeatured: form.isFeatured,
-        images: form.images
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
+        images: uploadedImages,
       };
 
       const res = await fetch(
@@ -228,18 +228,9 @@ export default function ProductForm({ categories, product }: Props) {
 
         <div>
           <label className="text-sm font-medium text-foreground block mb-1.5">
-            Image URLs
+            Product images
           </label>
-          <Input
-            name="images"
-            value={form.images}
-            onChange={handleChange}
-            placeholder="https://..., https://..."
-            className="border-border"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Separate multiple URLs with commas
-          </p>
+          <ImageUpload images={uploadedImages} onChange={setUploadedImages} />
         </div>
 
         <div className="flex items-center gap-3">
