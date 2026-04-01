@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, Search, Menu, User } from "lucide-react";
+import { ShoppingCart, Search, Menu, User, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/store/cart-store";
@@ -65,18 +65,47 @@ export default function Navbar() {
                   </Button>
                 </Link>
               )}
-              <Link href="/account/orders">
+
+              {/* Account dropdown */}
+              <div className="relative group">
                 <Button variant="outline" size="icon">
                   <User className="h-4 w-4" />
                 </Button>
-              </Link>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => signOut({ callbackUrl: "/" })}
-              >
-                Sign out
-              </Button>
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-border rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-border">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {session.user?.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {session.user?.email}
+                    </p>
+                  </div>
+                  <div className="py-1">
+                    <Link
+                      href="/account/orders"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
+                    >
+                      <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+                      My orders
+                    </Link>
+                    <Link
+                      href="/account/profile"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
+                    >
+                      <User className="h-4 w-4 text-muted-foreground" />
+                      My profile
+                    </Link>
+                  </div>
+                  <div className="border-t border-border py-1">
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-secondary transition-colors w-full text-left"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             <Link href="/sign-in">
