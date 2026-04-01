@@ -3,11 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2, Sparkles } from "lucide-react";
-import { signIn } from "next-auth/react";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -25,21 +25,26 @@ export default function SignInPage() {
     e.preventDefault();
     setLoading(true);
 
-    // Use NextAuth signIn with credentials
-    const res = await signIn("credentials", {
-      redirect: false,
-      email: form.email,
-      password: form.password,
-    });
+    try {
+      const result = await signIn("credentials", {
+        email: form.email,
+        password: form.password,
+        redirect: false,
+      });
 
-    if (res?.error) {
-      toast.error(res.error);
-    } else {
-      toast.success("Signed in successfully!");
-      router.push("/"); // Redirect to home or dashboard
+      if (result?.error) {
+        toast.error("Invalid email or password!");
+        return;
+      }
+
+      toast.success("Welcome back!");
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      toast.error("Something went wrong!");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -50,8 +55,10 @@ export default function SignInPage() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#FAEEDA] mb-4">
             <Sparkles className="h-7 w-7 text-[#D85A30]" />
           </div>
-          <h1 className="text-2xl font-medium text-[#412402]">Sign in</h1>
-          <p className="text-[#854F0B] text-sm mt-1">Welcome back to RÊVE</p>
+          <h1 className="text-2xl font-medium text-[#412402]">Welcome back</h1>
+          <p className="text-[#854F0B] text-sm mt-1">
+            Sign in to your RÊVE account
+          </p>
         </div>
 
         {/* Form */}
@@ -85,6 +92,14 @@ export default function SignInPage() {
                 required
                 className="border-[#FAC775] focus:ring-[#D85A30]"
               />
+              <div className="text-right mt-1.5">
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-[#D85A30] hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
             </div>
 
             <Button
@@ -92,9 +107,7 @@ export default function SignInPage() {
               disabled={loading}
               className="w-full bg-[#D85A30] hover:bg-[#993C1D] text-[#FAEEDA] py-6 rounded-xl text-base"
             >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : null}
+              {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               {loading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
@@ -105,19 +118,15 @@ export default function SignInPage() {
               href="/sign-up"
               className="text-[#D85A30] font-medium hover:underline"
             >
-              Create account
-            </Link>
-          </p>
-
-          <p className="text-center text-sm text-[#854F0B] mt-2">
-            <Link
-              href="/forgot-password"
-              className="text-[#D85A30] font-medium hover:underline"
-            >
-              Forgot password?
+              Create one
             </Link>
           </p>
         </div>
+
+        {/* Demo hint */}
+        <p className="text-center text-xs text-[#854F0B] mt-4 opacity-60">
+          New here? Create an account to start shopping.
+        </p>
       </div>
     </div>
   );
