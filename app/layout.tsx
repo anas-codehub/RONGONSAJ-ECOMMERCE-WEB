@@ -12,7 +12,7 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "RÊVE Fashion",
+  title: "RONGONSAAJ",
   description: "Dress for the life you love",
 };
 
