@@ -4,8 +4,10 @@ import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Truck, RefreshCw, Shield } from "lucide-react";
 import ProductCard from "@/components/shared/ProductCard";
+import { auth } from "@/lib/auth";
 
 export default async function HomePage() {
+  const session = await auth();
   const featuredProducts = await db.product.findMany({
     where: { isFeatured: true },
     include: { category: true },
@@ -156,22 +158,24 @@ export default async function HomePage() {
       </section>
 
       {/* Banner */}
-      <section className="bg-[#412402] mx-4 mb-14 rounded-3xl px-8 py-14 text-center">
-        <p className="text-[#FAC775] text-sm font-medium mb-3">
-          Limited time offer
-        </p>
-        <h2 className="text-3xl md:text-4xl font-medium text-[#FAEEDA] mb-4">
-          Get 20% off your first order
-        </h2>
-        <p className="text-[#EF9F27] mb-8 max-w-md mx-auto">
-          Sign up today and use code WELCOME20 at checkout.
-        </p>
-        <Link href="/sign-up">
-          <Button className="bg-[#D85A30] hover:bg-[#993C1D] text-[#FAEEDA] px-8 py-6 text-base rounded-xl">
-            Create account <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </Link>
-      </section>
+      {!session && (
+        <section className="bg-[#412402] mx-4 mb-14 rounded-3xl px-8 py-14 text-center">
+          <p className="text-[#FAC775] text-sm font-medium mb-3">
+            Limited time offer
+          </p>
+          <h2 className="text-3xl md:text-4xl font-medium text-[#FAEEDA] mb-4">
+            Get 20% off your first order
+          </h2>
+          <p className="text-[#EF9F27] mb-8 max-w-md mx-auto">
+            Sign up today and use code WELCOME20 at checkout.
+          </p>
+          <Link href="/sign-up">
+            <Button className="bg-[#D85A30] hover:bg-[#993C1D] text-[#FAEEDA] px-8 py-6 text-base rounded-xl">
+              Create account <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+        </section>
+      )}
     </div>
   );
 }
