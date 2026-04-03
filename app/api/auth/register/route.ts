@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,9 +14,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const existingUser = await db.user.findUnique({
-      where: { email },
-    });
+    const existingUser = await db.user.findUnique({ where: { email } });
 
     if (existingUser) {
       return NextResponse.json(
@@ -27,12 +26,18 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await db.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-      },
+      data: { name, email, password: hashedPassword },
     });
+
+    // Send welcome email
+    await sendWelcomeEmail({ to: email, customerName: name });
+    // Send welcome email
+try {
+  await sendWelcomeEmail({ to: email, customerName: name });
+  console.log("Welcome email sent to:", email);
+} catch (emailError) {
+  console.error("Email error:", emailError);
+}
 
     return NextResponse.json(
       { message: "Account created successfully", userId: user.id },

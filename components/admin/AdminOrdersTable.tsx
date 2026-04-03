@@ -71,6 +71,9 @@ export default function AdminOrdersTable({ orders }: { orders: Order[] }) {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-secondary border-b border-border">
+            <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4">
+              Order ID
+            </th>
             <tr>
               <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4">
                 Customer
@@ -95,6 +98,11 @@ export default function AdminOrdersTable({ orders }: { orders: Order[] }) {
                 key={order.id}
                 className="hover:bg-secondary/50 transition-colors"
               >
+                <td className="px-6 py-4">
+                  <span className="font-mono text-xs font-medium text-foreground bg-secondary px-2 py-1 rounded-lg">
+                    #{order.id}
+                  </span>
+                </td>
                 <td className="px-6 py-4">
                   <p className="text-sm font-medium text-foreground">
                     {order.user.name || "Unknown"}

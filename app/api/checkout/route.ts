@@ -14,8 +14,8 @@ export async function POST(req: NextRequest) {
         { status: 401 }
       );
     }
-    const userId = session.user.id as string;   
 
+    const userId = session.user.id as string;
     const { items, address, couponId, total } = await req.json();
 
     if (!items || items.length === 0) {
@@ -24,6 +24,35 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Check stock availability for all items first
+    for (const item of items) {
+      const product = await db.product.findUnique({
+        where: { id: item.id },
+      });
+
+      if (!product) {
+        return NextResponse.json(
+          { error: `Product ${item.name} not found` },
+          { status: 400 }
+        );
+      }
+
+      if (product.stock < item.quantity) {
+        return NextResponse.json(
+          {
+            error: `Sorry! Only ${product.stock} units of "${product.name}" are available`,
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Generate professional order number
+    const date = new Date();
+    const dateStr = date.toISOString().slice(0, 10).replace(/-/g, "");
+    const orderCount = await db.order.count();
+    const orderNumber = `ORD-${dateStr}-${String(orderCount + 1).padStart(3, "0")}`;
 
     // Create address in DB
     const savedAddress = await db.address.create({
@@ -37,21 +66,37 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Create order in DB
-    const order = await db.order.create({
-      data: {
-        total,
-        userId,
-        addressId: savedAddress.id,
-        ...(couponId && { couponId }),
-        items: {
-          create: items.map((item: any) => ({
-            productId: item.id,
-            quantity: item.quantity,
-            price: item.price,
-          })),
+    // Create order + decrease stock in a transaction
+    const order = await db.$transaction(async (tx) => {
+      // Create the order
+      const newOrder = await tx.order.create({
+        data: {
+          id: orderNumber,
+          total,
+          userId,
+          addressId: savedAddress.id,
+          ...(couponId && { couponId }),
+          items: {
+            create: items.map((item: any) => ({
+              productId: item.id,
+              quantity: item.quantity,
+              price: item.price,
+            })),
+          },
         },
-      },
+      });
+
+      // Decrease stock for each item
+      for (const item of items) {
+        await tx.product.update({
+          where: { id: item.id },
+          data: {
+            stock: { decrement: item.quantity },
+          },
+        });
+      }
+
+      return newOrder;
     });
 
     // SSLCommerz payment init
@@ -74,7 +119,7 @@ export async function POST(req: NextRequest) {
       product_category: "Fashion",
       product_profile: "general",
       cus_name: address.fullName,
-     cus_email: session.user.email ?? "",
+      cus_email: session.user.email ?? "",
       cus_add1: address.street,
       cus_city: address.city,
       cus_postcode: "1000",

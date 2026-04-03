@@ -7,9 +7,28 @@ export async function POST(req: NextRequest) {
     const tran_id = formData.get("tran_id") as string;
 
     if (tran_id) {
-      await db.order.update({
-        where: { id: tran_id },
-        data: { status: "CANCELLED" },
+      await db.$transaction(async (tx) => {
+        // Get order items
+        const order = await tx.order.findUnique({
+          where: { id: tran_id },
+          include: { items: true },
+        });
+
+        if (order) {
+          // Cancel the order
+          await tx.order.update({
+            where: { id: tran_id },
+            data: { status: "CANCELLED" },
+          });
+
+          // Restock items
+          for (const item of order.items) {
+            await tx.product.update({
+              where: { id: item.productId },
+              data: { stock: { increment: item.quantity } },
+            });
+          }
+        }
       });
     }
 

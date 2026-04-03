@@ -109,6 +109,7 @@ export default function ImageUpload({ images, onChange }: Props) {
                 src={url}
                 alt={`Product image ${index + 1}`}
                 fill
+                sizes="100vw"
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

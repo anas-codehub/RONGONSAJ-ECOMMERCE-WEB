@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       cloudinary.uploader
         .upload_stream(
           {
-            folder: "reve-fashion",
+            folder: "RONGONSAAJ",
             transformation: [
               {
                 width: 800,

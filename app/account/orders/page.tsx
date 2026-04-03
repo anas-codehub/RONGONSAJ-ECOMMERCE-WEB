@@ -66,7 +66,7 @@ export default async function OrdersPage() {
                       Order ID
                     </p>
                     <p className="text-sm font-medium text-foreground font-mono">
-                      {order.id.slice(0, 16)}...
+                      #{order.id}...
                     </p>
                   </div>
                   <div className="text-right">

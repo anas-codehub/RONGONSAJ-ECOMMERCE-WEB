@@ -126,17 +126,29 @@ export default function AdminProductsTable({
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span
-                        className={`text-sm font-medium ${
-                          product.stock === 0
-                            ? "text-destructive"
-                            : product.stock <= 10
-                              ? "text-yellow-600"
-                              : "text-green-600"
-                        }`}
-                      >
-                        {product.stock}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`text-sm font-medium ${
+                            product.stock === 0
+                              ? "text-destructive"
+                              : product.stock <= 10
+                                ? "text-yellow-600"
+                                : "text-green-600"
+                          }`}
+                        >
+                          {product.stock}
+                        </span>
+                        {product.stock === 0 && (
+                          <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+                            Out of stock
+                          </span>
+                        )}
+                        {product.stock > 0 && product.stock <= 10 && (
+                          <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
+                            Low stock
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       {product.isFeatured ? (

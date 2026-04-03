@@ -15,13 +15,51 @@ export async function PATCH(
     const { id } = await params;
     const { status } = await req.json();
 
-    const order = await db.order.update({
-      where: { id },
-      data: { status },
+    const order = await db.$transaction(async (tx) => {
+      const existingOrder = await tx.order.findUnique({
+        where: { id },
+        include: { items: true },
+      });
+
+      if (!existingOrder) {
+        throw new Error("Order not found");
+      }
+
+      // If cancelling — restock items
+      if (
+        status === "CANCELLED" &&
+        existingOrder.status !== "CANCELLED"
+      ) {
+        for (const item of existingOrder.items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { increment: item.quantity } },
+          });
+        }
+      }
+
+      // If un-cancelling — decrease stock again
+      if (
+        existingOrder.status === "CANCELLED" &&
+        status !== "CANCELLED"
+      ) {
+        for (const item of existingOrder.items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { decrement: item.quantity } },
+          });
+        }
+      }
+
+      return tx.order.update({
+        where: { id },
+        data: { status },
+      });
     });
 
     return NextResponse.json(order);
-  } catch {
+  } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { error: "Something went wrong" },
       { status: 500 }

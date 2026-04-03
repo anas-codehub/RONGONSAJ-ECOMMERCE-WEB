@@ -9,6 +9,7 @@ import {
   Tag,
   ArrowRight,
   TrendingUp,
+  HdIcon,
 } from "lucide-react";
 
 export default async function AdminPage() {
@@ -70,6 +71,8 @@ export default async function AdminPage() {
       href: "/admin/coupons",
       color: "bg-secondary text-primary",
     },
+
+    { label: "Add category", href: "/admin/categories/new" },
   ];
 
   const statusColors: Record<string, string> = {
@@ -101,7 +104,7 @@ export default async function AdminPage() {
                 <div
                   className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mb-4`}
                 >
-                  <Icon className="h-6 w-6" />
+                  <HdIcon className="h-6 w-6" />
                 </div>
                 <p className="text-3xl font-medium text-foreground mb-1">
                   {value}
