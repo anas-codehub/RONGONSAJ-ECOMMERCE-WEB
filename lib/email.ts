@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import OrderConfirmationEmail from "@/emails/OrderConfirmationEmail";
 import WelcomeEmail from "@/emails/WelcomeEmail";
+import PasswordResetEmail from "@/emails/PasswordResetEmail";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL!;
@@ -60,5 +61,26 @@ export async function sendWelcomeEmail({
     });
   } catch (error) {
     console.error("Failed to send welcome email:", error);
+  }
+}
+
+export async function sendPasswordResetEmail({
+  to,
+  customerName,
+  resetUrl,
+}: {
+  to: string;
+  customerName: string;
+  resetUrl: string;
+}) {
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to,
+      subject: "Reset your RÊVE Fashion password",
+      react: PasswordResetEmail({ resetUrl, customerName }),
+    });
+  } catch (error) {
+    console.error("Failed to send password reset email:", error);
   }
 }
