@@ -1,8 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
-
+  turbopack: {},
   images: {
     remotePatterns: [
       {
@@ -19,7 +18,6 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
-
 };
 
 export default nextConfig;
