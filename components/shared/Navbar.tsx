@@ -10,7 +10,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Navbar() {
-  const { items } = useCartStore();
+  const { items, clearCart } = useCartStore();
   const { data: session } = useSession();
   const [search, setSearch] = useState("");
   const router = useRouter();
@@ -98,7 +98,12 @@ export default function Navbar() {
                   </div>
                   <div className="border-t border-border py-1">
                     <button
-                      onClick={() => signOut({ callbackUrl: "/" })}
+                      onClick={() => {
+                        clearCart();
+                        localStorage.removeItem("cart-user-id");
+                        localStorage.removeItem("cart-storage");
+                        signOut({ callbackUrl: "/" });
+                      }}
                       className="flex items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-secondary transition-colors w-full text-left"
                     >
                       Sign out

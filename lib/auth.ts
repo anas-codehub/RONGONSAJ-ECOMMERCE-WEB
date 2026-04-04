@@ -2,6 +2,7 @@ import NextAuth from "next-auth"
 import  Credentials  from "next-auth/providers/credentials"
 import {db} from "@/lib/db"
 import bcrypt from "bcryptjs"
+    
 
 import React from 'react'
 
@@ -55,6 +56,17 @@ export const { handlers, signIn, signOut, auth} = NextAuth({
     return token;
   },
   async session({ session, token }) {
+
+    // Verify user still exist on DB 
+    const dbUser = await db.user.findUnique({
+        where: {id: token.id as string}
+    });
+
+    if(!dbUser) {
+        return {
+            ...session, user: undefined as any
+        }
+    }
     return {
       ...session,
       user: {

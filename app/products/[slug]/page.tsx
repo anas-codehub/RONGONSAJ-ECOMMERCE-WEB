@@ -7,9 +7,30 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Truck, RefreshCw, Shield, Star } from "lucide-react";
 import AddToCartButton from "@/components/shared/AddToCartButton";
+import ReviewForm from "@/components/shared/ReviewForm";
 
 interface Props {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: Props) {
+  const { slug } = await params;
+  const product = await db.product.findUnique({
+    where: { slug },
+    include: { category: true },
+  });
+
+  if (!product) return { title: "Product not found" };
+
+  return {
+    title: product.name,
+    description: product.description,
+    openGraph: {
+      title: product.name,
+      description: product.description,
+      images: product.images[0] ? [{ url: product.images[0] }] : [],
+    },
+  };
 }
 
 export default async function ProductDetailPage({ params }: Props) {
@@ -220,6 +241,10 @@ export default async function ProductDetailPage({ params }: Props) {
           <h2 className="text-2xl font-medium text-foreground mb-6">
             Customer Reviews
           </h2>
+
+          <div className="mb-8">
+            <ReviewForm productId={product.id} />
+          </div>
           {product.reviews.length === 0 ? (
             <div className="bg-secondary rounded-2xl p-10 text-center">
               <Star className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
