@@ -57,7 +57,7 @@ export default function SignInPage() {
           </div>
           <h1 className="text-2xl font-medium text-[#412402]">Welcome back</h1>
           <p className="text-[#854F0B] text-sm mt-1">
-            Sign in to your RÊVE account
+            Sign in to your RONGONSAAJ account
           </p>
         </div>
 
