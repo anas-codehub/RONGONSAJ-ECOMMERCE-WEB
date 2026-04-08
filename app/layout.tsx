@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/shared/Navbar";
 import { Toaster } from "@/components/ui/sonner";
 import SessionProvider from "@/components/shared/SessionProvider";
 import { auth } from "@/lib/auth";
-import Footer from "@/components/shared/Footer";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -14,7 +12,7 @@ const geist = Geist({
 
 export const metadata: Metadata = {
   title: {
-    default: "RONGONSAAJ - Dress for the fashion you love",
+    default: "RONGONSAAJ — Dress for the life you love",
     template: "%s | RONGONSAAJ",
   },
   description:
@@ -29,16 +27,16 @@ export const metadata: Metadata = {
     "online shopping",
   ],
   openGraph: {
-    title: "RÊVE Fashion",
+    title: "RONGONSAAJ",
     description: "Dress for the life you love",
     url: process.env.NEXTAUTH_URL,
-    siteName: "RÊVE Fashion",
+    siteName: "RONGONSAAJ",
     locale: "en_BD",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "RÊVE Fashion",
+    title: "RONGONSAAJ",
     description: "Dress for the life you love",
   },
   robots: {
@@ -46,6 +44,8 @@ export const metadata: Metadata = {
     follow: true,
   },
 };
+
+export const dynamic = "force-dynamic";
 
 export default async function RootLayout({
   children,
@@ -55,12 +55,10 @@ export default async function RootLayout({
   const session = await auth();
 
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html lang="en">
       <body className={`${geist.variable} antialiased min-h-screen`}>
         <SessionProvider session={session}>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
+          {children}
           <Toaster richColors position="top-right" />
         </SessionProvider>
       </body>

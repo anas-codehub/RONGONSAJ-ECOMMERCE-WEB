@@ -138,6 +138,7 @@ export default async function AdminPage() {
             { label: "Manage orders", href: "/admin/orders" },
             { label: "Manage users", href: "/admin/users" },
             { label: "Add coupon", href: "/admin/coupons/new" },
+            { label: "Manage slides", href: "/admin/slides" },
           ].map(({ label, href }) => (
             <Link key={label} href={href}>
               <div className="bg-secondary border border-border rounded-xl p-4 flex items-center justify-between hover:bg-muted transition-colors group">

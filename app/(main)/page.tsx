@@ -5,65 +5,77 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Truck, RefreshCw, Shield } from "lucide-react";
 import ProductCard from "@/components/shared/ProductCard";
 import { auth } from "@/lib/auth";
+import HeroSlider from "@/components/shared/HeroSlider";
 
 export default async function HomePage() {
   const session = await auth();
-  const featuredProducts = await db.product.findMany({
-    where: { isFeatured: true },
-    include: { category: true },
-    take: 8,
-  });
+  const [featuredProducts, categories, slides] = await Promise.all([
+    db.product.findMany({
+      where: { isFeatured: true },
+      include: { category: true },
+      take: 8,
+    }),
+    db.category.findMany({ take: 6 }),
+    db.heroSlide.findMany({
+      where: { isActive: true },
+      orderBy: { order: "asc" },
+    }),
+  ]);
 
-  const categories = await db.category.findMany({
-    take: 6,
-  });
+  // const categories = await db.category.findMany({
+  //   take: 6,
+  // });
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-[#FAEEDA] px-4 py-16 md:py-24">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
-          <div className="flex-1 space-y-6">
-            <span className="inline-block bg-[#FAC775] text-[#633806] text-sm font-medium px-4 py-1.5 rounded-full">
-              New collection 2026
-            </span>
-            <h1 className="text-4xl md:text-6xl font-medium text-[#412402] leading-tight">
-              Dress for the <br />
-              <span className="text-[#D85A30]">life you love</span>
-            </h1>
-            <p className="text-[#854F0B] text-lg max-w-md leading-relaxed">
-              Handpicked fashion pieces that celebrate your unique style every
-              single day.
-            </p>
-            <div className="flex gap-4 flex-wrap">
-              <Link href="/products">
-                <Button className="bg-[#D85A30] hover:bg-[#993C1D] text-[#FAEEDA] px-8 py-6 text-base rounded-xl">
-                  Shop now <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="/products?featured=true">
-                <Button
-                  variant="outline"
-                  className="border-[#D85A30] text-[#D85A30] hover:bg-[#FAEEDA] px-8 py-6 text-base rounded-xl"
-                >
-                  View lookbook
-                </Button>
-              </Link>
+      {/* Hero Slider */}
+      {slides.length > 0 ? (
+        <HeroSlider slides={slides} />
+      ) : (
+        // Default hero when no slides added yet
+        <section className="bg-secondary px-4 py-16 md:py-24">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
+            <div className="flex-1 space-y-6">
+              <span className="inline-block bg-muted text-secondary-foreground text-sm font-medium px-4 py-1.5 rounded-full">
+                New collection 2026
+              </span>
+              <h1 className="text-4xl md:text-6xl font-medium text-foreground leading-tight">
+                Dress for the <br />
+                <span className="text-primary">life you love</span>
+              </h1>
+              <p className="text-muted-foreground text-lg max-w-md leading-relaxed">
+                Handpicked fashion pieces that celebrate your unique style every
+                single day.
+              </p>
+              <div className="flex gap-4 flex-wrap">
+                <Link href="/products">
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-base rounded-xl">
+                    Shop now <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="/products?featured=true">
+                  <Button
+                    variant="outline"
+                    className="border-primary text-primary hover:bg-secondary px-8 py-6 text-base rounded-xl"
+                  >
+                    View lookbook
+                  </Button>
+                </Link>
+              </div>
             </div>
-          </div>
-
-          {/* Hero Visual */}
-          <div className="flex-1 flex justify-center">
-            <div className="relative w-72 h-72 md:w-96 md:h-96">
-              <div className="absolute inset-0 bg-[#FAC775] rounded-full opacity-30" />
-              <div className="absolute inset-8 bg-[#EF9F27] rounded-full opacity-20" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Sparkles className="h-24 w-24 text-[#D85A30] opacity-60" />
+            <div className="flex-1 flex justify-center">
+              <div className="relative w-72 h-72 md:w-96 md:h-96">
+                <div className="absolute inset-0 bg-muted rounded-full opacity-30" />
+                <div className="absolute inset-8 bg-muted rounded-full opacity-20" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Sparkles className="h-24 w-24 text-primary opacity-60" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Trust Badges */}
       <section className="border-y border-[#FAC775] bg-white">
