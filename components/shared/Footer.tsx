@@ -97,7 +97,7 @@ export default function Footer() {
         {/* Divider */}
         <div className="border-t border-border/20 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2026 RÊVE Fashion · Dhaka, Bangladesh · All rights reserved
+            © 2026 RONGONSAAJ · Dhaka, Bangladesh · All rights reserved
           </p>
           <div className="flex items-center gap-6">
             <p className="text-xs text-muted-foreground">

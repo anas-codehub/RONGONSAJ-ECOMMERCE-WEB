@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/store/cart-store";
 import { toast } from "sonner";
+import WishlistButton from "@/components/shared/WishlistButton";
 
 interface Product {
   id: string;
@@ -68,9 +69,10 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
 
           {/* Wishlist */}
-          <button className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <Heart className="h-4 w-4 text-[#D85A30]" />
-          </button>
+
+          <div className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center transition-opacity">
+            <WishlistButton productId={product.id} />
+          </div>
         </div>
 
         {/* Info */}

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, Search, User, ShoppingBag } from "lucide-react";
+import { ShoppingCart, Search, User, ShoppingBag, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/store/cart-store";
@@ -65,7 +65,7 @@ export default function Navbar() {
     : popularSearches;
 
   return (
-    <nav className="border-b bg-background sticky top-0 z-50">
+    <nav className="border-b border-border/40 bg-background/80 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
         {/* Logo */}
         <Link
@@ -205,6 +205,13 @@ export default function Navbar() {
                     >
                       <ShoppingBag className="h-4 w-4 text-muted-foreground" />
                       My orders
+                    </Link>
+                    <Link
+                      href="/account/wishlist"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
+                    >
+                      <Heart className="h-4 w-4 text-muted-foreground" />
+                      My wishlist
                     </Link>
                     <Link
                       href="/account/profile"
