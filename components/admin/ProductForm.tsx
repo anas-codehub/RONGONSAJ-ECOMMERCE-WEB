@@ -33,6 +33,8 @@ interface Props {
     images: string[];
     isFeatured: boolean;
     categoryId: string;
+    sizes: string[];
+    colors: string[];
   };
 }
 
