@@ -24,7 +24,6 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
       {/* Hero Slider */}
       {slides.length > 0 ? (
         <HeroSlider slides={slides} />
