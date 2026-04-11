@@ -22,10 +22,6 @@ export default async function HomePage() {
     }),
   ]);
 
-  // const categories = await db.category.findMany({
-  //   take: 6,
-  // });
-
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
