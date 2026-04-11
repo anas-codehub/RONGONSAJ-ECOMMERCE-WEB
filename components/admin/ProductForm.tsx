@@ -54,6 +54,34 @@ export default function ProductForm({ categories, product }: Props) {
   const [uploadedImages, setUploadedImages] = useState<string[]>(
     product?.images || [],
   );
+  const [sizes, setSizes] = useState<string[]>(product?.sizes || []);
+  const [colors, setColors] = useState<string[]>(product?.colors || []);
+  const [newSize, setNewSize] = useState("");
+  const [newColor, setNewColor] = useState("");
+
+  const addSize = () => {
+    const size = newSize.trim().toUpperCase();
+    if (size && !sizes.includes(size)) {
+      setSizes([...sizes, size]);
+      setNewSize("");
+    }
+  };
+
+  const removeSize = (size: string) => {
+    setSizes(sizes.filter((s) => s !== size));
+  };
+
+  const addColor = () => {
+    const color = newColor.trim();
+    if (color && !colors.includes(color)) {
+      setColors([...colors, color]);
+      setNewColor("");
+    }
+  };
+
+  const removeColor = (color: string) => {
+    setColors(colors.filter((c) => c !== color));
+  };
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -96,6 +124,8 @@ export default function ProductForm({ categories, product }: Props) {
         categoryId: form.categoryId,
         isFeatured: form.isFeatured,
         images: uploadedImages,
+        sizes,
+        colors,
       };
 
       const res = await fetch(
@@ -231,6 +261,132 @@ export default function ProductForm({ categories, product }: Props) {
             Product images
           </label>
           <ImageUpload images={uploadedImages} onChange={setUploadedImages} />
+        </div>
+
+        {/* Sizes */}
+        <div>
+          <label className="text-sm font-medium text-foreground block mb-1.5">
+            Available sizes
+          </label>
+          <div className="flex gap-2 flex-wrap mb-2">
+            {sizes.map((size) => (
+              <span
+                key={size}
+                className="flex items-center gap-1 bg-secondary text-foreground text-xs font-medium px-3 py-1.5 rounded-full border border-border"
+              >
+                {size}
+                <button
+                  type="button"
+                  onClick={() => removeSize(size)}
+                  className="text-muted-foreground hover:text-destructive ml-1"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <Input
+              value={newSize}
+              onChange={(e) => setNewSize(e.target.value)}
+              placeholder="e.g. S, M, L, XL"
+              className="border-border"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addSize();
+                }
+              }}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addSize}
+              className="border-border shrink-0"
+            >
+              Add
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Quick add:
+            {["S", "M", "L", "XL", "XXL"].map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => {
+                  if (!sizes.includes(s)) setSizes([...sizes, s]);
+                }}
+                className="ml-1 text-primary hover:underline"
+              >
+                {s}
+              </button>
+            ))}
+          </p>
+        </div>
+
+        {/* Colors */}
+        <div>
+          <label className="text-sm font-medium text-foreground block mb-1.5">
+            Available colors
+          </label>
+          <div className="flex gap-2 flex-wrap mb-2">
+            {colors.map((color) => (
+              <span
+                key={color}
+                className="flex items-center gap-1.5 bg-secondary text-foreground text-xs font-medium px-3 py-1.5 rounded-full border border-border"
+              >
+                <span
+                  className="w-3 h-3 rounded-full border border-border"
+                  style={{ backgroundColor: color.toLowerCase() }}
+                />
+                {color}
+                <button
+                  type="button"
+                  onClick={() => removeColor(color)}
+                  className="text-muted-foreground hover:text-destructive ml-1"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <Input
+              value={newColor}
+              onChange={(e) => setNewColor(e.target.value)}
+              placeholder="e.g. Red, Blue, Black"
+              className="border-border"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addColor();
+                }
+              }}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addColor}
+              className="border-border shrink-0"
+            >
+              Add
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Quick add:
+            {["Black", "White", "Red", "Blue", "Green", "Yellow"].map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => {
+                  if (!colors.includes(c)) setColors([...colors, c]);
+                }}
+                className="ml-1 text-primary hover:underline"
+              >
+                {c}
+              </button>
+            ))}
+          </p>
         </div>
 
         <div className="flex items-center gap-3">

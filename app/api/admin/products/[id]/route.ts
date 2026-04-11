@@ -26,6 +26,8 @@ export async function PATCH(
         categoryId: body.categoryId,
         isFeatured: body.isFeatured,
         images: body.images,
+         sizes: body.sizes || [],
+    colors: body.colors || [],
       },
     });
 

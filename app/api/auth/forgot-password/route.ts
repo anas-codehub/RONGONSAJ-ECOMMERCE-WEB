@@ -2,8 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sendPasswordResetEmail } from "@/lib/email";
 import crypto from "crypto";
+import { checkRateLimit } from "@/lib/ratelimits";
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") ?? "anonymous";
+const { success, minutesLeft } = checkRateLimit(ip);
+
+if (!success) {
+  return NextResponse.json(
+    { error: `Too many attempts. Please try again in ${minutesLeft} minutes.` },
+    { status: 429 }
+  );
+}
   try {
     const { email } = await req.json();
 

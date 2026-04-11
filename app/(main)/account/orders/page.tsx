@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Package, ArrowRight } from "lucide-react";
+import InvoiceButton from "@/components/shared/InvoiceButton";
 
 const statusColors: Record<string, string> = {
   PENDING: "bg-yellow-100 text-yellow-800",
@@ -113,6 +114,15 @@ export default async function OrdersPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
+                    <InvoiceButton
+                      order={{
+                        ...order,
+                        user: {
+                          name: session.user?.name || null,
+                          email: session.user?.email || null,
+                        },
+                      }}
+                    />
                     <span className="text-primary font-medium">
                       ৳{order.total.toLocaleString()}
                     </span>
