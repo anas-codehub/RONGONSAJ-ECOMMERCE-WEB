@@ -10,9 +10,9 @@ interface Slide {
   id: string;
   image: string;
   title: string;
-  subtitle?: string;
-  buttonText?: string;
-  buttonLink?: string;
+  subtitle?: string | null;
+  buttonText?: string | null;
+  buttonLink?: string | null;
 }
 
 export default function HeroSlider({ slides }: { slides: Slide[] }) {
