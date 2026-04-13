@@ -56,7 +56,7 @@ export default function AdminCategoriesTable({
 
   if (categories.length === 0) {
     return (
-      <div className="bg-white border border-border rounded-2xl p-16 text-center">
+      <div className="bg-card border border-border rounded-2xl p-16 text-center">
         <p className="text-muted-foreground">No categories yet</p>
       </div>
     );
@@ -64,7 +64,7 @@ export default function AdminCategoriesTable({
 
   return (
     <>
-      <div className="bg-white border border-border rounded-2xl overflow-hidden">
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-secondary border-b border-border">

@@ -70,7 +70,7 @@ export default function ReviewForm({ productId }: { productId: string }) {
   };
 
   return (
-    <div className="bg-white border border-border rounded-2xl p-6">
+    <div className="bg-card border border-border rounded-2xl p-6">
       <h3 className="text-base font-medium text-foreground mb-5">
         Write a review
       </h3>

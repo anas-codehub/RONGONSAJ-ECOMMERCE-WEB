@@ -75,7 +75,7 @@ export default function AdminSlidesTable({ slides }: { slides: Slide[] }) {
 
   if (slides.length === 0) {
     return (
-      <div className="bg-white border border-border rounded-2xl p-16 text-center">
+      <div className="bg-card border border-border rounded-2xl p-16 text-center">
         <p className="text-muted-foreground">No slides yet</p>
         <p className="text-sm text-muted-foreground mt-1">
           Add your first hero slide to show on the homepage
@@ -90,7 +90,7 @@ export default function AdminSlidesTable({ slides }: { slides: Slide[] }) {
         {slides.map((slide) => (
           <div
             key={slide.id}
-            className={`bg-white border border-border rounded-2xl p-4 flex items-center gap-4 ${
+            className={`bg-card border border-border rounded-2xl p-4 flex items-center gap-4 ${
               !slide.isActive ? "opacity-60" : ""
             }`}
           >

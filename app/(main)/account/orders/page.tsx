@@ -38,7 +38,7 @@ export default async function OrdersPage() {
         <h1 className="text-3xl font-medium text-foreground mb-8">My orders</h1>
 
         {orders.length === 0 ? (
-          <div className="text-center py-20 bg-white border border-border rounded-2xl">
+          <div className="text-center py-20 bg-card border border-border rounded-2xl">
             <Package className="h-12 w-12 mx-auto mb-4 text-muted" />
             <p className="text-lg font-medium text-foreground mb-1">
               No orders yet
@@ -58,7 +58,7 @@ export default async function OrdersPage() {
             {orders.map((order) => (
               <div
                 key={order.id}
-                className="bg-white border border-border rounded-2xl p-6"
+                className="bg-card border border-border rounded-2xl p-6"
               >
                 {/* Order header */}
                 <div className="flex items-start justify-between mb-4">

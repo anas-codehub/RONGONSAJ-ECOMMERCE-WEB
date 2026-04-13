@@ -278,7 +278,7 @@ export default async function ProductDetailPage({ params }: Props) {
               {product.reviews.map((review) => (
                 <div
                   key={review.id}
-                  className="bg-white border border-border rounded-2xl p-6"
+                  className="bg-card border border-border rounded-2xl p-6"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
@@ -336,7 +336,7 @@ export default async function ProductDetailPage({ params }: Props) {
                 <Link
                   key={relatedProduct.id}
                   href={`/products/${relatedProduct.slug}`}
-                  className="group bg-white border border-border rounded-2xl overflow-hidden hover:shadow-md transition-all"
+                  className="group bg-card border border-border rounded-2xl overflow-hidden hover:shadow-md transition-all"
                 >
                   <div className="relative h-48 bg-secondary">
                     {relatedProduct.images[0] ? (

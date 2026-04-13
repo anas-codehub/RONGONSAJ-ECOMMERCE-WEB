@@ -14,7 +14,7 @@ export default function AdminLoading() {
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="bg-white border border-border rounded-2xl p-6 space-y-3"
+              className="bg-card border border-border rounded-2xl p-6 space-y-3"
             >
               <Skeleton className="w-12 h-12 rounded-xl" />
               <Skeleton className="h-8 w-16" />
@@ -27,7 +27,7 @@ export default function AdminLoading() {
         <Skeleton className="w-full h-28 rounded-2xl mb-10" />
 
         {/* Recent orders skeleton */}
-        <div className="bg-white border border-border rounded-2xl p-6">
+        <div className="bg-card border border-border rounded-2xl p-6">
           <div className="flex justify-between mb-6">
             <Skeleton className="h-5 w-32" />
             <Skeleton className="h-4 w-16" />

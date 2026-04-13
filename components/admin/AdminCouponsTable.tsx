@@ -51,7 +51,7 @@ export default function AdminCouponsTable({ coupons }: { coupons: Coupon[] }) {
 
   if (coupons.length === 0) {
     return (
-      <div className="bg-white border border-border rounded-2xl p-16 text-center">
+      <div className="bg-card border border-border rounded-2xl p-16 text-center">
         <Tag className="h-10 w-10 mx-auto mb-3 text-muted" />
         <p className="text-muted-foreground">No coupons yet</p>
       </div>
@@ -60,7 +60,7 @@ export default function AdminCouponsTable({ coupons }: { coupons: Coupon[] }) {
 
   return (
     <>
-      <div className="bg-white border border-border rounded-2xl overflow-hidden">
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-secondary border-b border-border">

@@ -131,7 +131,7 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Left — Address form */}
           <div className="space-y-6">
-            <div className="bg-white border border-border rounded-2xl p-6">
+            <div className="bg-card border border-border rounded-2xl p-6">
               <h2 className="text-lg font-medium text-foreground mb-5">
                 Delivery address
               </h2>
@@ -202,7 +202,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Coupon */}
-            <div className="bg-white border border-border rounded-2xl p-6">
+            <div className="bg-card border border-border rounded-2xl p-6">
               <h2 className="text-lg font-medium text-foreground mb-4">
                 Coupon code
               </h2>
@@ -238,7 +238,7 @@ export default function CheckoutPage() {
 
           {/* Right — Order summary */}
           <div>
-            <div className="bg-white border border-border rounded-2xl p-6 sticky top-24">
+            <div className="bg-card border border-border rounded-2xl p-6 sticky top-24">
               <h2 className="text-lg font-medium text-foreground mb-5">
                 Order summary
               </h2>

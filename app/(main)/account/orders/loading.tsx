@@ -9,7 +9,7 @@ export default function OrdersLoading() {
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="bg-white border border-border rounded-2xl p-6 space-y-4"
+              className="bg-card border border-border rounded-2xl p-6 space-y-4"
             >
               <div className="flex justify-between">
                 <div className="space-y-2">

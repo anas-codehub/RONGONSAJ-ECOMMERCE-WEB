@@ -103,13 +103,13 @@ export default function HeroSlider({ slides }: { slides: Slide[] }) {
         <>
           <button
             onClick={prev}
-            className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm flex items-center justify-center transition-colors"
+            className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-card/20 hover:bg-card/40 backdrop-blur-sm flex items-center justify-center transition-colors"
           >
             <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
           </button>
           <button
             onClick={next}
-            className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm flex items-center justify-center transition-colors"
+            className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-card/20 hover:bg-card/40 backdrop-blur-sm flex items-center justify-center transition-colors"
           >
             <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
           </button>
@@ -125,8 +125,8 @@ export default function HeroSlider({ slides }: { slides: Slide[] }) {
               onClick={() => goTo(i)}
               className={`rounded-full transition-all duration-300 ${
                 i === current
-                  ? "w-6 h-2 bg-white"
-                  : "w-2 h-2 bg-white/50 hover:bg-white/80"
+                  ? "w-6 h-2 bg-card"
+                  : "w-2 h-2 bg-card/50 hover:bg-card/80"
               }`}
             />
           ))}

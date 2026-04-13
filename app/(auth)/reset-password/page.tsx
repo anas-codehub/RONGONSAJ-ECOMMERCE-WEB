@@ -129,7 +129,7 @@ export default function ResetPasswordPage() {
             Enter your new password below
           </p>
         </div>
-        <div className="bg-white border border-border rounded-2xl p-8">
+        <div className="bg-card border border-border rounded-2xl p-8">
           <Suspense
             fallback={
               <div className="text-center text-muted-foreground">

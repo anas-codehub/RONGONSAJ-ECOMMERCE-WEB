@@ -85,7 +85,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
                 className={`w-12 h-10 rounded-lg border text-sm font-medium transition-all ${
                   selectedSize === size
                     ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-white border-border text-foreground hover:border-primary"
+                    : "bg-card border-border text-foreground hover:border-primary"
                 }`}
               >
                 {size}

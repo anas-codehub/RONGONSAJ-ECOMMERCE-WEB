@@ -43,7 +43,7 @@ export default function ProfilePage() {
           My profile
         </h1>
 
-        <div className="bg-white border border-border rounded-2xl p-8">
+        <div className="bg-card border border-border rounded-2xl p-8">
           {/* Avatar */}
           <div className="flex items-center gap-5 mb-8">
             <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center">

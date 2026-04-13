@@ -16,7 +16,7 @@ export default function OrderSuccessPage() {
           Thank you for your purchase. We'll send you a confirmation and notify
           you when your order ships.
         </p>
-        <div className="bg-white border border-border rounded-2xl p-6 mb-6 text-left">
+        <div className="bg-card border border-border rounded-2xl p-6 mb-6 text-left">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
               <Package className="h-5 w-5 text-primary" />

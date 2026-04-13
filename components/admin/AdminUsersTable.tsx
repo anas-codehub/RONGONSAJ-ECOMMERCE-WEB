@@ -54,7 +54,7 @@ export default function AdminUsersTable({
   };
 
   return (
-    <div className="bg-white border border-border rounded-2xl overflow-hidden">
+    <div className="bg-card border border-border rounded-2xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-secondary border-b border-border">

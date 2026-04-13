@@ -16,13 +16,13 @@ export default function ProductsLoading() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar skeleton */}
           <div className="w-full lg:w-64 space-y-4 shrink-0">
-            <div className="bg-white border border-border rounded-xl p-4 space-y-3">
+            <div className="bg-card border border-border rounded-xl p-4 space-y-3">
               <Skeleton className="h-4 w-24" />
               {Array.from({ length: 5 }).map((_, i) => (
                 <Skeleton key={i} className="h-8 w-full rounded-lg" />
               ))}
             </div>
-            <div className="bg-white border border-border rounded-xl p-4 space-y-3">
+            <div className="bg-card border border-border rounded-xl p-4 space-y-3">
               <Skeleton className="h-4 w-16" />
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-8 w-full rounded-lg" />

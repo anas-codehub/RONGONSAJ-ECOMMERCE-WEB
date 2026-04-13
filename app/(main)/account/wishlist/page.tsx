@@ -35,7 +35,7 @@ export default async function WishlistPage() {
         </div>
 
         {products.length === 0 ? (
-          <div className="text-center py-20 bg-white border border-border rounded-2xl">
+          <div className="text-center py-20 bg-card border border-border rounded-2xl">
             <Heart className="h-12 w-12 mx-auto mb-4 text-muted" />
             <p className="text-lg font-medium text-foreground mb-1">
               Your wishlist is empty

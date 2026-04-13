@@ -115,7 +115,7 @@ export default function ImageUpload({ images, onChange }: Props) {
               <div className="absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <button
                   onClick={() => removeImage(index)}
-                  className="w-8 h-8 rounded-full bg-white flex items-center justify-center"
+                  className="w-8 h-8 rounded-full bg-card flex items-center justify-center"
                 >
                   <X className="h-4 w-4 text-destructive" />
                 </button>

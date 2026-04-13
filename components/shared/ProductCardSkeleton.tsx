@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProductCardSkeleton() {
   return (
-    <div className="bg-white border border-border rounded-2xl overflow-hidden">
+    <div className="bg-card border border-border rounded-2xl overflow-hidden">
       {/* Image skeleton */}
       <Skeleton className="h-56 w-full rounded-none" />
       {/* Info skeleton */}

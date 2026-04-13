@@ -65,7 +65,7 @@ export default function SlideForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-white border border-border rounded-2xl p-6 space-y-5">
+      <div className="bg-card border border-border rounded-2xl p-6 space-y-5">
         {/* Image upload */}
         <div>
           <label className="text-sm font-medium text-foreground block mb-1.5">
