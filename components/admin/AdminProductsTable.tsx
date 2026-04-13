@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Pencil, Trash2, Eye } from "lucide-react";
+import { Pencil, Trash2, Eye, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -41,6 +42,13 @@ export default function AdminProductsTable({
   const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filtered = products.filter(
+    (p) =>
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.category.name.toLowerCase().includes(search.toLowerCase()),
+  );
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -65,139 +73,155 @@ export default function AdminProductsTable({
 
   return (
     <>
-      <div className="bg-white border border-border rounded-2xl overflow-hidden">
-        {products.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-muted-foreground">No products yet</p>
-            <Link
-              href="/admin/products/new"
-              className="text-primary text-sm hover:underline mt-2 block"
-            >
-              Add your first product →
-            </Link>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-secondary border-b border-border">
-                <tr>
-                  <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4">
-                    Product
-                  </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4">
-                    Category
-                  </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4">
-                    Price
-                  </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4">
-                    Stock
-                  </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4">
-                    Featured
-                  </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {products.map((product) => (
-                  <tr
-                    key={product.id}
-                    className="hover:bg-secondary/50 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-foreground">
-                        {product.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {product.slug}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-muted-foreground">
-                        {product.category.name}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-primary">
-                        ৳{product.price.toLocaleString()}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`text-sm font-medium ${
-                            product.stock === 0
-                              ? "text-destructive"
-                              : product.stock <= 10
-                                ? "text-yellow-600"
-                                : "text-green-600"
-                          }`}
-                        >
-                          {product.stock}
-                        </span>
-                        {product.stock === 0 && (
-                          <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
-                            Out of stock
-                          </span>
-                        )}
-                        {product.stock > 0 && product.stock <= 10 && (
-                          <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
-                            Low stock
-                          </span>
+      {/* Search */}
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search products..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9 border-border bg-card"
+        />
+      </div>
+
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-secondary border-b border-border">
+              <tr>
+                <th className="text-left text-xs font-bold text-muted-foreground px-5 py-3 uppercase tracking-wider">
+                  Product
+                </th>
+                <th className="text-left text-xs font-bold text-muted-foreground px-5 py-3 uppercase tracking-wider">
+                  Category
+                </th>
+                <th className="text-left text-xs font-bold text-muted-foreground px-5 py-3 uppercase tracking-wider">
+                  Price
+                </th>
+                <th className="text-left text-xs font-bold text-muted-foreground px-5 py-3 uppercase tracking-wider">
+                  Stock
+                </th>
+                <th className="text-left text-xs font-bold text-muted-foreground px-5 py-3 uppercase tracking-wider">
+                  Featured
+                </th>
+                <th className="text-left text-xs font-bold text-muted-foreground px-5 py-3 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {filtered.map((product) => (
+                <tr
+                  key={product.id}
+                  className="hover:bg-secondary/50 transition-colors"
+                >
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-secondary shrink-0">
+                        {product.images[0] ? (
+                          <Image
+                            src={product.images[0]}
+                            alt={product.name}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <div className="w-4 h-6 bg-muted rounded-full opacity-40" />
+                          </div>
                         )}
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      {product.isFeatured ? (
-                        <Badge className="bg-secondary text-primary border border-border text-xs">
-                          Featured
-                        </Badge>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
+                      <div>
+                        <p className="text-sm font-bold text-foreground">
+                          {product.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {product.slug}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className="text-xs font-medium bg-secondary text-foreground px-2.5 py-1 rounded-lg">
+                      {product.category.name}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className="text-sm font-extrabold text-primary">
+                      ৳{product.price.toLocaleString()}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-sm font-bold ${
+                          product.stock === 0
+                            ? "text-destructive"
+                            : product.stock <= 10
+                              ? "text-yellow-600"
+                              : "text-green-600"
+                        }`}
+                      >
+                        {product.stock}
+                      </span>
+                      {product.stock === 0 && (
+                        <span className="text-xs bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 px-2 py-0.5 rounded-full font-medium">
+                          Out
+                        </span>
                       )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <Link href={`/products/${product.slug}`}>
-                          <Button
-                            size="icon"
-                            variant="outline"
-                            className="h-8 w-8 border-border"
-                          >
-                            <Eye className="h-3.5 w-3.5" />
-                          </Button>
-                        </Link>
-                        <Link href={`/admin/products/${product.id}/edit`}>
-                          <Button
-                            size="icon"
-                            variant="outline"
-                            className="h-8 w-8 border-border"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                        </Link>
+                      {product.stock > 0 && product.stock <= 10 && (
+                        <span className="text-xs bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 px-2 py-0.5 rounded-full font-medium">
+                          Low
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-5 py-4">
+                    {product.isFeatured ? (
+                      <span className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full font-bold">
+                        Featured
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-1.5">
+                      <Link href={`/products/${product.slug}`}>
                         <Button
                           size="icon"
                           variant="outline"
-                          className="h-8 w-8 border-border text-destructive hover:text-destructive"
-                          onClick={() => setDeleteId(product.id)}
+                          className="h-8 w-8 border-border rounded-lg"
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <Eye className="h-3.5 w-3.5" />
                         </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                      </Link>
+                      <Link href={`/admin/products/${product.id}/edit`}>
+                        <Button
+                          size="icon"
+                          variant="outline"
+                          className="h-8 w-8 border-border rounded-lg"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                      </Link>
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        className="h-8 w-8 border-border rounded-lg text-destructive hover:text-destructive"
+                        onClick={() => setDeleteId(product.id)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Delete confirmation dialog */}
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent className="border-border">
           <DialogHeader>
@@ -205,22 +229,21 @@ export default function AdminProductsTable({
               Delete product?
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              This action cannot be undone. The product will be permanently
-              deleted.
+              This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-3 mt-4">
             <Button
               variant="outline"
               onClick={() => setDeleteId(null)}
-              className="border-border"
+              className="border-border rounded-xl"
             >
               Cancel
             </Button>
             <Button
               onClick={handleDelete}
               disabled={deleting}
-              className="bg-destructive text-white hover:bg-destructive/90"
+              className="bg-destructive text-white hover:bg-destructive/90 rounded-xl"
             >
               {deleting ? "Deleting..." : "Delete"}
             </Button>
