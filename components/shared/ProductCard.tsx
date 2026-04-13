@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, Heart } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ShoppingCart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/store/cart-store";
 import { toast } from "sonner";
@@ -38,9 +37,9 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <Link href={`/products/${product.slug}`}>
-      <div className="group bg-white border border-[#FAC775] rounded-2xl overflow-hidden hover:shadow-md transition-all duration-300">
+      <div className="group bg-card rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-border">
         {/* Image */}
-        <div className="relative h-56 bg-[#FAEEDA] overflow-hidden">
+        <div className="relative h-56 bg-secondary overflow-hidden">
           {product.images[0] ? (
             <Image
               src={product.images[0]}
@@ -50,49 +49,60 @@ export default function ProductCard({ product }: { product: Product }) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <div className="w-16 h-24 bg-[#FAC775] rounded-full opacity-60" />
+              <div className="w-16 h-24 bg-muted rounded-full opacity-40" />
             </div>
           )}
 
-          {/* Badges */}
+          {/* Top badges */}
           <div className="absolute top-3 left-3 flex gap-2">
             {product.isFeatured && (
-              <Badge className="bg-[#D85A30] text-[#FAEEDA] text-xs">
+              <Badge className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-lg">
                 Featured
               </Badge>
             )}
             {product.stock === 0 && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge className="bg-foreground text-background text-xs font-bold px-2 py-0.5 rounded-lg">
                 Sold out
               </Badge>
             )}
           </div>
 
           {/* Wishlist */}
-
-          <div className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center transition-opacity">
+          <div className="absolute top-3 right-3 w-8 h-8 bg-card rounded-full flex items-center justify-center shadow-sm">
             <WishlistButton productId={product.id} />
           </div>
+
+          {/* Add to cart overlay */}
+          {product.stock > 0 && (
+            <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+              <button
+                onClick={handleAddToCart}
+                className="w-full bg-foreground text-background py-3 text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary hover:text-primary-foreground transition-colors"
+              >
+                <ShoppingCart className="h-4 w-4" />
+                Add to cart
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Info */}
         <div className="p-4">
-          <p className="text-xs text-[#854F0B] mb-1">{product.category.name}</p>
-          <h3 className="text-sm font-medium text-[#412402] mb-3 line-clamp-1">
+          <p className="text-xs text-muted-foreground font-medium mb-1 uppercase tracking-wide">
+            {product.category.name}
+          </p>
+          <h3 className="text-sm font-bold text-foreground mb-2 line-clamp-1">
             {product.name}
           </h3>
           <div className="flex items-center justify-between">
-            <span className="text-base font-medium text-[#D85A30]">
+            <span className="text-base font-extrabold text-primary">
               ৳{product.price.toLocaleString()}
             </span>
-            <Button
-              size="sm"
-              onClick={handleAddToCart}
-              disabled={product.stock === 0}
-              className="bg-[#FAEEDA] hover:bg-[#FAC775] text-[#854F0B] border border-[#FAC775] h-8 w-8 p-0 rounded-full"
-            >
-              <ShoppingCart className="h-3.5 w-3.5" />
-            </Button>
+            {product.stock > 0 && product.stock <= 10 && (
+              <span className="text-xs text-destructive font-medium">
+                Only {product.stock} left
+              </span>
+            )}
           </div>
         </div>
       </div>

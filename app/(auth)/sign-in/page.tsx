@@ -7,15 +7,12 @@ import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 export default function SignInPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+  const [form, setForm] = useState({ email: "", password: "" });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -24,23 +21,20 @@ export default function SignInPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const result = await signIn("credentials", {
         email: form.email,
         password: form.password,
         redirect: false,
       });
-
       if (result?.error) {
         toast.error("Invalid email or password!");
         return;
       }
-
       toast.success("Welcome back!");
       router.push("/");
       router.refresh();
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong!");
     } finally {
       setLoading(false);
@@ -48,24 +42,57 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFBF5] flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#FAEEDA] mb-4">
-            <Sparkles className="h-7 w-7 text-[#D85A30]" />
-          </div>
-          <h1 className="text-2xl font-medium text-[#412402]">Welcome back</h1>
-          <p className="text-[#854F0B] text-sm mt-1">
-            Sign in to your RONGONSAAJ account
+    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
+      {/* Left — terracotta panel */}
+      <div className="hidden md:flex bg-primary flex-col justify-between p-12">
+        <Link
+          href="/"
+          className="text-2xl font-extrabold text-primary-foreground tracking-wider"
+        >
+          RONGO<span className="text-foreground">N</span>SAAJ
+        </Link>
+        <div>
+          <h2 className="text-4xl font-extrabold text-primary-foreground leading-tight mb-4">
+            Welcome
+            <br />
+            back!
+          </h2>
+          <p className="text-primary-foreground/70 text-lg leading-relaxed">
+            Sign in to your account and continue your fashion journey.
           </p>
         </div>
+        <p className="text-primary-foreground/40 text-sm">
+          © 2026 Rongonsaaj · Dhaka, Bangladesh
+        </p>
+      </div>
 
-        {/* Form */}
-        <div className="bg-white border border-[#FAC775] rounded-2xl p-8 shadow-sm">
+      {/* Right — form */}
+      <div className="flex items-center justify-center px-6 py-12 bg-background">
+        <div className="w-full max-w-sm">
+          <div className="mb-8">
+            <Link
+              href="/"
+              className="text-xl font-extrabold text-foreground tracking-wider md:hidden"
+            >
+              RONGO<span className="text-primary">N</span>SAAJ
+            </Link>
+            <h1 className="text-2xl font-extrabold text-foreground mt-4 mb-1">
+              Sign in
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Don't have an account?{" "}
+              <Link
+                href="/sign-up"
+                className="text-primary font-semibold hover:underline"
+              >
+                Create one
+              </Link>
+            </p>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-[#412402] block mb-1.5">
+              <label className="text-sm font-semibold text-foreground block mb-1.5">
                 Email address
               </label>
               <Input
@@ -75,14 +102,21 @@ export default function SignInPage() {
                 value={form.email}
                 onChange={handleChange}
                 required
-                className="border-[#FAC775] focus:ring-[#D85A30]"
+                className="border-border bg-secondary h-11"
               />
             </div>
-
             <div>
-              <label className="text-sm font-medium text-[#412402] block mb-1.5">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-sm font-semibold text-foreground">
+                  Password
+                </label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <Input
                 name="password"
                 type="password"
@@ -90,43 +124,19 @@ export default function SignInPage() {
                 value={form.password}
                 onChange={handleChange}
                 required
-                className="border-[#FAC775] focus:ring-[#D85A30]"
+                className="border-border bg-secondary h-11"
               />
-              <div className="text-right mt-1.5">
-                <Link
-                  href="/forgot-password"
-                  className="text-xs text-[#D85A30] hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
             </div>
-
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#D85A30] hover:bg-[#993C1D] text-[#FAEEDA] py-6 rounded-xl text-base"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 rounded-xl text-base font-bold mt-2"
             >
               {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               {loading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
-
-          <p className="text-center text-sm text-[#854F0B] mt-6">
-            Don't have an account?{" "}
-            <Link
-              href="/sign-up"
-              className="text-[#D85A30] font-medium hover:underline"
-            >
-              Create one
-            </Link>
-          </p>
         </div>
-
-        {/* Demo hint */}
-        <p className="text-center text-xs text-[#854F0B] mt-4 opacity-60">
-          New here? Create an account to start shopping.
-        </p>
       </div>
     </div>
   );

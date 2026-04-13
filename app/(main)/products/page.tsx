@@ -1,8 +1,7 @@
 import { db } from "@/lib/db";
 import ProductCard from "@/components/shared/ProductCard";
-
-import { Sparkles } from "lucide-react";
 import ProductFilters from "@/components/shared/ProductFilters";
+import { Sparkles } from "lucide-react";
 import Link from "next/link";
 
 interface Props {
@@ -21,9 +20,7 @@ export default async function ProductsPage({ searchParams }: Props) {
   const skip = (page - 1) * limit;
 
   const where = {
-    ...(params.category && {
-      category: { slug: params.category },
-    }),
+    ...(params.category && { category: { slug: params.category } }),
     ...(params.search && {
       OR: [
         { name: { contains: params.search, mode: "insensitive" as const } },
@@ -61,11 +58,11 @@ export default async function ProductsPage({ searchParams }: Props) {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="min-h-screen bg-[#FFFBF5]">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-[#FAEEDA] border-b border-[#FAC775] px-4 py-10">
+      <div className="bg-secondary border-b border-border px-4 py-10">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-medium text-[#412402] mb-2">
+          <h1 className="text-3xl font-extrabold text-foreground mb-1 tracking-tight">
             {params.search
               ? `Results for "${params.search}"`
               : params.category
@@ -73,7 +70,7 @@ export default async function ProductsPage({ searchParams }: Props) {
                   "Products"
                 : "All products"}
           </h1>
-          <p className="text-[#854F0B] text-sm">
+          <p className="text-muted-foreground text-sm">
             {total} {total === 1 ? "product" : "products"} found
           </p>
         </div>
@@ -94,12 +91,12 @@ export default async function ProductsPage({ searchParams }: Props) {
           {/* Products Grid */}
           <div className="flex-1">
             {products.length === 0 ? (
-              <div className="text-center py-20">
-                <Sparkles className="h-12 w-12 mx-auto mb-4 text-[#FAC775]" />
-                <p className="text-lg font-medium text-[#412402]">
+              <div className="text-center py-20 bg-secondary rounded-3xl">
+                <Sparkles className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-40" />
+                <p className="text-lg font-bold text-foreground">
                   No products found
                 </p>
-                <p className="text-sm text-[#854F0B] mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   Try a different search or category
                 </p>
               </div>
@@ -126,10 +123,10 @@ export default async function ProductsPage({ searchParams }: Props) {
                             ...(params.sort ? { sort: params.sort } : {}),
                             page: p.toString(),
                           })}`}
-                          className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-colors ${
                             p === page
-                              ? "bg-[#D85A30] text-[#FAEEDA]"
-                              : "bg-white border border-[#FAC775] text-[#854F0B] hover:bg-[#FAEEDA]"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-secondary border border-border text-muted-foreground hover:bg-muted"
                           }`}
                         >
                           {p}

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -9,34 +8,45 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
           {/* Brand */}
           <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="h-5 w-5 text-muted" />
-              <span className="text-xl font-medium text-primary-foreground tracking-widest">
-                RONGONSAAJ
+            <div className="mb-4">
+              <span className="text-2xl font-extrabold text-background tracking-wider">
+                RONGO<span className="text-primary">N</span>SAAJ
               </span>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Handpicked fashion pieces that celebrate your unique style every
-              single day.
+            <p className="text-sm text-background/50 leading-relaxed mb-4">
+              Fashion for every chapter of your life. Curated with love from
+              Dhaka, Bangladesh.
             </p>
+            <div className="flex gap-3">
+              {["F", "I", "T"].map((s) => (
+                <div
+                  key={s}
+                  className="w-8 h-8 rounded-lg bg-background/10 flex items-center justify-center text-background/50 text-xs font-bold hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
+                >
+                  {s}
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Shop */}
           <div>
-            <p className="text-sm font-medium text-primary-foreground mb-4">
+            <p className="text-sm font-bold text-background mb-4 uppercase tracking-widest">
               Shop
             </p>
             <ul className="space-y-3">
               {[
                 { label: "All products", href: "/products" },
                 { label: "New arrivals", href: "/products?sort=newest" },
-                { label: "Featured", href: "/products?featured=true" },
-                { label: "Sale", href: "/products?sale=true" },
+                { label: "Male", href: "/products?category=male" },
+                { label: "Female", href: "/products?category=female" },
+                { label: "Couple", href: "/products?category=couple" },
+                { label: "Baby", href: "/products?category=baby" },
               ].map(({ label, href }) => (
                 <li key={label}>
                   <Link
                     href={href}
-                    className="text-sm text-muted-foreground hover:text-primary-foreground transition-colors"
+                    className="text-sm text-background/50 hover:text-primary transition-colors"
                   >
                     {label}
                   </Link>
@@ -47,7 +57,7 @@ export default function Footer() {
 
           {/* Account */}
           <div>
-            <p className="text-sm font-medium text-primary-foreground mb-4">
+            <p className="text-sm font-bold text-background mb-4 uppercase tracking-widest">
               Account
             </p>
             <ul className="space-y-3">
@@ -55,12 +65,13 @@ export default function Footer() {
                 { label: "Sign in", href: "/sign-in" },
                 { label: "Create account", href: "/sign-up" },
                 { label: "My orders", href: "/account/orders" },
+                { label: "My wishlist", href: "/account/wishlist" },
                 { label: "My profile", href: "/account/profile" },
               ].map(({ label, href }) => (
                 <li key={label}>
                   <Link
                     href={href}
-                    className="text-sm text-muted-foreground hover:text-primary-foreground transition-colors"
+                    className="text-sm text-background/50 hover:text-primary transition-colors"
                   >
                     {label}
                   </Link>
@@ -71,7 +82,7 @@ export default function Footer() {
 
           {/* Help */}
           <div>
-            <p className="text-sm font-medium text-primary-foreground mb-4">
+            <p className="text-sm font-bold text-background mb-4 uppercase tracking-widest">
               Help
             </p>
             <ul className="space-y-3">
@@ -80,11 +91,12 @@ export default function Footer() {
                 { label: "Shipping policy", href: "/shipping" },
                 { label: "Return policy", href: "/returns" },
                 { label: "Privacy policy", href: "/privacy" },
+                { label: "FAQ", href: "/faq" },
               ].map(({ label, href }) => (
                 <li key={label}>
                   <Link
                     href={href}
-                    className="text-sm text-muted-foreground hover:text-primary-foreground transition-colors"
+                    className="text-sm text-background/50 hover:text-primary transition-colors"
                   >
                     {label}
                   </Link>
@@ -95,25 +107,20 @@ export default function Footer() {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-border/20 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            © 2026 RONGONSAAJ · Dhaka, Bangladesh · All rights reserved
+        <div className="border-t border-background/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-background/40">
+            © 2026 Rongonsaaj · Dhaka, Bangladesh · All rights reserved
           </p>
-          <div className="flex items-center gap-6">
-            <p className="text-xs text-muted-foreground">
-              Payments secured by SSLCommerz
-            </p>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-5 bg-muted/20 rounded text-muted-foreground text-xs flex items-center justify-center">
-                VISA
+          <div className="flex items-center gap-3">
+            <p className="text-xs text-background/30">Secured by SSLCommerz</p>
+            {["VISA", "MC", "bKash", "Nagad"].map((method) => (
+              <div
+                key={method}
+                className="bg-background/10 text-background/50 text-xs px-2 py-1 rounded font-medium"
+              >
+                {method}
               </div>
-              <div className="w-8 h-5 bg-muted/20 rounded text-muted-foreground text-xs flex items-center justify-center">
-                MC
-              </div>
-              <div className="w-8 h-5 bg-muted/20 rounded text-muted-foreground text-xs flex items-center justify-center">
-                bKash
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

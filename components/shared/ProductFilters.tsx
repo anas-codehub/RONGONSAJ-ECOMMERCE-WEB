@@ -1,9 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Search, X } from "lucide-react";
+import { X } from "lucide-react";
 
 interface Category {
   id: string;
@@ -44,51 +42,59 @@ export default function ProductFilters({
     params.delete("page");
     router.push(`/products?${params.toString()}`);
   };
-  const clearAll = () => {
-    router.push("/products");
-  };
 
-  const hasFilters = selectedCategory || selectedSort || Search;
+  const clearAll = () => router.push("/products");
+  const hasFilters = selectedCategory || selectedSort || search;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Active filters */}
       {hasFilters && (
-        <div className="bg-primary-background rounded-xl p-4">
+        <div className="bg-secondary rounded-2xl p-4">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-medium text-primary-foreground">
+            <p className="text-xs font-bold text-foreground uppercase tracking-wider">
               Active filters
             </p>
             <button
               onClick={clearAll}
-              className="text-xs text-primary hover:underline flex items-center gap-1"
+              className="text-xs text-primary hover:underline flex items-center gap-1 font-semibold"
             >
-              <X className="h-3 w-3 " /> Clear All
+              <X className="h-3 w-3" /> Clear all
             </button>
           </div>
           <div className="flex flex-wrap gap-2">
             {search && (
-              <Badge
-                className="bg-white border border-border text-muted-foreground cursor-pointer"
+              <button
                 onClick={() => updateFilter("search", null)}
+                className="text-xs bg-card border border-border text-foreground px-3 py-1 rounded-lg font-medium hover:border-primary transition-colors"
               >
-                "{search}" x
-              </Badge>
+                "{search}" ×
+              </button>
+            )}
+            {selectedCategory && (
+              <button
+                onClick={() => updateFilter("category", null)}
+                className="text-xs bg-card border border-border text-foreground px-3 py-1 rounded-lg font-medium hover:border-primary transition-colors"
+              >
+                {categories.find((c) => c.slug === selectedCategory)?.name} ×
+              </button>
             )}
           </div>
         </div>
       )}
 
       {/* Categories */}
-      <div className="bg-white border border-border rounded-xl p-4">
-        <p className="text-sm font-medium text-foreground mb-3">Category</p>
+      <div className="bg-card border border-border rounded-2xl p-4">
+        <p className="text-xs font-bold text-foreground mb-3 uppercase tracking-wider">
+          Category
+        </p>
         <div className="space-y-1">
           <button
             onClick={() => updateFilter("category", null)}
-            className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${
+            className={`w-full text-left text-sm px-3 py-2 rounded-xl transition-colors font-medium ${
               !selectedCategory
                 ? "bg-primary text-primary-foreground"
-                : "text-secondary-foreground hover:bg-primary-foreground"
+                : "text-muted-foreground hover:bg-secondary"
             }`}
           >
             All categories
@@ -97,10 +103,10 @@ export default function ProductFilters({
             <button
               key={cat.id}
               onClick={() => updateFilter("category", cat.slug)}
-              className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${
+              className={`w-full text-left text-sm px-3 py-2 rounded-xl transition-colors font-medium ${
                 selectedCategory === cat.slug
                   ? "bg-primary text-primary-foreground"
-                  : "text-secondary-foreground hover:bg-primary-foreground"
+                  : "text-muted-foreground hover:bg-secondary"
               }`}
             >
               {cat.name}
@@ -110,18 +116,20 @@ export default function ProductFilters({
       </div>
 
       {/* Sort */}
-      <div className="bg-white border border-[#FAC775] rounded-xl p-4">
-        <p className="text-sm font-medium text-[#412402] mb-3">Sort by</p>
+      <div className="bg-card border border-border rounded-2xl p-4">
+        <p className="text-xs font-bold text-foreground mb-3 uppercase tracking-wider">
+          Sort by
+        </p>
         <div className="space-y-1">
           {sortOptions.map((opt) => (
             <button
               key={opt.value}
               onClick={() => updateFilter("sort", opt.value)}
-              className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${
+              className={`w-full text-left text-sm px-3 py-2 rounded-xl transition-colors font-medium ${
                 selectedSort === opt.value ||
                 (!selectedSort && opt.value === "newest")
                   ? "bg-primary text-primary-foreground"
-                  : "text-secondary-foreground hover:bg-primary-foreground"
+                  : "text-muted-foreground hover:bg-secondary"
               }`}
             >
               {opt.label}

@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import SessionProvider from "@/components/shared/SessionProvider";
 import { auth } from "@/lib/auth";
+import ThemeProvider from "@/components/shared/ThemeProvider";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -57,10 +58,12 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${geist.variable} antialiased min-h-screen`}>
-        <SessionProvider session={session}>
-          {children}
-          <Toaster richColors position="top-right" />
-        </SessionProvider>
+        <ThemeProvider>
+          <SessionProvider session={session}>
+            {children}
+            <Toaster richColors position="top-right" />
+          </SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
