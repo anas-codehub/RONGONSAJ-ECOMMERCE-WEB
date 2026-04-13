@@ -37,13 +37,11 @@ export default function AdminCategoriesTable({
       const res = await fetch(`/api/admin/categories/${deleteId}`, {
         method: "DELETE",
       });
-
       if (!res.ok) {
         const data = await res.json();
         toast.error(data.error || "Failed to delete category");
         return;
       }
-
       toast.success("Category deleted!");
       router.refresh();
     } catch {
@@ -54,14 +52,6 @@ export default function AdminCategoriesTable({
     }
   };
 
-  if (categories.length === 0) {
-    return (
-      <div className="bg-card border border-border rounded-2xl p-16 text-center">
-        <p className="text-muted-foreground">No categories yet</p>
-      </div>
-    );
-  }
-
   return (
     <>
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
@@ -69,19 +59,19 @@ export default function AdminCategoriesTable({
           <table className="w-full">
             <thead className="bg-secondary border-b border-border">
               <tr>
-                <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4">
+                <th className="text-left text-xs font-bold text-muted-foreground px-5 py-3 uppercase tracking-wider">
                   Name
                 </th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4">
+                <th className="text-left text-xs font-bold text-muted-foreground px-5 py-3 uppercase tracking-wider">
                   Slug
                 </th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4">
+                <th className="text-left text-xs font-bold text-muted-foreground px-5 py-3 uppercase tracking-wider">
                   Products
                 </th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4">
+                <th className="text-left text-xs font-bold text-muted-foreground px-5 py-3 uppercase tracking-wider">
                   Created
                 </th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4">
+                <th className="text-left text-xs font-bold text-muted-foreground px-5 py-3 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -92,37 +82,40 @@ export default function AdminCategoriesTable({
                   key={cat.id}
                   className="hover:bg-secondary/50 transition-colors"
                 >
-                  <td className="px-6 py-4">
-                    <p className="text-sm font-medium text-foreground">
+                  <td className="px-5 py-4">
+                    <p className="text-sm font-bold text-foreground">
                       {cat.name}
                     </p>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-5 py-4">
                     <span className="font-mono text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-lg">
                       {cat.slug}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm text-muted-foreground">
-                      {cat._count.products} products
+                  <td className="px-5 py-4">
+                    <span className="text-sm font-bold text-foreground">
+                      {cat._count.products}
+                    </span>
+                    <span className="text-xs text-muted-foreground ml-1">
+                      products
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-5 py-4">
                     <span className="text-sm text-muted-foreground">
                       {new Date(cat.createdAt).toLocaleDateString("en-BD")}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-5 py-4">
                     <Button
                       size="icon"
                       variant="outline"
-                      className="h-8 w-8 border-border text-destructive hover:text-destructive"
+                      className="h-8 w-8 border-border rounded-lg text-destructive hover:text-destructive disabled:opacity-30"
                       onClick={() => setDeleteId(cat.id)}
                       disabled={cat._count.products > 0}
                       title={
                         cat._count.products > 0
                           ? "Cannot delete category with products"
-                          : "Delete category"
+                          : "Delete"
                       }
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -136,7 +129,7 @@ export default function AdminCategoriesTable({
       </div>
 
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent className="border-border">
+        <DialogContent className="border-border bg-card">
           <DialogHeader>
             <DialogTitle className="text-foreground">
               Delete category?
@@ -149,14 +142,14 @@ export default function AdminCategoriesTable({
             <Button
               variant="outline"
               onClick={() => setDeleteId(null)}
-              className="border-border"
+              className="border-border rounded-xl"
             >
               Cancel
             </Button>
             <Button
               onClick={handleDelete}
               disabled={deleting}
-              className="bg-destructive text-white hover:bg-destructive/90"
+              className="bg-destructive text-white hover:bg-destructive/90 rounded-xl"
             >
               {deleting ? "Deleting..." : "Delete"}
             </Button>
