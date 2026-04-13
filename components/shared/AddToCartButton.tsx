@@ -10,6 +10,7 @@ interface Product {
   id: string;
   name: string;
   price: number;
+  discount: number;
   images: string[];
   stock: number;
   sizes: string[];
@@ -36,10 +37,15 @@ export default function AddToCartButton({ product }: { product: Product }) {
       return;
     }
 
+    const finalPrice =
+      product.discount > 0
+        ? Math.round(product.price - (product.price * product.discount) / 100)
+        : product.price;
+
     addItem({
       id: `${product.id}-${selectedSize}-${selectedColor}`,
       name: `${product.name}${selectedSize !== "one-size" ? ` (${selectedSize})` : ""}${selectedColor !== "one-color" ? ` - ${selectedColor}` : ""}`,
-      price: product.price,
+      price: finalPrice,
       image: product.images[0] || "",
       quantity,
     });

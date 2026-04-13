@@ -172,12 +172,32 @@ export default async function ProductDetailPage({ params }: Props) {
             )}
 
             {/* Price */}
-            <div className="flex items-baseline gap-3">
-              <span className="text-4xl font-medium text-primary">
-                ৳{product.price.toLocaleString()}
-              </span>
+            <div className="space-y-1">
+              <div className="flex items-baseline gap-3 flex-wrap">
+                {product.discount > 0 ? (
+                  <>
+                    <span className="text-4xl font-extrabold text-primary">
+                      ৳
+                      {Math.round(
+                        product.price -
+                          (product.price * product.discount) / 100,
+                      ).toLocaleString()}
+                    </span>
+                    <span className="text-xl text-muted-foreground line-through">
+                      ৳{product.price.toLocaleString()}
+                    </span>
+                    <span className="bg-destructive text-white text-sm font-bold px-2.5 py-1 rounded-lg">
+                      -{product.discount}% off
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-4xl font-extrabold text-primary">
+                    ৳{product.price.toLocaleString()}
+                  </span>
+                )}
+              </div>
               {product.stock > 0 && product.stock <= 10 && (
-                <span className="text-sm text-destructive">
+                <span className="text-sm text-destructive font-medium">
                   Only {product.stock} left!
                 </span>
               )}
