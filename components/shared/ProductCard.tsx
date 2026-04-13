@@ -13,6 +13,8 @@ interface Product {
   name: string;
   slug: string;
   price: number;
+  actualPrice: number;
+  discount: number;
   images: string[];
   stock: number;
   isFeatured: boolean;
@@ -65,6 +67,11 @@ export default function ProductCard({ product }: { product: Product }) {
                 Sold out
               </Badge>
             )}
+            {product.discount > 0 && (
+              <Badge className="bg-destructive text-white text-xs font-bold px-2 py-0.5 rounded-lg">
+                -{product.discount}%
+              </Badge>
+            )}
           </div>
 
           {/* Wishlist */}
@@ -95,9 +102,26 @@ export default function ProductCard({ product }: { product: Product }) {
             {product.name}
           </h3>
           <div className="flex items-center justify-between">
-            <span className="text-base font-extrabold text-primary">
-              ৳{product.price.toLocaleString()}
-            </span>
+            <div>
+              {product.discount > 0 ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-base font-extrabold text-primary">
+                    ৳
+                    {(
+                      product.price -
+                      (product.price * product.discount) / 100
+                    ).toLocaleString()}
+                  </span>
+                  <span className="text-xs text-muted-foreground line-through">
+                    ৳{product.price.toLocaleString()}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-base font-extrabold text-primary">
+                  ৳{product.price.toLocaleString()}
+                </span>
+              )}
+            </div>
             {product.stock > 0 && product.stock <= 10 && (
               <span className="text-xs text-destructive font-medium">
                 Only {product.stock} left

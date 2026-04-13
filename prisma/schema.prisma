@@ -57,7 +57,10 @@ model Product {
   name        String
   slug        String    @unique
   description String
-  price       Float
+  actualPrice   Float     @default(0)
+  price         Float
+  discount      Float     @default(0)
+ 
   stock       Int       @default(0)
   images      String[]
    sizes       String[]  

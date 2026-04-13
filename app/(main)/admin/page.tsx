@@ -18,6 +18,8 @@ export default async function AdminPage() {
   if (!session?.user || (session.user as any).role !== "ADMIN") {
     redirect("/");
   }
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
   const [
     totalProducts,
@@ -28,6 +30,8 @@ export default async function AdminPage() {
     revenue,
     pendingOrders,
     deliveredOrders,
+    monthlyOrders,
+    monthlyRevenue,
   ] = await Promise.all([
     db.product.count(),
     db.order.count(),
@@ -44,7 +48,38 @@ export default async function AdminPage() {
     }),
     db.order.count({ where: { status: "PENDING" } }),
     db.order.count({ where: { status: "DELIVERED" } }),
+    db.order.count({
+      where: {
+        createdAt: { gte: startOfMonth },
+        status: { not: "CANCELLED" },
+      },
+    }),
+    db.order.aggregate({
+      _sum: { total: true },
+      where: {
+        createdAt: { gte: startOfMonth },
+        status: { not: "CANCELLED" },
+      },
+    }),
   ]);
+
+  // Calculate monthly profit
+  const monthlyOrderItems = await db.orderItem.findMany({
+    where: {
+      order: {
+        createdAt: { gte: startOfMonth },
+        status: { not: "CANCELLED" },
+      },
+    },
+    include: { product: true },
+  });
+
+  const monthlyProfit = monthlyOrderItems.reduce((acc, item) => {
+    const sellingPrice =
+      item.price - (item.price * item.product.discount) / 100;
+    const profit = (sellingPrice - item.product.actualPrice) * item.quantity;
+    return acc + profit;
+  }, 0);
 
   const statusColors: Record<string, string> = {
     PENDING:
@@ -91,6 +126,50 @@ export default async function AdminPage() {
         </div>
         <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center">
           <TrendingUp className="h-8 w-8 text-primary" />
+        </div>
+      </div>
+
+      {/* Monthly stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-card border border-border rounded-2xl p-5">
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">
+            Monthly orders
+          </p>
+          <p className="text-3xl font-extrabold text-foreground">
+            {monthlyOrders}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {new Date().toLocaleString("en-BD", {
+              month: "long",
+              year: "numeric",
+            })}
+          </p>
+        </div>
+
+        <div className="bg-card border border-border rounded-2xl p-5">
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">
+            Monthly revenue
+          </p>
+          <p className="text-3xl font-extrabold text-foreground">
+            ৳{(monthlyRevenue._sum.total || 0).toLocaleString()}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Total sales this month
+          </p>
+        </div>
+
+        <div className="bg-card border border-border rounded-2xl p-5">
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">
+            Monthly profit
+          </p>
+          <p
+            className={`text-3xl font-extrabold ${monthlyProfit >= 0 ? "text-green-600" : "text-destructive"}`}
+          >
+            ৳{Math.round(monthlyProfit).toLocaleString()}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            After deducting cost prices
+          </p>
         </div>
       </div>
 

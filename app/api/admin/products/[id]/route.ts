@@ -16,20 +16,22 @@ export async function PATCH(
     const body = await req.json();
 
     const product = await db.product.update({
-      where: { id },
-      data: {
-        name: body.name,
-        slug: body.slug,
-        description: body.description,
-        price: parseFloat(body.price),
-        stock: parseInt(body.stock),
-        categoryId: body.categoryId,
-        isFeatured: body.isFeatured,
-        images: body.images,
-         sizes: body.sizes || [],
+  where: { id },
+  data: {
+    name: body.name,
+    slug: body.slug,
+    description: body.description,
+    actualPrice: parseFloat(body.actualPrice || 0),
+    price: parseFloat(body.price),
+    discount: parseFloat(body.discount || 0),
+    stock: parseInt(body.stock),
+    categoryId: body.categoryId,
+    isFeatured: body.isFeatured,
+    images: body.images,
+    sizes: body.sizes || [],
     colors: body.colors || [],
-      },
-    });
+  },
+});
 
     return NextResponse.json(product);
   } catch {

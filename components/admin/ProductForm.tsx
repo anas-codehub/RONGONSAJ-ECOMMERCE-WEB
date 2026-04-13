@@ -29,6 +29,8 @@ interface Props {
     slug: string;
     description: string;
     price: number;
+    actualPrice: number;
+    discount: number;
     stock: number;
     images: string[];
     isFeatured: boolean;
@@ -47,7 +49,9 @@ export default function ProductForm({ categories, product }: Props) {
     name: product?.name || "",
     slug: product?.slug || "",
     description: product?.description || "",
+    actualPrice: product?.actualPrice?.toString() || "",
     price: product?.price?.toString() || "",
+    discount: product?.discount?.toString() || "0",
     stock: product?.stock?.toString() || "",
     categoryId: product?.categoryId || "",
     isFeatured: product?.isFeatured || false,
@@ -121,7 +125,9 @@ export default function ProductForm({ categories, product }: Props) {
         name: form.name,
         slug: form.slug,
         description: form.description,
+        actualPrice: parseFloat(form.actualPrice || "0"),
         price: parseFloat(form.price),
+        discount: parseFloat(form.discount || "0"),
         stock: parseInt(form.stock),
         categoryId: form.categoryId,
         isFeatured: form.isFeatured,
@@ -205,20 +211,111 @@ export default function ProductForm({ categories, product }: Props) {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium text-foreground block mb-1.5">
-              Price (৳)
-            </label>
-            <Input
-              name="price"
-              type="number"
-              value={form.price}
-              onChange={handleChange}
-              placeholder="1500"
-              required
-              min="0"
-              className="border-border"
-            />
+          {/* Pricing section */}
+          <div className="border border-border rounded-xl p-4 space-y-4 bg-secondary/50">
+            <p className="text-sm font-bold text-foreground">Pricing</p>
+
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="text-sm font-semibold text-foreground block mb-1.5">
+                  Actual price (৳)
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    — your cost price (hidden from customers)
+                  </span>
+                </label>
+                <Input
+                  name="actualPrice"
+                  type="number"
+                  value={form.actualPrice}
+                  onChange={handleChange}
+                  placeholder="1000"
+                  min="0"
+                  className="border-border"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-foreground block mb-1.5">
+                  Selling price (৳)
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    — shown to customers
+                  </span>
+                </label>
+                <Input
+                  name="price"
+                  type="number"
+                  value={form.price}
+                  onChange={handleChange}
+                  placeholder="1500"
+                  required
+                  min="0"
+                  className="border-border"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-foreground block mb-1.5">
+                  Discount (%)
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    — shown as sale badge on product
+                  </span>
+                </label>
+                <Input
+                  name="discount"
+                  type="number"
+                  value={form.discount}
+                  onChange={handleChange}
+                  placeholder="0"
+                  min="0"
+                  max="100"
+                  className="border-border"
+                />
+              </div>
+            </div>
+
+            {/* Live profit preview */}
+            {form.price && form.actualPrice && (
+              <div className="bg-card border border-border rounded-xl p-3 space-y-2">
+                <p className="text-xs font-bold text-foreground uppercase tracking-wider">
+                  Profit preview
+                </p>
+                <div className="grid grid-cols-3 gap-3 text-center">
+                  <div>
+                    <p className="text-xs text-muted-foreground">
+                      Customer pays
+                    </p>
+                    <p className="text-sm font-extrabold text-foreground">
+                      ৳
+                      {(
+                        parseFloat(form.price || "0") -
+                        (parseFloat(form.price || "0") *
+                          parseFloat(form.discount || "0")) /
+                          100
+                      ).toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Your cost</p>
+                    <p className="text-sm font-extrabold text-foreground">
+                      ৳{parseFloat(form.actualPrice || "0").toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Profit/unit</p>
+                    <p className="text-sm font-extrabold text-green-600">
+                      ৳
+                      {(
+                        parseFloat(form.price || "0") -
+                        (parseFloat(form.price || "0") *
+                          parseFloat(form.discount || "0")) /
+                          100 -
+                        parseFloat(form.actualPrice || "0")
+                      ).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           <div>
             <label className="text-sm font-medium text-foreground block mb-1.5">

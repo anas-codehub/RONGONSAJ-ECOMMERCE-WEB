@@ -28,20 +28,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const product = await db.product.create({
-      data: {
-        name,
-        slug,
-        description,
-        price: parseFloat(price),
-        stock: parseInt(stock),
-        categoryId,
-        isFeatured: isFeatured || false,
-        images: images || [],
-         sizes: sizes || [],
+   const product = await db.product.create({
+  data: {
+    name,
+    slug,
+    description,
+    actualPrice: parseFloat(body.actualPrice || 0),
+    price: parseFloat(price),
+    discount: parseFloat(body.discount || 0),
+    stock: parseInt(stock),
+    categoryId,
+    isFeatured: isFeatured || false,
+    images: images || [],
+    sizes: sizes || [],
     colors: colors || [],
-      },
-    });
+  },
+});
 
     return NextResponse.json(product, { status: 201 });
   } catch {
