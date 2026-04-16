@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     const file = formData.get("file") as File;
+    const type = formData.get("type") as string || "product";
 
     if (!file) {
       return NextResponse.json(
@@ -19,7 +20,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check file type
     if (!file.type.startsWith("image/")) {
       return NextResponse.json(
         { error: "Only image files are allowed" },
@@ -27,7 +27,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json(
         { error: "File size must be under 10MB" },
@@ -35,26 +34,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Convert file to buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Upload to Cloudinary with compression
     const result = await new Promise<any>((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
-            folder: "RONGONSAAJ",
-            transformation: [
-              {
-                width: 800,
-                height: 1000,
-                crop: "fill",
-                gravity: "auto",
-                quality: "auto:good",
-                fetch_format: "auto",
-              },
-            ],
+            folder: type === "slide" ? "reve-slides" : "reve-fashion",
+            // No forced crop — preserve original aspect ratio
+            transformation:
+              type === "slide"
+                ? [
+                    {
+                      width: 1920,
+                      crop: "scale", // scale width only, preserve height
+                      quality: "auto:best",
+                      fetch_format: "auto",
+                    },
+                  ]
+                : [
+                    {
+                      width: 1000,
+                      crop: "scale", // scale width only, preserve height
+                      quality: "auto:best",
+                      fetch_format: "auto",
+                    },
+                  ],
           },
           (error, result) => {
             if (error) reject(error);

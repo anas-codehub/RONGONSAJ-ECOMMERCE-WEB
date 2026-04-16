@@ -98,7 +98,7 @@ export default async function ProductDetailPage({ params }: Props) {
                   src={product.images[0]}
                   alt={product.name}
                   fill
-                  className="object-cover"
+                  className="object-contain p-2"
                   priority // ← ADD THIS - prioritize main image
                 />
               ) : (

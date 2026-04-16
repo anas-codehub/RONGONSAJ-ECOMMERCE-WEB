@@ -60,15 +60,15 @@ export default function HeroSlider({ slides }: { slides: Slide[] }) {
             style={{ minWidth: "100%" }}
           >
             {/* Image — responsive height */}
-            <div className="relative h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] w-full">
+            <div className="relative h-75 sm:h-100 md:h-125 lg:h-150 w-full">
               <Image
                 src={slide.image}
                 alt={slide.title}
                 fill
-                className="object-cover object-top"
+                className="object-cover object-center"
                 priority
                 sizes="100vw"
-                quality={90}
+                quality={95}
               />
               {/* Overlay */}
               <div className="absolute inset-0 bg-foreground/30" />

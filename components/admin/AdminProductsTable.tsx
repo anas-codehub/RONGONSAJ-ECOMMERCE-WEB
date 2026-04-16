@@ -123,7 +123,7 @@ export default function AdminProductsTable({
                             src={product.images[0]}
                             alt={product.name}
                             fill
-                            className="object-cover"
+                            className="object-contain p-1"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
