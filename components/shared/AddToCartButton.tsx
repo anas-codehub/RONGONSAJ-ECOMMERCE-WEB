@@ -11,12 +11,12 @@ interface Product {
   name: string;
   price: number;
   discount: number;
+  discountAmount: number;
   images: string[];
   stock: number;
   sizes: string[];
   colors: string[];
 }
-
 export default function AddToCartButton({ product }: { product: Product }) {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(
@@ -40,7 +40,9 @@ export default function AddToCartButton({ product }: { product: Product }) {
     const finalPrice =
       product.discount > 0
         ? Math.round(product.price - (product.price * product.discount) / 100)
-        : product.price;
+        : product.discountAmount > 0
+          ? Math.round(product.price - product.discountAmount)
+          : product.price;
 
     addItem({
       id: `${product.id}-${selectedSize}-${selectedColor}`,

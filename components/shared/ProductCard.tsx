@@ -15,6 +15,7 @@ interface Product {
   price: number;
   actualPrice: number;
   discount: number;
+  discountAmount: number;
   images: string[];
   stock: number;
   isFeatured: boolean;
@@ -67,9 +68,11 @@ export default function ProductCard({ product }: { product: Product }) {
                 Sold out
               </Badge>
             )}
-            {product.discount > 0 && (
+            {(product.discount > 0 || product.discountAmount > 0) && (
               <Badge className="bg-destructive text-white text-xs font-bold px-2 py-0.5 rounded-lg">
-                -{product.discount}%
+                {product.discount > 0
+                  ? `-${product.discount}%`
+                  : `-৳${product.discountAmount}`}
               </Badge>
             )}
           </div>
@@ -103,13 +106,15 @@ export default function ProductCard({ product }: { product: Product }) {
           </h3>
           <div className="flex items-center justify-between">
             <div>
-              {product.discount > 0 ? (
-                <div className="flex items-center gap-2">
+              {product.discount > 0 || product.discountAmount > 0 ? (
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-base font-extrabold text-primary">
                     ৳
-                    {(
-                      product.price -
-                      (product.price * product.discount) / 100
+                    {Math.round(
+                      product.discount > 0
+                        ? product.price -
+                            (product.price * product.discount) / 100
+                        : product.price - product.discountAmount,
                     ).toLocaleString()}
                   </span>
                   <span className="text-xs text-muted-foreground line-through">

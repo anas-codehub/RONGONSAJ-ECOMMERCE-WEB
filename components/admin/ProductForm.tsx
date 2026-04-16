@@ -31,6 +31,7 @@ interface Props {
     price: number;
     actualPrice: number;
     discount: number;
+    discountAmount: number;
     stock: number;
     images: string[];
     isFeatured: boolean;
@@ -52,6 +53,13 @@ export default function ProductForm({ categories, product }: Props) {
     actualPrice: product?.actualPrice?.toString() || "",
     price: product?.price?.toString() || "",
     discount: product?.discount?.toString() || "0",
+    discountAmount: product?.discountAmount?.toString() || "0",
+    discountType:
+      (product?.discount ?? 0) > 0
+        ? "percent"
+        : (product?.discountAmount ?? 0) > 0
+          ? "amount"
+          : "percent",
     stock: product?.stock?.toString() || "",
     categoryId: product?.categoryId || "",
     isFeatured: product?.isFeatured || false,
@@ -127,7 +135,14 @@ export default function ProductForm({ categories, product }: Props) {
         description: form.description,
         actualPrice: parseFloat(form.actualPrice || "0"),
         price: parseFloat(form.price),
-        discount: parseFloat(form.discount || "0"),
+        discount:
+          form.discountType === "percent"
+            ? parseFloat(form.discount || "0")
+            : 0,
+        discountAmount:
+          form.discountType === "amount"
+            ? parseFloat(form.discountAmount || "0")
+            : 0,
         stock: parseInt(form.stock),
         categoryId: form.categoryId,
         isFeatured: form.isFeatured,
@@ -212,10 +227,12 @@ export default function ProductForm({ categories, product }: Props) {
 
         <div className="grid grid-cols-2 gap-4">
           {/* Pricing section */}
+          {/* Pricing section */}
           <div className="border border-border rounded-xl p-4 space-y-4 bg-secondary/50">
             <p className="text-sm font-bold text-foreground">Pricing</p>
 
             <div className="grid grid-cols-1 gap-4">
+              {/* Actual price */}
               <div>
                 <label className="text-sm font-semibold text-foreground block mb-1.5">
                   Actual price (৳)
@@ -234,11 +251,12 @@ export default function ProductForm({ categories, product }: Props) {
                 />
               </div>
 
+              {/* Selling price */}
               <div>
                 <label className="text-sm font-semibold text-foreground block mb-1.5">
                   Selling price (৳)
                   <span className="text-xs font-normal text-muted-foreground ml-2">
-                    — shown to customers
+                    — shown to customers before discount
                   </span>
                 </label>
                 <Input
@@ -253,67 +271,176 @@ export default function ProductForm({ categories, product }: Props) {
                 />
               </div>
 
+              {/* Discount type toggle */}
               <div>
-                <label className="text-sm font-semibold text-foreground block mb-1.5">
-                  Discount (%)
-                  <span className="text-xs font-normal text-muted-foreground ml-2">
-                    — shown as sale badge on product
-                  </span>
+                <label className="text-sm font-semibold text-foreground block mb-2">
+                  Discount type
                 </label>
-                <Input
-                  name="discount"
-                  type="number"
-                  value={form.discount}
-                  onChange={handleChange}
-                  placeholder="0"
-                  min="0"
-                  max="100"
-                  className="border-border"
-                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setForm({
+                        ...form,
+                        discountType: "percent",
+                        discountAmount: "0",
+                      })
+                    }
+                    className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${
+                      form.discountType === "percent"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-card border border-border text-muted-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    By percentage (%)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setForm({
+                        ...form,
+                        discountType: "amount",
+                        discount: "0",
+                      })
+                    }
+                    className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${
+                      form.discountType === "amount"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-card border border-border text-muted-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    By amount (৳)
+                  </button>
+                </div>
               </div>
+
+              {/* Discount input */}
+              {form.discountType === "percent" ? (
+                <div>
+                  <label className="text-sm font-semibold text-foreground block mb-1.5">
+                    Discount percentage (%)
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      — e.g. 10 means 10% off
+                    </span>
+                  </label>
+                  <Input
+                    name="discount"
+                    type="number"
+                    value={form.discount}
+                    onChange={handleChange}
+                    placeholder="0"
+                    min="0"
+                    max="100"
+                    className="border-border"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className="text-sm font-semibold text-foreground block mb-1.5">
+                    Discount amount (৳)
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      — e.g. 200 means ৳200 off
+                    </span>
+                  </label>
+                  <Input
+                    name="discountAmount"
+                    type="number"
+                    value={form.discountAmount}
+                    onChange={handleChange}
+                    placeholder="0"
+                    min="0"
+                    className="border-border"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Live profit preview */}
             {form.price && form.actualPrice && (
-              <div className="bg-card border border-border rounded-xl p-3 space-y-2">
+              <div className="bg-card border border-border rounded-xl p-4 space-y-3">
                 <p className="text-xs font-bold text-foreground uppercase tracking-wider">
-                  Profit preview
+                  Live preview
                 </p>
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  <div>
-                    <p className="text-xs text-muted-foreground">
-                      Customer pays
-                    </p>
-                    <p className="text-sm font-extrabold text-foreground">
-                      ৳
-                      {(
-                        parseFloat(form.price || "0") -
-                        (parseFloat(form.price || "0") *
-                          parseFloat(form.discount || "0")) /
+                {(() => {
+                  const sellingPrice = parseFloat(form.price || "0");
+                  const actualPrice = parseFloat(form.actualPrice || "0");
+                  const discountPercent =
+                    form.discountType === "percent"
+                      ? parseFloat(form.discount || "0")
+                      : sellingPrice > 0
+                        ? (parseFloat(form.discountAmount || "0") /
+                            sellingPrice) *
                           100
-                      ).toLocaleString()}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Your cost</p>
-                    <p className="text-sm font-extrabold text-foreground">
-                      ৳{parseFloat(form.actualPrice || "0").toLocaleString()}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Profit/unit</p>
-                    <p className="text-sm font-extrabold text-green-600">
-                      ৳
-                      {(
-                        parseFloat(form.price || "0") -
-                        (parseFloat(form.price || "0") *
-                          parseFloat(form.discount || "0")) /
-                          100 -
-                        parseFloat(form.actualPrice || "0")
-                      ).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
+                        : 0;
+                  const discountAmt =
+                    form.discountType === "amount"
+                      ? parseFloat(form.discountAmount || "0")
+                      : (sellingPrice * parseFloat(form.discount || "0")) / 100;
+                  const customerPays = Math.round(sellingPrice - discountAmt);
+                  const profit = customerPays - actualPrice;
+
+                  return (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-secondary rounded-xl p-3 text-center">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Customer pays
+                        </p>
+                        <p className="text-lg font-extrabold text-foreground">
+                          ৳{customerPays.toLocaleString()}
+                        </p>
+                        {discountAmt > 0 && (
+                          <p className="text-xs text-muted-foreground line-through mt-0.5">
+                            ৳{sellingPrice.toLocaleString()}
+                          </p>
+                        )}
+                      </div>
+                      <div className="bg-secondary rounded-xl p-3 text-center">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Discount
+                        </p>
+                        <p className="text-lg font-extrabold text-primary">
+                          ৳{Math.round(discountAmt).toLocaleString()}
+                        </p>
+                        {discountPercent > 0 && (
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {discountPercent.toFixed(1)}% off
+                          </p>
+                        )}
+                      </div>
+                      <div className="bg-secondary rounded-xl p-3 text-center">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Your cost
+                        </p>
+                        <p className="text-lg font-extrabold text-foreground">
+                          ৳{actualPrice.toLocaleString()}
+                        </p>
+                      </div>
+                      <div
+                        className={`rounded-xl p-3 text-center ${
+                          profit >= 0
+                            ? "bg-green-50 dark:bg-green-900/20"
+                            : "bg-red-50 dark:bg-red-900/20"
+                        }`}
+                      >
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Profit/unit
+                        </p>
+                        <p
+                          className={`text-lg font-extrabold ${
+                            profit >= 0 ? "text-green-600" : "text-destructive"
+                          }`}
+                        >
+                          ৳{Math.round(profit).toLocaleString()}
+                        </p>
+                        {profit < 0 && (
+                          <p className="text-xs text-destructive mt-0.5">
+                            Loss!
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
           </div>

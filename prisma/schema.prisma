@@ -53,30 +53,29 @@ model Category {
 }
 
 model Product {
-  id          String    @id @default(cuid())
-  name        String
-  slug        String    @unique
-  description String
-  actualPrice   Float     @default(0)
-  price         Float
-  discount      Float     @default(0)
- 
-  stock       Int       @default(0)
-  images      String[]
-   sizes       String[]  
-  colors      String[] 
-  isFeatured  Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  name           String
+  slug           String    @unique
+  description    String
+  actualPrice    Float     @default(0)
+  price          Float
+  discount       Float     @default(0)
+  discountAmount Float     @default(0)
+  stock          Int       @default(0)
+  images         String[]
+  sizes          String[]
+  colors         String[]
+  isFeatured     Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   categoryId  String
   category    Category    @relation(fields: [categoryId], references: [id])
 
   orderItems  OrderItem[]
   reviews     Review[]
-  wishlists     Wishlist[]
+  wishlists   Wishlist[]
 }
-
 model Order {
   id          String      @id 
   status      OrderStatus @default(PENDING)

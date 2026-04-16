@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-   const product = await db.product.create({
+const product = await db.product.create({
   data: {
     name,
     slug,
@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
     actualPrice: parseFloat(body.actualPrice || 0),
     price: parseFloat(price),
     discount: parseFloat(body.discount || 0),
+    discountAmount: parseFloat(body.discountAmount || 0),
     stock: parseInt(stock),
     categoryId,
     isFeatured: isFeatured || false,

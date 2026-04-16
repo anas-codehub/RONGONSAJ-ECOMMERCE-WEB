@@ -172,37 +172,53 @@ export default async function ProductDetailPage({ params }: Props) {
             )}
 
             {/* Price */}
-            <div className="space-y-1">
-              <div className="flex items-baseline gap-3 flex-wrap">
-                {product.discount > 0 ? (
-                  <>
-                    <span className="text-4xl font-extrabold text-primary">
-                      ৳
-                      {Math.round(
-                        product.price -
-                          (product.price * product.discount) / 100,
-                      ).toLocaleString()}
-                    </span>
-                    <span className="text-xl text-muted-foreground line-through">
-                      ৳{product.price.toLocaleString()}
-                    </span>
-                    <span className="bg-destructive text-white text-sm font-bold px-2.5 py-1 rounded-lg">
-                      -{product.discount}% off
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-4xl font-extrabold text-primary">
-                    ৳{product.price.toLocaleString()}
-                  </span>
-                )}
-              </div>
-              {product.stock > 0 && product.stock <= 10 && (
-                <span className="text-sm text-destructive font-medium">
-                  Only {product.stock} left!
-                </span>
-              )}
-            </div>
+            {(() => {
+              const hasDiscount =
+                product.discount > 0 || product.discountAmount > 0;
+              const finalPrice =
+                product.discount > 0
+                  ? Math.round(
+                      product.price - (product.price * product.discount) / 100,
+                    )
+                  : product.discountAmount > 0
+                    ? Math.round(product.price - product.discountAmount)
+                    : product.price;
+              const discountLabel =
+                product.discount > 0
+                  ? `-${product.discount}% off`
+                  : product.discountAmount > 0
+                    ? `-৳${product.discountAmount} off`
+                    : "";
 
+              return (
+                <div className="space-y-1">
+                  <div className="flex items-baseline gap-3 flex-wrap">
+                    {hasDiscount ? (
+                      <>
+                        <span className="text-4xl font-extrabold text-primary">
+                          ৳{finalPrice.toLocaleString()}
+                        </span>
+                        <span className="text-xl text-muted-foreground line-through">
+                          ৳{product.price.toLocaleString()}
+                        </span>
+                        <span className="bg-destructive text-white text-sm font-bold px-2.5 py-1 rounded-lg">
+                          {discountLabel}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-4xl font-extrabold text-primary">
+                        ৳{product.price.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                  {product.stock > 0 && product.stock <= 10 && (
+                    <span className="text-sm text-destructive font-medium">
+                      Only {product.stock} left!
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
             <Separator className="bg-border" />
 
             {/* Description */}

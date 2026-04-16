@@ -15,7 +15,7 @@ export async function PATCH(
     const { id } = await params;
     const body = await req.json();
 
-    const product = await db.product.update({
+  const product = await db.product.update({
   where: { id },
   data: {
     name: body.name,
@@ -24,6 +24,7 @@ export async function PATCH(
     actualPrice: parseFloat(body.actualPrice || 0),
     price: parseFloat(body.price),
     discount: parseFloat(body.discount || 0),
+    discountAmount: parseFloat(body.discountAmount || 0),
     stock: parseInt(body.stock),
     categoryId: body.categoryId,
     isFeatured: body.isFeatured,
