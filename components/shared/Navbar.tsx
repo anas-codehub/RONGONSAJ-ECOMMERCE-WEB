@@ -78,7 +78,7 @@ export default function Navbar() {
         Free delivery on orders over ৳2,000 · New drops every week
       </div>
 
-      <nav className="border-b border-border bg-background sticky top-0 z-50">
+      <nav className="border-b border-border bg-[#F9F5F1] sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
           {/* Logo */}
           <Link
@@ -122,7 +122,7 @@ export default function Navbar() {
 
             {/* Search dropdown */}
             {focused && (
-              <div className="absolute right-0 top-full mt-2 w-52 bg-card border border-border rounded-2xl shadow-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
+              <div className="absolute right-0 top-full mt-2 w-52 bg-[#F9F5F1] border border-border rounded-2xl shadow-md opacity-0 group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
                 <div className="p-3 border-b border-border">
                   <p className="text-xs font-medium text-muted-foreground mb-2">
                     Categories
