@@ -225,9 +225,9 @@ export default function ProductForm({ categories, product }: Props) {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Pricing section */}
-          {/* Pricing section */}
+
           <div className="border border-border rounded-xl p-4 space-y-4 bg-secondary/50">
             <p className="text-sm font-bold text-foreground">Pricing</p>
 
