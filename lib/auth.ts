@@ -56,28 +56,26 @@ export const { handlers, signIn, signOut, auth} = NextAuth({
     return token;
   },
   async session({ session, token }) {
+  const dbUser = await db.user.findUnique({
+    where: { id: token.id as string },
+  });
 
-    // Verify user still exist on DB 
-    const dbUser = await db.user.findUnique({
-        where: {id: token.id as string}
-    });
+  if (!dbUser) {
+    return { ...session, user: undefined as any };
+  }
 
-    if(!dbUser) {
-        return {
-            ...session, user: undefined as any
-        }
-    }
-    return {
-      ...session,
-      user: {
-        ...session.user,
-        id: token.id as string,
-        name: token.name,
-        email: token.email,
-        role: token.role,
-      },
-    };
-  },
+  return {
+    ...session,
+    user: {
+      ...session.user,
+      id: token.id as string,
+      name: dbUser.name,
+      email: dbUser.email,
+      role: dbUser.role,
+      image: dbUser.image,
+    },
+  };
+},
 },
     pages: {
         signIn: "/signIn"

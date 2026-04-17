@@ -15,6 +15,7 @@ import { useCartStore } from "@/store/cart-store";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const categories = [
   { name: "Male", slug: "male" },
@@ -77,7 +78,7 @@ export default function Navbar() {
         Free delivery on orders over ৳2,000 · New drops every week
       </div>
 
-      <nav className="border-b border-border bg-background/90 backdrop-blur-md sticky top-0 z-50">
+      <nav className="border-b border-border bg-background sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
           {/* Logo */}
           <Link
@@ -121,7 +122,7 @@ export default function Navbar() {
 
             {/* Search dropdown */}
             {focused && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-2xl shadow-lg overflow-hidden z-50">
+              <div className="absolute right-0 top-full mt-2 w-52 bg-card border border-border rounded-2xl shadow-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
                 <div className="p-3 border-b border-border">
                   <p className="text-xs font-medium text-muted-foreground mb-2">
                     Categories
@@ -186,8 +187,18 @@ export default function Navbar() {
             {session ? (
               <div className="relative group">
                 <button className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors">
-                  <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-xs font-medium text-primary-foreground">
-                    {session.user?.name?.[0]?.toUpperCase() || "U"}
+                  <div className="w-7 h-7 rounded-full overflow-hidden bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground shrink-0">
+                    {(session.user as any)?.image ? (
+                      <Image
+                        src={(session.user as any).image}
+                        alt="Profile"
+                        width={28}
+                        height={28}
+                        className="object-cover w-full h-full"
+                      />
+                    ) : (
+                      session.user?.name?.[0]?.toUpperCase() || "U"
+                    )}
                   </div>
                 </button>
                 <div className="absolute right-0 top-full mt-2 w-52 bg-card border border-border rounded-2xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
