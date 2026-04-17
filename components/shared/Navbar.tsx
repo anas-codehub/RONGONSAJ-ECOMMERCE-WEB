@@ -122,7 +122,7 @@ export default function Navbar() {
 
             {/* Search dropdown */}
             {focused && (
-              <div className="absolute right-0 top-full mt-2 w-52 bg-[#F9F5F1] border border-border rounded-2xl shadow-md opacity-0 group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
+              <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-neutral-900 border border-border rounded-2xl shadow-xl z-50 overflow-hidden">
                 <div className="p-3 border-b border-border">
                   <p className="text-xs font-medium text-muted-foreground mb-2">
                     Categories

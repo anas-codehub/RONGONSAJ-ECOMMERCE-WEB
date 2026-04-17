@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ShoppingCart } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/store/cart-store";
 import { toast } from "sonner";
 import WishlistButton from "@/components/shared/WishlistButton";
@@ -25,13 +24,24 @@ interface Product {
 export default function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCartStore();
 
+  const hasDiscount = product.discount > 0 || product.discountAmount > 0;
+
+  const finalPrice = hasDiscount
+    ? product.discount > 0
+      ? Math.round(product.price - (product.price * product.discount) / 100)
+      : Math.round(product.price - product.discountAmount)
+    : product.price;
+
+  const savedAmount = product.price - finalPrice;
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     if (product.stock === 0) return;
     addItem({
       id: product.id,
+      productId: product.id,
       name: product.name,
-      price: product.price,
+      price: finalPrice,
       image: product.images[0] || "",
       quantity: 1,
     });
@@ -56,26 +66,35 @@ export default function ProductCard({ product }: { product: Product }) {
             </div>
           )}
 
-          {/* Top badges */}
-          <div className="absolute top-3 left-3 flex gap-2">
+          {/* Top left badges */}
+          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             {product.isFeatured && (
-              <Badge className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-lg">
+              <span className="bg-primary text-primary-foreground text-xs font-bold px-2.5 py-1 rounded-lg">
                 Featured
-              </Badge>
+              </span>
             )}
             {product.stock === 0 && (
-              <Badge className="bg-foreground text-background text-xs font-bold px-2 py-0.5 rounded-lg">
+              <span className="bg-foreground text-background text-xs font-bold px-2.5 py-1 rounded-lg">
                 Sold out
-              </Badge>
-            )}
-            {(product.discount > 0 || product.discountAmount > 0) && (
-              <Badge className="bg-destructive text-white text-xs font-bold px-2 py-0.5 rounded-lg">
-                {product.discount > 0
-                  ? `-${product.discount}%`
-                  : `-৳${product.discountAmount}`}
-              </Badge>
+              </span>
             )}
           </div>
+
+          {/* Task 7: Discount badge — moved to bottom-left, more visible */}
+          {hasDiscount && product.stock > 0 && (
+            <div className="absolute bottom-10 left-0 right-0 px-3">
+              <div className="bg-destructive text-white text-xs font-black px-3 py-1.5 rounded-xl flex items-center justify-between shadow-lg">
+                <span>
+                  {product.discount > 0
+                    ? `${product.discount}% OFF`
+                    : `-৳${product.discountAmount}`}
+                </span>
+                <span className="opacity-90">
+                  Save ৳{savedAmount.toLocaleString()}
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Wishlist */}
           <div className="absolute top-3 right-3 w-8 h-8 bg-card rounded-full flex items-center justify-center shadow-sm">
@@ -106,16 +125,10 @@ export default function ProductCard({ product }: { product: Product }) {
           </h3>
           <div className="flex items-center justify-between">
             <div>
-              {product.discount > 0 || product.discountAmount > 0 ? (
+              {hasDiscount ? (
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-base font-extrabold text-primary">
-                    ৳
-                    {Math.round(
-                      product.discount > 0
-                        ? product.price -
-                            (product.price * product.discount) / 100
-                        : product.price - product.discountAmount,
-                    ).toLocaleString()}
+                    ৳{finalPrice.toLocaleString()}
                   </span>
                   <span className="text-xs text-muted-foreground line-through">
                     ৳{product.price.toLocaleString()}

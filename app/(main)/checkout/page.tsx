@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Loader2, Tag, ArrowRight } from "lucide-react";
+import { Loader2, Tag, ArrowRight, Package } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -61,8 +61,9 @@ export default function CheckoutPage() {
   };
 
   const handleCheckout = async () => {
+    // Task 5: Require sign-in
     if (!session) {
-      toast.error("Please sign in to checkout");
+      toast.error("Please sign in to place an order");
       router.push("/sign-in");
       return;
     }
@@ -94,15 +95,14 @@ export default function CheckoutPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.error || "Checkout failed");
+        toast.error(data.error || "Order failed");
         return;
       }
 
-      // Redirect to SSLCommerz payment page
-      if (data.paymentUrl) {
-        clearCart();
-        window.location.href = data.paymentUrl;
-      }
+      // Task 6: Cash on Delivery — no payment redirect, go to order success
+      clearCart();
+      toast.success("Order placed successfully!");
+      router.push(`/order-success?orderId=${data.orderId}`);
     } catch {
       toast.error("Something went wrong");
     } finally {
@@ -126,7 +126,16 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 py-10">
-        <h1 className="text-3xl font-medium text-foreground mb-8">Checkout</h1>
+        <h1 className="text-3xl font-medium text-foreground mb-2">Checkout</h1>
+
+        {/* Task 6: Cash on Delivery notice */}
+        <div className="flex items-center gap-3 bg-primary/10 border border-primary/20 rounded-2xl px-5 py-3 mb-8">
+          <Package className="h-5 w-5 text-primary shrink-0" />
+          <p className="text-sm text-primary font-semibold">
+            Cash on Delivery — Pay when your order arrives at your door. No
+            advance payment needed.
+          </p>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Left — Address form */}
@@ -316,15 +325,18 @@ export default function CheckoutPage() {
               <Button
                 onClick={handleCheckout}
                 disabled={loading}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 rounded-xl text-base"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 rounded-xl text-base font-bold"
               >
                 {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                {loading ? "Processing..." : "Pay now"}
+                {loading
+                  ? "Placing order..."
+                  : "Place Order — Cash on Delivery"}
                 {!loading && <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
 
+              {/* Task 6: Updated payment note */}
               <p className="text-xs text-muted-foreground text-center mt-3">
-                Secured by SSLCommerz · Your payment is safe
+                💵 You will pay in cash when your order is delivered
               </p>
             </div>
           </div>

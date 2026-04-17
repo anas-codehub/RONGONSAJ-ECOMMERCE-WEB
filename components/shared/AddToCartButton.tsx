@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Minus, Plus } from "lucide-react";
+import { ShoppingCart, Minus, Plus, Zap } from "lucide-react";
 import { useCartStore } from "@/store/cart-store";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: string;
@@ -17,6 +19,7 @@ interface Product {
   sizes: string[];
   colors: string[];
 }
+
 export default function AddToCartButton({ product }: { product: Product }) {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(
@@ -26,33 +29,54 @@ export default function AddToCartButton({ product }: { product: Product }) {
     product.colors.length > 0 ? null : "one-color",
   );
   const { addItem } = useCartStore();
+  const { data: session } = useSession();
+  const router = useRouter();
 
-  const handleAdd = () => {
+  const finalPrice =
+    product.discount > 0
+      ? Math.round(product.price - (product.price * product.discount) / 100)
+      : product.discountAmount > 0
+        ? Math.round(product.price - product.discountAmount)
+        : product.price;
+
+  const validateSelections = () => {
     if (product.sizes.length > 0 && !selectedSize) {
       toast.error("Please select a size");
-      return;
+      return false;
     }
     if (product.colors.length > 0 && !selectedColor) {
       toast.error("Please select a color");
+      return false;
+    }
+    return true;
+  };
+
+  const buildCartItem = () => ({
+    id: `${product.id}-${selectedSize}-${selectedColor}`,
+    productId: product.id,
+    name: `${product.name}${selectedSize !== "one-size" ? ` (${selectedSize})` : ""}${selectedColor !== "one-color" ? ` - ${selectedColor}` : ""}`,
+    price: finalPrice,
+    image: product.images[0] || "",
+    quantity,
+  });
+
+  const handleAdd = () => {
+    if (!validateSelections()) return;
+    addItem(buildCartItem());
+    toast.success(`${product.name} added to cart!`);
+  };
+
+  // Task 3: Order Now — add to cart and go directly to checkout
+  // Task 5: Require sign-in before ordering
+  const handleOrderNow = () => {
+    if (!session) {
+      toast.error("Please sign in to place an order");
+      router.push("/sign-in");
       return;
     }
-
-    const finalPrice =
-      product.discount > 0
-        ? Math.round(product.price - (product.price * product.discount) / 100)
-        : product.discountAmount > 0
-          ? Math.round(product.price - product.discountAmount)
-          : product.price;
-
-    addItem({
-      id: `${product.id}-${selectedSize}-${selectedColor}`,
-      productId: product.id,
-      name: `${product.name}${selectedSize !== "one-size" ? ` (${selectedSize})` : ""}${selectedColor !== "one-color" ? ` - ${selectedColor}` : ""}`,
-      price: finalPrice,
-      image: product.images[0] || "",
-      quantity,
-    });
-    toast.success(`${product.name} added to cart!`);
+    if (!validateSelections()) return;
+    addItem(buildCartItem());
+    router.push("/checkout");
   };
 
   if (product.stock === 0) {
@@ -154,14 +178,25 @@ export default function AddToCartButton({ product }: { product: Product }) {
         </div>
       </div>
 
-      {/* Add to cart */}
-      <Button
-        onClick={handleAdd}
-        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 rounded-xl text-base"
-      >
-        <ShoppingCart className="h-5 w-5 mr-2" />
-        Add to cart
-      </Button>
+      {/* Buttons row — Add to Cart + Order Now */}
+      <div className="flex gap-3">
+        <Button
+          onClick={handleAdd}
+          variant="outline"
+          className="flex-1 border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground py-6 rounded-xl text-base font-bold transition-all"
+        >
+          <ShoppingCart className="h-5 w-5 mr-2" />
+          Add to Cart
+        </Button>
+
+        <Button
+          onClick={handleOrderNow}
+          className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground py-6 rounded-xl text-base font-bold"
+        >
+          <Zap className="h-5 w-5 mr-2" />
+          Order Now
+        </Button>
+      </div>
     </div>
   );
 }
