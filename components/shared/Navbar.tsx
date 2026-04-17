@@ -243,7 +243,7 @@ export default function Navbar() {
                   </div>
                   <div className="border-t border-border py-1">
                     <button
-                      onClick={() => signOut({ callbackUrl: "/" })}
+                      onClick={() => signOut({ callbackUrl: "/sign-in" })}
                       className="flex items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-secondary transition-colors w-full text-left"
                     >
                       Sign out

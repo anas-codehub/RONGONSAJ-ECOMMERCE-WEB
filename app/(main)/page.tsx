@@ -44,7 +44,7 @@ export default async function HomePage() {
       ) : (
         <section className="bg-background">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 min-h-[580px]">
+            <div className="grid grid-cols-1 md:grid-cols-2 min-h-145">
               {/* Left */}
               <div className="flex flex-col justify-center py-16 md:py-24 pr-0 md:pr-12">
                 <div className="flex items-center gap-2 mb-6">
@@ -112,7 +112,7 @@ export default async function HomePage() {
 
               {/* Right — split color block */}
               <div className="hidden md:grid grid-cols-2 gap-3 py-8">
-                <div className="bg-primary rounded-3xl flex items-end p-6 min-h-[240px]">
+                <div className="bg-primary rounded-3xl flex items-end p-6 min-h-60">
                   <div>
                     <p className="text-primary-foreground/70 text-xs font-bold tracking-widest uppercase mb-1">
                       Featured
@@ -199,7 +199,7 @@ export default async function HomePage() {
                   className="shrink-0"
                 >
                   <div
-                    className={`group rounded-3xl px-8 py-6 min-w-[140px] text-center transition-all hover:scale-105 cursor-pointer ${
+                    className={`group rounded-3xl px-8 py-6 min-w-35 text-center transition-all hover:scale-105 cursor-pointer ${
                       i % 3 === 0
                         ? "bg-primary text-primary-foreground"
                         : i % 3 === 1
