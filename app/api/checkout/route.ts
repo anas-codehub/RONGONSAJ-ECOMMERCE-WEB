@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     // Check stock availability for all items first
     for (const item of items) {
       const product = await db.product.findUnique({
-        where: { id: item.id },
+        where: { id: item.productId },
       });
 
       if (!product) {
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
           ...(couponId && { couponId }),
           items: {
             create: items.map((item: any) => ({
-              productId: item.id,
+              productId: item.productId,
               quantity: item.quantity,
               price: item.price,
             })),
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
       // Decrease stock for each item
       for (const item of items) {
         await tx.product.update({
-          where: { id: item.id },
+          where: { id: item.productId },
           data: {
             stock: { decrement: item.quantity },
           },

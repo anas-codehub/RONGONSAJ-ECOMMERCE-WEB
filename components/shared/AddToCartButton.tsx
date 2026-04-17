@@ -46,6 +46,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
 
     addItem({
       id: `${product.id}-${selectedSize}-${selectedColor}`,
+      productId: product.id,
       name: `${product.name}${selectedSize !== "one-size" ? ` (${selectedSize})` : ""}${selectedColor !== "one-color" ? ` - ${selectedColor}` : ""}`,
       price: finalPrice,
       image: product.images[0] || "",
