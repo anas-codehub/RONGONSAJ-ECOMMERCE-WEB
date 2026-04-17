@@ -44,7 +44,7 @@ export default function InvoiceButton({ order }: { order: Order }) {
     doc.setFontSize(24);
     doc.setTextColor(65, 36, 2);
     doc.setFont("helvetica", "bold");
-    doc.text("RÊVE", 14, 18);
+    doc.text("RONGONSAAJ", 14, 18);
 
     doc.setFontSize(10);
     doc.setTextColor(133, 79, 11);
@@ -155,7 +155,7 @@ export default function InvoiceButton({ order }: { order: Order }) {
     doc.setTextColor(133, 79, 11);
     doc.setFont("helvetica", "normal");
     doc.text(
-      "Thank you for shopping with RÊVE Fashion!",
+      "Thank you for shopping with RONGONSAAJ!",
       pageWidth / 2,
       finalY + 10,
       { align: "center" },
@@ -167,7 +167,7 @@ export default function InvoiceButton({ order }: { order: Order }) {
       { align: "center" },
     );
     doc.text(
-      "© 2026 RÊVE Fashion · Dhaka, Bangladesh",
+      "© 2026 RONGONSAAJ · Dhaka, Bangladesh",
       pageWidth / 2,
       finalY + 24,
       { align: "center" },

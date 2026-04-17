@@ -74,8 +74,8 @@ export async function POST(req: NextRequest) {
           total,
           userId,
           addressId: savedAddress.id,
-          // Task 6: Set status to CONFIRMED since it's cash on delivery
-          status: "CONFIRMED",
+          // Cash on Delivery — starts as PENDING (admin will update to PROCESSING → SHIPPED → DELIVERED)
+          status: "PENDING",
           ...(couponId && { couponId }),
           items: {
             create: items.map((item: any) => ({
