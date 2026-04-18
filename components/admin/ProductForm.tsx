@@ -55,11 +55,9 @@ export default function ProductForm({ categories, product }: Props) {
     discount: product?.discount?.toString() || "0",
     discountAmount: product?.discountAmount?.toString() || "0",
     discountType:
-      (product?.discount ?? 0) > 0
-        ? "percent"
-        : (product?.discountAmount ?? 0) > 0
-          ? "amount"
-          : "percent",
+      product?.discountAmount && product.discountAmount > 0
+        ? "amount"
+        : "percent",
     stock: product?.stock?.toString() || "",
     categoryId: product?.categoryId || "",
     isFeatured: product?.isFeatured || false,
