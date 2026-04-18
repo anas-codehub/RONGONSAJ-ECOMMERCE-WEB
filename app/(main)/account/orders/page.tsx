@@ -128,7 +128,7 @@ export default async function OrdersPage() {
                     </span>
                     <Link
                       href={`/account/orders/${order.id}`}
-                      className="text-sm text-muted-foreground hover:text-primary flex items-center gap-1"
+                      className="text-sm text-muted-foreground hover:text-primary flex items-center gap-1 font-medium"
                     >
                       Details <ArrowRight className="h-3 w-3" />
                     </Link>
