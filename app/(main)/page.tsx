@@ -13,6 +13,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { unstable_cache } from "next/cache";
+import AllProductsSection from "@/components/shared/AllProductsSection";
 
 const getFeaturedProducts = unstable_cache(
   async () =>
@@ -211,6 +212,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <AllProductsSection />
 
       {/* REVIEWS */}
       {recentReviews.length > 0 && (

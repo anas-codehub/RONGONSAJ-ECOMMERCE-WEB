@@ -484,6 +484,17 @@ export default function ProductForm({ categories, product }: Props) {
           <label className="text-sm font-medium text-foreground block mb-1.5">
             Product images
           </label>
+          <p className="text-xs text-muted-foreground mt-2 bg-secondary rounded-xl p-3 leading-relaxed">
+            <span className="font-bold text-foreground">
+              Recommended image sizes:
+            </span>
+            <br />• <span className="font-bold">Product images:</span> 800×800px
+            (square) or 800×1000px (portrait) · JPG or PNG · max 5MB
+            <br />• <span className="font-bold">Best format:</span> White or
+            light background for clean product display
+            <br />• <span className="font-bold">Avoid:</span> Very dark
+            backgrounds, blurry images, or watermarks
+          </p>
           <ImageUpload images={uploadedImages} onChange={setUploadedImages} />
         </div>
 

@@ -2,7 +2,7 @@
 
 import { signOut } from "next-auth/react";
 import { Bell, LogOut, Menu } from "lucide-react";
-import ThemeToggle from "@/components/shared/ThemeToggle";
+import ThemeToggle from "@/components/admin/ThemeToggle";
 import { useState } from "react";
 import Link from "next/link";
 import {

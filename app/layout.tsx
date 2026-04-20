@@ -5,6 +5,9 @@ import { Toaster } from "@/components/ui/sonner";
 import SessionProvider from "@/components/shared/SessionProvider";
 import { auth } from "@/lib/auth";
 import ThemeProvider from "@/components/shared/ThemeProvider";
+import Navbar from "@/components/shared/Navbar";
+import Footer from "@/components/shared/Footer";
+import MobileNav from "@/components/shared/MobileNav";
 
 const geist = Geist({
   subsets: ["latin"],

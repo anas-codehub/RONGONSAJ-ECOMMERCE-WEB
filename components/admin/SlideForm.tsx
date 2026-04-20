@@ -71,6 +71,17 @@ export default function SlideForm() {
           <label className="text-sm font-medium text-foreground block mb-1.5">
             Slide image
           </label>
+          <p className="text-xs text-muted-foreground mt-2 bg-secondary rounded-xl p-3 leading-relaxed">
+            <span className="font-bold text-foreground">
+              Recommended slide image sizes:
+            </span>
+            <br />• <span className="font-bold">Desktop:</span> 1920×600px (wide
+            landscape) · JPG · max 5MB
+            <br />• <span className="font-bold">Mobile:</span> Image will
+            auto-crop to center on small screens
+            <br />• <span className="font-bold">Tip:</span> Keep important
+            content (text/subject) in the center of the image
+          </p>
           <ImageUpload images={images} onChange={setImages} />
           <p className="text-xs text-muted-foreground mt-1">
             Best size: 1920×600px (landscape). Will be responsive on mobile.

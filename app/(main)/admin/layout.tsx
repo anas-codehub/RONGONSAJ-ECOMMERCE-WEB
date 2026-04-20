@@ -1,7 +1,7 @@
-import AdminHeader from "@/components/admin/AdminHeader";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminHeader from "@/components/admin/AdminHeader";
 
 export default async function AdminLayout({
   children,
@@ -15,7 +15,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex" id="admin-root">
       <AdminSidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <AdminHeader session={session} />

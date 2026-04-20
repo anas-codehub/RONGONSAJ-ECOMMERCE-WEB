@@ -8,11 +8,11 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="light" style={{ colorScheme: "light" }}>
       <Navbar />
       <main className="pb-16 md:pb-0">{children}</main>
       <Footer />
       <MobileNav />
-    </>
+    </div>
   );
 }
