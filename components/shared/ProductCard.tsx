@@ -25,14 +25,17 @@ export default function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCartStore();
 
   const hasDiscount = product.discount > 0 || product.discountAmount > 0;
-
-  const finalPrice = hasDiscount
-    ? product.discount > 0
+  const finalPrice =
+    product.discount > 0
       ? Math.round(product.price - (product.price * product.discount) / 100)
-      : Math.round(product.price - product.discountAmount)
-    : product.price;
-
+      : product.discountAmount > 0
+        ? Math.round(product.price - product.discountAmount)
+        : product.price;
   const savedAmount = product.price - finalPrice;
+  const discountLabel =
+    product.discount > 0
+      ? `${product.discount}% off`
+      : `৳${product.discountAmount} off`;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -50,7 +53,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <Link href={`/products/${product.slug}`}>
-      <div className="group bg-card rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-border">
+      <div className="group bg-card rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-border">
         {/* Image */}
         <div className="relative h-56 bg-secondary overflow-hidden">
           {product.images[0] ? (
@@ -58,7 +61,7 @@ export default function ProductCard({ product }: { product: Product }) {
               src={product.images[0]}
               alt={product.name}
               fill
-              className="object-contain group-hover:scale-105 transition-transform duration-500 p-2"
+              className="object-contain p-2 group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -66,35 +69,24 @@ export default function ProductCard({ product }: { product: Product }) {
             </div>
           )}
 
-          {/* Top left badges */}
+          {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+            {hasDiscount && (
+              <span className="bg-destructive text-white text-xs font-bold px-2 py-0.5 rounded-lg">
+                -{discountLabel}
+              </span>
+            )}
             {product.isFeatured && (
-              <span className="bg-primary text-primary-foreground text-xs font-bold px-2.5 py-1 rounded-lg">
+              <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-lg">
                 Featured
               </span>
             )}
             {product.stock === 0 && (
-              <span className="bg-foreground text-background text-xs font-bold px-2.5 py-1 rounded-lg">
+              <span className="bg-foreground text-background text-xs font-bold px-2 py-0.5 rounded-lg">
                 Sold out
               </span>
             )}
           </div>
-
-          {/* Task 7: Discount badge — moved to bottom-left, more visible */}
-          {hasDiscount && product.stock > 0 && (
-            <div className="absolute bottom-10 left-0 right-0 px-3">
-              <div className="bg-destructive text-white text-xs font-black px-3 py-1.5 rounded-xl flex items-center justify-between shadow-lg">
-                <span>
-                  {product.discount > 0
-                    ? `${product.discount}% OFF`
-                    : `-৳${product.discountAmount}`}
-                </span>
-                <span className="opacity-90">
-                  Save ৳{savedAmount.toLocaleString()}
-                </span>
-              </div>
-            </div>
-          )}
 
           {/* Wishlist */}
           <div className="absolute top-3 right-3 w-8 h-8 bg-card rounded-full flex items-center justify-center shadow-sm">
@@ -117,33 +109,34 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Info */}
         <div className="p-4">
-          <p className="text-xs text-muted-foreground font-medium mb-1 uppercase tracking-wide">
+          <p className="text-xs text-muted-foreground font-bold mb-1 uppercase tracking-wide">
             {product.category.name}
           </p>
-          <h3 className="text-sm font-bold text-foreground mb-2 line-clamp-1">
+          <h3 className="text-sm font-bold text-foreground mb-3 line-clamp-1">
             {product.name}
           </h3>
-          <div className="flex items-center justify-between">
-            <div>
-              {hasDiscount ? (
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-base font-extrabold text-primary">
-                    ৳{finalPrice.toLocaleString()}
-                  </span>
-                  <span className="text-xs text-muted-foreground line-through">
-                    ৳{product.price.toLocaleString()}
-                  </span>
-                </div>
-              ) : (
-                <span className="text-base font-extrabold text-primary">
+
+          {/* Price section */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-lg font-extrabold text-primary">
+                ৳{finalPrice.toLocaleString()}
+              </span>
+              {hasDiscount && (
+                <span className="text-xs text-muted-foreground line-through">
                   ৳{product.price.toLocaleString()}
                 </span>
               )}
             </div>
+            {hasDiscount && (
+              <p className="text-xs font-bold text-green-600">
+                You save ৳{savedAmount.toLocaleString()}
+              </p>
+            )}
             {product.stock > 0 && product.stock <= 10 && (
-              <span className="text-xs text-destructive font-medium">
-                Only {product.stock} left
-              </span>
+              <p className="text-xs text-destructive font-bold">
+                Only {product.stock} left!
+              </p>
             )}
           </div>
         </div>
