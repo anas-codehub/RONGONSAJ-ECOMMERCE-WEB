@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/store/cart-store";
 import { useSession, signOut } from "next-auth/react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -45,26 +45,34 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (search.trim()) {
-      router.push(`/products?search=${search}`);
+  const handleSearch = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (search.trim()) {
+        router.push(`/products?search=${search}`);
+        setFocused(false);
+      }
+    },
+    [search, router],
+  );
+
+  const handleSuggestionClick = useCallback(
+    (suggestion: string) => {
+      setSearch(suggestion);
+      router.push(`/products?search=${suggestion}`);
       setFocused(false);
-    }
-  };
+    },
+    [router],
+  );
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setSearch(suggestion);
-    router.push(`/products?search=${suggestion}`);
-    setFocused(false);
-  };
-
-  const handleCategoryClick = (slug: string) => {
-    router.push(`/products?category=${slug}`);
-    setFocused(false);
-    setSearch("");
-  };
-
+  const handleCategoryClick = useCallback(
+    (slug: string) => {
+      router.push(`/products?category=${slug}`);
+      setFocused(false);
+      setSearch("");
+    },
+    [router],
+  );
   const filteredSuggestions = search.trim()
     ? popularSearches.filter((s) =>
         s.toLowerCase().includes(search.toLowerCase()),

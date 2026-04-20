@@ -12,20 +12,42 @@ import {
   Star,
   ArrowUpRight,
 } from "lucide-react";
+import { unstable_cache } from "next/cache";
+
+const getFeaturedProducts = unstable_cache(
+  async () => {
+    return db.product.findMany({
+      where: { isFeatured: true },
+      include: { category: true },
+      take: 8,
+    });
+  },
+  ["featured-products"],
+  { revalidate: 300 }, // cache for 5 minutes
+);
+
+const getCategories = unstable_cache(
+  async () => db.category.findMany({ take: 6 }),
+  ["categories"],
+  { revalidate: 300 },
+);
+
+const getSlides = unstable_cache(
+  async () =>
+    db.heroSlide.findMany({
+      where: { isActive: true },
+      orderBy: { order: "asc" },
+    }),
+  ["hero-slides"],
+  { revalidate: 300 },
+);
 
 export default async function HomePage() {
   const [featuredProducts, categories, slides, recentReviews] =
     await Promise.all([
-      db.product.findMany({
-        where: { isFeatured: true },
-        include: { category: true },
-        take: 8,
-      }),
-      db.category.findMany({ take: 6 }),
-      db.heroSlide.findMany({
-        where: { isActive: true },
-        orderBy: { order: "asc" },
-      }),
+      getFeaturedProducts(),
+      getCategories(),
+      getSlides(),
       db.review.findMany({
         take: 3,
         orderBy: { createdAt: "desc" },
@@ -33,8 +55,10 @@ export default async function HomePage() {
       }),
     ]);
 
-  const totalProducts = await db.product.count();
-  const totalOrders = await db.order.count();
+  const [totalProducts, totalOrders] = await Promise.all([
+    db.product.count(),
+    db.order.count(),
+  ]);
 
   return (
     <div className="min-h-screen">

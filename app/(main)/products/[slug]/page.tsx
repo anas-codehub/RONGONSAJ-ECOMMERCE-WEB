@@ -13,6 +13,16 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const products = await db.product.findMany({
+    select: { slug: true },
+    take: 50,
+  });
+  return products.map((p) => ({ slug: p.slug }));
+}
+
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const product = await db.product.findUnique({
@@ -92,7 +102,7 @@ export default async function ProductDetailPage({ params }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           {/* Images */}
           <div className="space-y-4">
-            <div className="relative h-96 lg:h-[500px] bg-secondary rounded-2xl overflow-hidden">
+            <div className="relative h-96 lg:h-125 bg-secondary rounded-2xl overflow-hidden">
               {product.images[0] ? (
                 <Image
                   src={product.images[0]}
