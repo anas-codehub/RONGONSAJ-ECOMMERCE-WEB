@@ -42,7 +42,10 @@ export default function MobileNav() {
   }, []);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background border-t border-border">
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-border"
+      style={{ background: "var(--background)" }}
+    >
       <div className="flex items-center justify-around px-2 py-2">
         {navItems.map(({ label, href, icon: Icon }) => {
           const isActive = pathname === href;
@@ -74,8 +77,17 @@ export default function MobileNav() {
 
                 {/* Account popup card */}
                 {accountOpen && (
-                  <div className="absolute bottom-full right-0 mb-2 w-48 bg-card border border-border rounded-2xl shadow-xl overflow-hidden">
-                    <div className="px-4 py-3 border-b border-border bg-secondary">
+                  <div
+                    className="absolute bottom-full right-0 mb-2 w-48 rounded-2xl shadow-xl overflow-hidden"
+                    style={{
+                      background: "var(--card)",
+                      border: "1px solid var(--border)",
+                    }}
+                  >
+                    <div
+                      className="px-4 py-3 border-b border-border"
+                      style={{ background: "var(--secondary)" }}
+                    >
                       <p className="text-xs font-extrabold text-foreground truncate">
                         {session?.user?.name || "Guest"}
                       </p>
@@ -87,6 +99,7 @@ export default function MobileNav() {
                       href="/account/profile"
                       onClick={() => setAccountOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-foreground hover:bg-secondary transition-colors"
+                      style={{ background: "var(--card)", display: "flex" }}
                     >
                       <UserCircle className="h-4 w-4 text-muted-foreground" />
                       My profile
@@ -96,6 +109,7 @@ export default function MobileNav() {
                         href="/admin"
                         onClick={() => setAccountOpen(false)}
                         className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-primary hover:bg-secondary transition-colors border-t border-border"
+                        style={{ background: "var(--card)", display: "flex" }}
                       >
                         <LayoutDashboard className="h-4 w-4" />
                         Admin panel

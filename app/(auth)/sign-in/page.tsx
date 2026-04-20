@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { handleEnterKey } from "@/hooks/useEnterToNext";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -103,6 +104,7 @@ export default function SignInPage() {
                 onChange={handleChange}
                 required
                 className="border-border bg-secondary h-11"
+                onKeyDown={(e) => handleEnterKey(e, "password")}
               />
             </div>
             <div>

@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Loader2, Tag, ArrowRight, Package } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { handleEnterKey } from "@/hooks/useEnterToNext";
 
 export default function CheckoutPage() {
   const { items, total, clearCart } = useCartStore();
@@ -155,6 +156,7 @@ export default function CheckoutPage() {
                     value={address.fullName}
                     onChange={handleAddressChange}
                     className="border-border"
+                    onKeyDown={(e) => handleEnterKey(e, "password")}
                   />
                 </div>
                 <div>
@@ -167,6 +169,7 @@ export default function CheckoutPage() {
                     value={address.phone}
                     onChange={handleAddressChange}
                     className="border-border"
+                    onKeyDown={(e) => handleEnterKey(e, "password")}
                   />
                 </div>
                 <div>
@@ -179,6 +182,7 @@ export default function CheckoutPage() {
                     value={address.street}
                     onChange={handleAddressChange}
                     className="border-border"
+                    onKeyDown={(e) => handleEnterKey(e, "password")}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -192,6 +196,7 @@ export default function CheckoutPage() {
                       value={address.city}
                       onChange={handleAddressChange}
                       className="border-border"
+                      onKeyDown={(e) => handleEnterKey(e, "password")}
                     />
                   </div>
                   <div>
