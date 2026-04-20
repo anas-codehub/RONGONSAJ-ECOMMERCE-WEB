@@ -12,7 +12,7 @@ export default function MainLayout({
       <Navbar />
       <main className="pb-16 md:pb-0">{children}</main>
       <Footer />
-      {/* <MobileNav /> */}
+      <MobileNav />
     </>
   );
 }
