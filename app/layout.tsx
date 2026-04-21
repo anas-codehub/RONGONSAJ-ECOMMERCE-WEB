@@ -59,14 +59,12 @@ export default async function RootLayout({
   const session = await auth();
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning style={{ overflowY: "scroll" }}>
       <body className={`${geist.variable} antialiased min-h-screen`}>
-        <ThemeProvider>
-          <SessionProvider session={session}>
-            {children}
-            <Toaster richColors position="top-right" />
-          </SessionProvider>
-        </ThemeProvider>
+        <SessionProvider session={session}>
+          {children}
+          <Toaster richColors position="top-right" />
+        </SessionProvider>
       </body>
     </html>
   );

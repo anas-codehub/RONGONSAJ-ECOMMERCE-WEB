@@ -459,25 +459,33 @@ export default function ProductForm({ categories, product }: Props) {
           </div>
         </div>
 
+        {/* Category */}
         <div>
-          <label className="text-sm font-medium text-foreground block mb-1.5">
+          <label className="text-sm font-semibold text-foreground block mb-1.5">
             Category
           </label>
-          <Select
+          <select
             value={form.categoryId}
-            onValueChange={(val) => setForm({ ...form, categoryId: val })}
+            onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+            className="w-full h-11 px-3 rounded-xl border border-border bg-card text-foreground text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary appearance-none cursor-pointer"
+            style={{ background: "var(--card)", color: "var(--foreground)" }}
           >
-            <SelectTrigger className="border-border">
-              <SelectValue placeholder="Select a category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id}>
-                  {cat.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <option value="" disabled>
+              Select a category
+            </option>
+            {categories.map((cat) => (
+              <option
+                key={cat.id}
+                value={cat.id}
+                style={{
+                  background: "var(--card)",
+                  color: "var(--foreground)",
+                }}
+              >
+                {cat.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
