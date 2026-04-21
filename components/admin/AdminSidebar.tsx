@@ -11,6 +11,7 @@ import {
   Image,
   FolderOpen,
   ChevronRight,
+  BookOpen,
 } from "lucide-react";
 
 const navItems = [
@@ -49,6 +50,8 @@ const navItems = [
     href: "/admin/slides",
     icon: Image,
   },
+
+  { label: "Admin guide", href: "/admin/guide", icon: BookOpen },
 ];
 
 export default function AdminSidebar() {

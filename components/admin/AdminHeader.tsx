@@ -2,7 +2,6 @@
 
 import { signOut } from "next-auth/react";
 import { Bell, LogOut, Menu } from "lucide-react";
-import ThemeToggle from "@/components/admin/ThemeToggle";
 import { useState } from "react";
 import Link from "next/link";
 import {
@@ -48,8 +47,6 @@ export default function AdminHeader({ session }: { session: any }) {
 
         {/* Right side */}
         <div className="flex items-center gap-2 ml-auto">
-          <ThemeToggle />
-
           <button className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors relative">
             <Bell className="h-4 w-4 text-foreground" />
           </button>
