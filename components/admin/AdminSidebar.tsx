@@ -58,7 +58,7 @@ export default function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 shrink-0 bg-foreground min-h-screen flex flex-col hidden md:flex">
+    <aside className="w-64 shrink-0 bg-foreground min-h-screen  flex-col hidden md:flex">
       {/* Logo */}
       <div className="px-6 py-5 border-b border-background/10">
         <Link
