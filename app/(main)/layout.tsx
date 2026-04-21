@@ -10,7 +10,7 @@ export default function MainLayout({
   return (
     <div className="light" style={{ colorScheme: "light" }}>
       <Navbar />
-      <main className="pb-16 md:pb-0">{children}</main>
+      <main className="pb-20 md:pb-0">{children}</main>
       <Footer />
       <MobileNav />
     </div>

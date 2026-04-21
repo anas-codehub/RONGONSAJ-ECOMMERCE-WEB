@@ -43,8 +43,14 @@ export default function MobileNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-border"
-      style={{ background: "var(--background)" }}
+      className="fixed left-0 right-0 z-50 md:hidden border-t border-border"
+      style={{
+        background: "var(--background)",
+        bottom: 0,
+        position: "fixed",
+        transform: "translateZ(0)",
+        willChange: "transform",
+      }}
     >
       <div className="flex items-center justify-around px-2 py-2">
         {navItems.map(({ label, href, icon: Icon }) => {

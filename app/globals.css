@@ -73,6 +73,38 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Prevent scrollbar layout shift */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: stable;
+   overflow-y: scroll;
+}
+
+/* Remove scrollbar visual on all pages */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+
+
+/* Prevent mobile nav from moving with keyboard */
+@supports (-webkit-touch-callout: none) {
+  .mobile-nav-fix {
+    position: fixed;
+    bottom: 0;
+    bottom: env(safe-area-inset-bottom);
+  }
 }
