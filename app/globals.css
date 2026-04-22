@@ -1,87 +1,56 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
   --background: #F9F5F1;
   --foreground: #3D2B1F;
-
   --primary: #E07B54;
   --primary-foreground: #FFFFFF;
-
   --secondary: #F0EBE3;
   --secondary-foreground: #7A5C4F;
-
   --muted: #E8DDD4;
   --muted-foreground: #7A5C4F;
-
   --accent: #E07B54;
   --accent-foreground: #FFFFFF;
-
   --card: #FFFFFF;
   --card-foreground: #3D2B1F;
-
   --border: #E8DDD4;
   --input: #E8DDD4;
   --ring: #E07B54;
-
   --destructive: #DC2626;
   --destructive-foreground: #FFFFFF;
-
   --radius: 0.75rem;
-  --font-sans: "Geist", sans-serif;
 }
-
-.dark {
-  --background: #1A1209;
-  --foreground: #F0EBE3;
-  --primary: #E07B54;
-  --primary-foreground: #FFFFFF;
-  --secondary: #2A1E14;
-  --secondary-foreground: #D4B8A8;
-  --muted: #2A1E14;
-  --muted-foreground: #D4B8A8;
-  --accent: #2A1E14;
-  --accent-foreground: #F0EBE3;
-  --card: #1A1209;
-  --card-foreground: #F0EBE3;
-  --border: #3A2818;
-  --input: #3A2818;
-  --ring: #E07B54;
-}
-
-@keyframes blob {
-   0% { transform: translate(0px, 0px) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
- 66% { transform: translate(-20px, 20px) scale(0.9); }
-  100% { transform: translate(0px, 0px) scale(1); }
-}
-.animate-blob { animation: blob 7s infinite; }
-.animation-delay-2000 { animation-delay: 2s; }
- .animation-delay-4000 { animation-delay: 4s; }
-
 
 * {
+  box-sizing: border-box;
   border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Prevent scrollbar layout shift */
-html {
-  scroll-behavior: stable;
-   overflow-y: scroll;
+img {
+  max-width: 100%;
 }
 
-/* Remove scrollbar visual on all pages */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -90,21 +59,14 @@ html {
 
 ::-webkit-scrollbar-thumb {
   background: var(--border);
-  border-radius: 3px;
+  border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
 }
 
-
-
-/* Prevent mobile nav from moving with keyboard */
-@supports (-webkit-touch-callout: none) {
-  .mobile-nav-fix {
-    position: fixed;
-    bottom: 0;
-    bottom: env(safe-area-inset-bottom);
-  }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }

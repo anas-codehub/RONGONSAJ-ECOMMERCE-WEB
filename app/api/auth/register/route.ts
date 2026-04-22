@@ -4,8 +4,10 @@ import bcrypt from "bcryptjs";
 import { sendWelcomeEmail } from "@/lib/email";
 import { checkRateLimit } from "@/lib/ratelimits";
 
-
+export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
+
+  
 
   const ip = req.headers.get("x-forwarded-for") ?? "anonymous";
 const { success, minutesLeft } = checkRateLimit(ip);

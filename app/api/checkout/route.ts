@@ -1,60 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
-
+export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
 
-    // Task 5: Require authentication to place an order
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "You must be signed in to place an order" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Please sign in to checkout" }, { status: 401 });
     }
 
     const userId = session.user.id as string;
-    const { items, address, couponId, total } = await req.json();
+    const body = await req.json();
+    const { items, address, couponId, total } = body;
 
     if (!items || items.length === 0) {
-      return NextResponse.json(
-        { error: "Cart is empty" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
 
-    // Check stock availability for all items first
-    // Task fix: use item.productId (not item.id which includes size/color suffix)
+    if (!address?.fullName || !address?.phone || !address?.street || !address?.city || !address?.district) {
+      return NextResponse.json({ error: "Please fill in all address fields" }, { status: 400 });
+    }
+
+    // Verify stock
     for (const item of items) {
-      const product = await db.product.findUnique({
-        where: { id: item.productId },
-      });
-
+      const productId = item.id.split("-")[0];
+      const product = await db.product.findUnique({ where: { id: productId } });
       if (!product) {
-        return NextResponse.json(
-          { error: `Product "${item.name}" not found` },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: `Product not found` }, { status: 400 });
       }
-
       if (product.stock < item.quantity) {
-        return NextResponse.json(
-          {
-            error: `Sorry! Only ${product.stock} units of "${product.name}" are available`,
-          },
-          { status: 400 }
-        );
+        return NextResponse.json({
+          error: `Only ${product.stock} units of "${product.name}" available`,
+        }, { status: 400 });
       }
     }
 
-    // Generate professional order number
+    // Generate order ID
     const date = new Date();
     const dateStr = date.toISOString().slice(0, 10).replace(/-/g, "");
     const orderCount = await db.order.count();
     const orderNumber = `ORD-${dateStr}-${String(orderCount + 1).padStart(3, "0")}`;
 
-    // Create address in DB
+    // Create address
     const savedAddress = await db.address.create({
       data: {
         fullName: address.fullName,
@@ -66,20 +54,19 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Task 6: Cash on Delivery — create order directly, no payment gateway needed
+    // Create order in transaction
     const order = await db.$transaction(async (tx) => {
       const newOrder = await tx.order.create({
         data: {
           id: orderNumber,
           total,
+          status: "PENDING",
           userId,
           addressId: savedAddress.id,
-          // Cash on Delivery — starts as PENDING (admin will update to PROCESSING → SHIPPED → DELIVERED)
-          status: "PENDING",
           ...(couponId && { couponId }),
           items: {
             create: items.map((item: any) => ({
-              productId: item.productId,
+              productId: item.id.split("-")[0],
               quantity: item.quantity,
               price: item.price,
             })),
@@ -87,30 +74,19 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // Decrease stock for each item
       for (const item of items) {
         await tx.product.update({
-          where: { id: item.productId },
-          data: {
-            stock: { decrement: item.quantity },
-          },
+          where: { id: item.id.split("-")[0] },
+          data: { stock: { decrement: item.quantity } },
         });
       }
 
       return newOrder;
     });
 
-    // Task 6: Return orderId directly — no payment redirect needed
-    return NextResponse.json({
-      orderId: order.id,
-      message: "Order placed successfully! You will pay on delivery.",
-    });
-
+    return NextResponse.json({ orderId: order.id });
   } catch (error) {
     console.error("Checkout error:", error);
-    return NextResponse.json(
-      { error: "Something went wrong" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }

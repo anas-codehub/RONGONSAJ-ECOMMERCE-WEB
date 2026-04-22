@@ -64,7 +64,7 @@ export default function AdminHeader({ session }: { session: any }) {
               </p>
             </div>
             <button
-              onClick={() => signOut({ callbackUrl: "/" })}
+              onClick={() => signOut({ callbackUrl: "sign-in" })}
               className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors ml-1"
               title="Sign out"
             >

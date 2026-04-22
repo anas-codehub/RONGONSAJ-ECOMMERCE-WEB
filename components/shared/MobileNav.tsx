@@ -145,6 +145,15 @@ export default function MobileNav() {
                     Admin panel
                   </Link>
                 )}
+
+                <Link
+                  href="/sign-in"
+                  onClick={() => setAccountOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-foreground hover:bg-secondary transition-colors"
+                >
+                  <UserCircle className="h-4 w-4 text-muted-foreground shrink-0" />
+                  Sign-out
+                </Link>
               </div>
             </div>
           )}
