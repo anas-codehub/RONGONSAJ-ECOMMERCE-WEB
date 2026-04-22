@@ -2,15 +2,13 @@
 
 import Link from "next/link";
 import {
-  ShoppingCart,
   Search,
+  ShoppingCart,
   User,
   ShoppingBag,
   Heart,
-  Menu,
   X,
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/store/cart-store";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -27,16 +25,16 @@ const categories = [
 const popularSearches = ["Dress", "T-shirt", "Saree", "Panjabi", "Kurta"];
 
 export default function Navbar() {
-  const { items, clearCart } = useCartStore();
+  const { items } = useCartStore();
   const { data: session } = useSession();
   const [search, setSearch] = useState("");
   const [focused, setFocused] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const router = useRouter();
   const searchRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+  const mobileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -54,23 +52,17 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Prevent body scroll when mobile menu is open
   useEffect(() => {
-    if (mobileOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
+    if (mobileSearchOpen) {
+      setTimeout(() => mobileInputRef.current?.focus(), 50);
     }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [mobileOpen]);
+  }, [mobileSearchOpen]);
 
   const handleSearch = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
       if (search.trim()) {
-        router.push(`/products?search=${search}`);
+        router.push(`/products?search=${encodeURIComponent(search)}`);
         setFocused(false);
         setMobileSearchOpen(false);
         setSearch("");
@@ -80,9 +72,8 @@ export default function Navbar() {
   );
 
   const handleSuggestionClick = useCallback(
-    (suggestion: string) => {
-      setSearch(suggestion);
-      router.push(`/products?search=${suggestion}`);
+    (s: string) => {
+      router.push(`/products?search=${encodeURIComponent(s)}`);
       setFocused(false);
       setMobileSearchOpen(false);
       setSearch("");
@@ -94,7 +85,6 @@ export default function Navbar() {
     (slug: string) => {
       router.push(`/products?category=${slug}`);
       setFocused(false);
-      setMobileOpen(false);
       setMobileSearchOpen(false);
       setSearch("");
     },
@@ -109,79 +99,85 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Top announcement bar - hide on mobile */}
-      <div className="bg-[#3D2B1F] text-[#F0EBE3] text-center text-xs py-2 tracking-wide hidden sm:block">
+      {/* Announcement bar — desktop only */}
+      <div className="hidden sm:block bg-[#3D2B1F] text-[#F0EBE3] text-center text-xs py-2 tracking-widest">
         Free delivery on orders over ৳2,000 · New drops every week
       </div>
 
-      <nav className="border-b border-border bg-[#F9F5F1] sticky top-0 z-50">
-        {/* Main navbar */}
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors shrink-0"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Menu"
-          >
-            {mobileOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
-          </button>
-
-          {/* Logo */}
+      <nav
+        className="sticky top-0 z-50 border-b border-border"
+        style={{ background: "var(--background)" }}
+      >
+        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-3">
+          {/* Logo — always visible */}
           <Link
             href="/"
-            className="font-bold text-xl shrink-0 text-foreground tracking-wider"
-            onClick={() => {
-              setMobileOpen(false);
-              setMobileSearchOpen(false);
-            }}
+            className="shrink-0 font-extrabold text-lg text-foreground tracking-widest"
           >
             RONGO<span className="text-primary">N</span>SAAJ
           </Link>
 
-          {/* Desktop nav links */}
-          <div className="hidden md:flex items-center gap-6 ml-4">
+          {/* Desktop category links */}
+          <div className="hidden md:flex items-center gap-5 ml-4">
             {categories.map((cat) => (
               <Link
                 key={cat.slug}
                 href={`/products?category=${cat.slug}`}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
               >
                 {cat.name}
               </Link>
             ))}
             <Link
               href="/products?sort=newest"
-              className="text-sm text-primary font-medium"
+              className="text-sm text-primary font-extrabold"
             >
               New arrivals
             </Link>
           </div>
 
-          {/* Desktop Search */}
-          <div
-            ref={searchRef}
-            className="hidden md:block flex-1 relative max-w-xs ml-auto"
-          >
-            <form onSubmit={handleSearch} className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search..."
+          {/* Search — takes full remaining width on mobile */}
+          <div ref={searchRef} className="flex-1 relative">
+            {/* Desktop search */}
+            <form onSubmit={handleSearch} className="hidden md:block relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search products..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onFocus={() => setFocused(true)}
-                className="pl-9 border-border bg-secondary text-sm h-9"
+                className="w-full pl-9 pr-4 h-9 rounded-xl border border-border text-sm outline-none focus:border-primary transition-colors"
+                style={{
+                  background: "var(--secondary)",
+                  color: "var(--foreground)",
+                }}
               />
             </form>
 
-            {/* Search dropdown */}
+            {/* Mobile search bar — always visible, full width */}
+            <button
+              className="md:hidden w-full flex items-center gap-2 h-9 px-3 rounded-xl border border-border text-sm text-muted-foreground"
+              style={{ background: "var(--secondary)" }}
+              onClick={() => setMobileSearchOpen(true)}
+            >
+              <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+              <span className="text-sm text-muted-foreground">
+                Search products...
+              </span>
+            </button>
+
+            {/* Desktop search dropdown */}
             {focused && (
-              <div className="absolute right-0 top-full mt-2 w-52 rounded-2xl shadow-xl z-50 overflow-hidden bg-white border border-gray-200">
-                <div className="p-3 border-b border-gray-100">
-                  <p className="text-xs font-medium text-gray-500 mb-2">
+              <div
+                className="hidden md:block absolute left-0 right-0 top-full mt-2 rounded-2xl z-50 overflow-hidden shadow-lg"
+                style={{
+                  background: "var(--card)",
+                  border: "1px solid var(--border)",
+                }}
+              >
+                <div className="p-3 border-b border-border">
+                  <p className="text-xs font-extrabold text-muted-foreground uppercase tracking-widest mb-2">
                     Categories
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -189,7 +185,7 @@ export default function Navbar() {
                       <button
                         key={cat.slug}
                         onClick={() => handleCategoryClick(cat.slug)}
-                        className="text-xs font-medium px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-primary hover:text-white transition-colors"
+                        className="text-xs font-bold px-3 py-1.5 rounded-full bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
                       >
                         {cat.name}
                       </button>
@@ -197,54 +193,43 @@ export default function Navbar() {
                   </div>
                 </div>
                 <div className="p-3">
-                  <p className="text-xs font-medium text-gray-500 mb-2">
+                  <p className="text-xs font-extrabold text-muted-foreground uppercase tracking-widest mb-2">
                     {search.trim() ? "Suggestions" : "Popular searches"}
                   </p>
-                  <div className="space-y-1">
-                    {filteredSuggestions.map((suggestion) => (
-                      <button
-                        key={suggestion}
-                        onClick={() => handleSuggestionClick(suggestion)}
-                        className="w-full text-left flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-100 transition-colors"
-                      >
-                        <Search className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                        <span className="text-sm text-gray-700">
-                          {suggestion}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
+                  {filteredSuggestions.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => handleSuggestionClick(s)}
+                      className="w-full text-left flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-secondary transition-colors"
+                    >
+                      <Search className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-sm text-foreground font-medium">
+                        {s}
+                      </span>
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
           </div>
 
-          {/* Right icons */}
-          <div className="flex items-center gap-1 ml-auto md:ml-0">
-            {/* Mobile search button */}
-            <button
-              className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors"
-              onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-              aria-label="Search"
-            >
-              <Search className="h-5 w-5 text-foreground" />
-            </button>
-
+          {/* Right icons — desktop only */}
+          <div className="hidden md:flex items-center gap-1 shrink-0">
             {/* Cart */}
             <Link href="/cart">
-              <button className="relative w-10 h-10 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors">
+              <button className="relative w-9 h-9 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors">
                 <ShoppingCart className="h-5 w-5 text-foreground" />
                 {items.length > 0 && (
-                  <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium">
+                  <span className="absolute top-0.5 right-0.5 bg-primary text-primary-foreground text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-extrabold">
                     {items.length}
                   </span>
                 )}
               </button>
             </Link>
 
-            {/* Wishlist - hide on mobile */}
-            <Link href="/account/wishlist" className="hidden sm:block">
-              <button className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors">
+            {/* Wishlist */}
+            <Link href="/account/wishlist">
+              <button className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors">
                 <Heart className="h-5 w-5 text-foreground" />
               </button>
             </Link>
@@ -254,10 +239,9 @@ export default function Navbar() {
               <div ref={profileRef} className="relative">
                 <button
                   onClick={() => setProfileOpen(!profileOpen)}
-                  className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors"
-                  aria-label="Profile"
+                  className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors"
                 >
-                  <div className="w-7 h-7 rounded-full overflow-hidden bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground shrink-0">
+                  <div className="w-7 h-7 rounded-full overflow-hidden bg-primary flex items-center justify-center text-xs font-extrabold text-primary-foreground shrink-0">
                     {(session.user as any)?.image ? (
                       <Image
                         src={(session.user as any).image}
@@ -271,14 +255,22 @@ export default function Navbar() {
                     )}
                   </div>
                 </button>
-
                 {profileOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-gray-200 rounded-2xl shadow-lg z-50 overflow-hidden">
-                    <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                  <div
+                    className="absolute right-0 top-full mt-2 w-52 rounded-2xl shadow-xl z-50 overflow-hidden"
+                    style={{
+                      background: "var(--card)",
+                      border: "1px solid var(--border)",
+                    }}
+                  >
+                    <div
+                      className="px-4 py-3 border-b border-border"
+                      style={{ background: "var(--secondary)" }}
+                    >
+                      <p className="text-sm font-extrabold text-foreground truncate">
                         {session.user?.name}
                       </p>
-                      <p className="text-xs text-gray-500 truncate">
+                      <p className="text-xs text-muted-foreground truncate">
                         {session.user?.email}
                       </p>
                     </div>
@@ -286,44 +278,51 @@ export default function Navbar() {
                       <Link
                         href="/admin"
                         onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-primary font-medium hover:bg-gray-50 transition-colors border-b border-gray-100"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-primary font-extrabold border-b border-border hover:bg-secondary transition-colors"
+                        style={{ background: "var(--card)" }}
                       >
                         Admin panel
                       </Link>
                     )}
-                    <div className="py-1">
-                      <Link
-                        href="/account/orders"
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      >
-                        <ShoppingBag className="h-4 w-4 text-gray-400" />
-                        My orders
-                      </Link>
-                      <Link
-                        href="/account/wishlist"
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      >
-                        <Heart className="h-4 w-4 text-gray-400" />
-                        My wishlist
-                      </Link>
-                      <Link
-                        href="/account/profile"
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      >
-                        <User className="h-4 w-4 text-gray-400" />
-                        My profile
-                      </Link>
+                    <div style={{ background: "var(--card)" }}>
+                      {[
+                        {
+                          href: "/account/orders",
+                          icon: ShoppingBag,
+                          label: "My orders",
+                        },
+                        {
+                          href: "/account/wishlist",
+                          icon: Heart,
+                          label: "My wishlist",
+                        },
+                        {
+                          href: "/account/profile",
+                          icon: User,
+                          label: "My profile",
+                        },
+                      ].map(({ href, icon: Icon, label }) => (
+                        <Link
+                          key={href}
+                          href={href}
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
+                        >
+                          <Icon className="h-4 w-4 text-muted-foreground" />
+                          {label}
+                        </Link>
+                      ))}
                     </div>
-                    <div className="border-t border-gray-100 py-1">
+                    <div
+                      className="border-t border-border"
+                      style={{ background: "var(--card)" }}
+                    >
                       <button
                         onClick={() => {
                           signOut({ callbackUrl: "/sign-in" });
                           setProfileOpen(false);
                         }}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-50 transition-colors w-full text-left"
+                        className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-secondary transition-colors"
                       >
                         Sign out
                       </button>
@@ -332,185 +331,102 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <Link href="/sign-in">
-                <button className="ml-1 bg-primary text-primary-foreground text-sm font-medium px-4 py-2 rounded-xl hover:bg-primary/90 transition-colors hidden sm:block">
-                  Sign in
-                </button>
-              </Link>
+              <div className="flex items-center gap-2 ml-1">
+                <Link href="/sign-in">
+                  <button className="text-sm font-bold text-foreground px-3 py-1.5 rounded-xl hover:bg-secondary transition-colors">
+                    Sign in
+                  </button>
+                </Link>
+                <Link href="/sign-up">
+                  <button className="bg-primary text-primary-foreground text-sm font-bold px-4 py-1.5 rounded-xl hover:bg-primary/90 transition-colors">
+                    Sign up
+                  </button>
+                </Link>
+              </div>
             )}
           </div>
         </div>
+      </nav>
 
-        {/* Mobile Search Bar */}
-        {mobileSearchOpen && (
-          <div className="md:hidden border-t border-border bg-background px-4 py-3">
-            <form onSubmit={handleSearch} className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
+      {/* Mobile full-screen search overlay */}
+      {mobileSearchOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex flex-col md:hidden"
+          style={{ background: "var(--background)" }}
+        >
+          {/* Header */}
+          <div
+            className="flex items-center gap-3 px-4 h-14 border-b border-border shrink-0"
+            style={{ background: "var(--background)" }}
+          >
+            <form onSubmit={handleSearch} className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <input
+                ref={mobileInputRef}
+                type="text"
                 placeholder="Search products..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 pr-20 border-border bg-secondary text-sm h-10 w-full"
-                autoFocus
+                className="w-full pl-9 pr-4 h-10 rounded-xl border border-border text-sm outline-none focus:border-primary transition-colors"
+                style={{
+                  background: "var(--secondary)",
+                  color: "var(--foreground)",
+                }}
               />
-              {search && (
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-xs bg-primary text-primary-foreground px-3 py-1 rounded-lg"
-                >
-                  Search
-                </button>
-              )}
             </form>
+            <button
+              onClick={() => {
+                setMobileSearchOpen(false);
+                setSearch("");
+              }}
+              className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors"
+            >
+              <X className="h-5 w-5 text-foreground" />
+            </button>
+          </div>
 
-            {/* Mobile search suggestions */}
-            {search && filteredSuggestions.length > 0 && (
-              <div className="mt-3 space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">
-                  Suggestions
-                </p>
-                {filteredSuggestions.map((suggestion) => (
+          {/* Body */}
+          <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+            <div>
+              <p className="text-xs font-extrabold text-muted-foreground uppercase tracking-widest mb-3">
+                Shop by category
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {categories.map((cat) => (
                   <button
-                    key={suggestion}
-                    onClick={() => handleSuggestionClick(suggestion)}
-                    className="w-full text-left flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-secondary transition-colors"
+                    key={cat.slug}
+                    onClick={() => handleCategoryClick(cat.slug)}
+                    className="text-sm font-bold px-4 py-3 rounded-xl border border-border text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all text-left"
+                    style={{ background: "var(--secondary)" }}
                   >
-                    <Search className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                    <span className="text-sm text-foreground">
-                      {suggestion}
+                    {cat.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-extrabold text-muted-foreground uppercase tracking-widest mb-3">
+                {search.trim() ? "Suggestions" : "Popular searches"}
+              </p>
+              <div className="space-y-1">
+                {filteredSuggestions.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => handleSuggestionClick(s)}
+                    className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary transition-colors"
+                  >
+                    <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span className="text-sm text-foreground font-medium">
+                      {s}
                     </span>
                   </button>
                 ))}
               </div>
-            )}
-          </div>
-        )}
-
-        {/* Mobile Menu Overlay */}
-        {mobileOpen && (
-          <>
-            <div
-              className="fixed inset-0 bg-black/50 z-40 md:hidden"
-              onClick={() => setMobileOpen(false)}
-            />
-            <div className="md:hidden fixed left-0 top-16 bottom-0 w-80 bg-white border-r border-gray-200 z-50 overflow-y-auto">
-              <div className="px-4 py-6 space-y-6">
-                {/* User info for mobile */}
-                {session && (
-                  <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
-                    <div className="w-10 h-10 rounded-full overflow-hidden bg-primary flex items-center justify-center text-sm font-bold text-primary-foreground shrink-0">
-                      {(session.user as any)?.image ? (
-                        <Image
-                          src={(session.user as any).image}
-                          alt="Profile"
-                          width={40}
-                          height={40}
-                          className="object-cover w-full h-full"
-                        />
-                      ) : (
-                        session.user?.name?.[0]?.toUpperCase() || "U"
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">
-                        {session.user?.name}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {session.user?.email}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Categories */}
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                    Shop by Category
-                  </p>
-                  <div className="space-y-1">
-                    {categories.map((cat) => (
-                      <Link
-                        key={cat.slug}
-                        href={`/products?category=${cat.slug}`}
-                        onClick={() => setMobileOpen(false)}
-                        className="block py-3 px-3 text-base text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
-                      >
-                        {cat.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Quick Links */}
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                    Quick Links
-                  </p>
-                  <div className="space-y-1">
-                    <Link
-                      href="/products?sort=newest"
-                      onClick={() => setMobileOpen(false)}
-                      className="block py-3 px-3 text-base text-primary font-medium hover:bg-gray-50 rounded-lg transition-colors"
-                    >
-                      New Arrivals
-                    </Link>
-                    <Link
-                      href="/account/wishlist"
-                      onClick={() => setMobileOpen(false)}
-                      className="block py-3 px-3 text-base text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
-                    >
-                      My Wishlist
-                    </Link>
-                    <Link
-                      href="/account/orders"
-                      onClick={() => setMobileOpen(false)}
-                      className="block py-3 px-3 text-base text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
-                    >
-                      My Orders
-                    </Link>
-                    {session && (
-                      <Link
-                        href="/account/profile"
-                        onClick={() => setMobileOpen(false)}
-                        className="block py-3 px-3 text-base text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
-                      >
-                        My Profile
-                      </Link>
-                    )}
-                  </div>
-                </div>
-
-                {/* Auth for mobile */}
-                {!session && (
-                  <div className="pt-4 border-t border-gray-100">
-                    <Link
-                      href="/sign-in"
-                      onClick={() => setMobileOpen(false)}
-                      className="block w-full text-center bg-primary text-white py-3 rounded-xl font-medium"
-                    >
-                      Sign In
-                    </Link>
-                  </div>
-                )}
-
-                {session && (
-                  <div className="pt-4 border-t border-gray-100">
-                    <button
-                      onClick={() => {
-                        signOut({ callbackUrl: "/sign-in" });
-                        setMobileOpen(false);
-                      }}
-                      className="block w-full text-center bg-red-50 text-red-600 py-3 rounded-xl font-medium hover:bg-red-100 transition-colors"
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                )}
-              </div>
             </div>
-          </>
-        )}
-      </nav>
+          </div>
+        </div>
+      )}
     </>
   );
 }
