@@ -23,32 +23,12 @@ export default function MobileNav() {
 
   const { data: session } = useSession();
   const [accountOpen, setAccountOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
   const isAdmin = (session?.user as any)?.role === "ADMIN";
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setAccountOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   // Sign out using API call directly — most reliable method
   const handleSignOut = () => {
     setAccountOpen(false);
     window.location.href = "/api/auth/signout?callbackUrl=/sign-in";
-  };
-  const getCsrfToken = async () => {
-    try {
-      const res = await fetch("/api/auth/csrf");
-      const data = await res.json();
-      return data.csrfToken || "";
-    } catch {
-      return "";
-    }
   };
 
   const handleAccountClick = () => {
@@ -57,6 +37,11 @@ export default function MobileNav() {
       return;
     }
     setAccountOpen(!accountOpen);
+  };
+
+  const handleNavigate = (href: string) => {
+    setAccountOpen(false);
+    router.push(href);
   };
 
   const navItems = [
@@ -224,7 +209,7 @@ export default function MobileNav() {
           })}
 
           {/* Account button */}
-          <div ref={ref} className="flex-1 relative">
+          <div className="flex-1 relative">
             <button
               onClick={handleAccountClick}
               className="w-full flex flex-col items-center gap-1 py-1.5 relative"
