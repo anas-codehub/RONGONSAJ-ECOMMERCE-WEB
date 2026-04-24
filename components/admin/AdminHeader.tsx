@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { Bell, BookOpen, LogOut, Menu } from "lucide-react";
+import { BookOpen, LogOut, Menu } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import {
@@ -48,9 +48,9 @@ export default function AdminHeader({ session }: { session: any }) {
 
         {/* Right side */}
         <div className="flex items-center gap-2 ml-auto">
-          <button className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors relative">
+          {/* <button className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors relative">
             <Bell className="h-4 w-4 text-foreground" />
-          </button>
+          </button> */}
 
           <div className="flex items-center gap-3 pl-3 border-l border-border ml-1">
             <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground">
