@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { Bell, LogOut, Menu } from "lucide-react";
+import { Bell, BookOpen, LogOut, Menu } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import {
@@ -22,6 +22,7 @@ const navItems = [
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Coupons", href: "/admin/coupons", icon: Tag },
   { label: "Hero slides", href: "/admin/slides", icon: Image },
+  { label: "Admin guide", href: "/admin/guide", icon: BookOpen },
 ];
 
 export default function AdminHeader({ session }: { session: any }) {
