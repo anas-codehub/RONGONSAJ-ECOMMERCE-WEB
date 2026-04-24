@@ -100,9 +100,9 @@ export default function Navbar() {
   return (
     <>
       {/* Announcement bar — desktop only */}
-      <div className="hidden sm:block bg-[#3D2B1F] text-[#F0EBE3] text-center text-xs py-2 tracking-widest">
+      {/* <div className="hidden sm:block bg-[#3D2B1F] text-[#F0EBE3] text-center text-xs py-2 tracking-widest">
         Free delivery on orders over ৳2,000 · New drops every week
-      </div>
+      </div> */}
 
       <nav
         className="sticky top-0 z-50 border-b border-border"
