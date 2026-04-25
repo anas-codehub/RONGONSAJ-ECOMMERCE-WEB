@@ -70,3 +70,12 @@ img {
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 2px white, 0 0 6px #22c55e;
+  }
+  50% {
+    box-shadow: 0 0 0 2px white, 0 0 14px #22c55e, 0 0 20px #22c55e;
+  }
+}

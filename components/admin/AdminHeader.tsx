@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { LogOut, Menu, Bell, ShoppingBag, X } from "lucide-react";
+import { LogOut, Menu, Bell, ShoppingBag, X, Check } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
@@ -39,8 +39,16 @@ export default function AdminHeader({ session }: { session: any }) {
   const [bellOpen, setBellOpen] = useState(false);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [lastReadAt, setLastReadAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const bellRef = useRef<HTMLDivElement>(null);
+
+  // Load last read timestamp from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("admin_notifications_read_at");
+    setLastReadAt(stored);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -52,14 +60,25 @@ export default function AdminHeader({ session }: { session: any }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch notifications
   const fetchNotifications = async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/notifications");
       const data = await res.json();
-      setRecentOrders(data.recentOrders || []);
+      const orders = data.recentOrders || [];
+      setRecentOrders(orders);
       setPendingCount(data.pendingCount || 0);
+
+      // Calculate unread count based on lastReadAt
+      const readAt = localStorage.getItem("admin_notifications_read_at");
+      if (readAt) {
+        const unread = orders.filter(
+          (o: Order) => new Date(o.createdAt) > new Date(readAt),
+        ).length;
+        setUnreadCount(unread);
+      } else {
+        setUnreadCount(orders.length);
+      }
     } catch {
       // ignore
     } finally {
@@ -67,7 +86,6 @@ export default function AdminHeader({ session }: { session: any }) {
     }
   };
 
-  // Auto fetch every 60 seconds
   useEffect(() => {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 60 * 1000);
@@ -77,6 +95,18 @@ export default function AdminHeader({ session }: { session: any }) {
   const handleBellClick = () => {
     setBellOpen(!bellOpen);
     if (!bellOpen) fetchNotifications();
+  };
+
+  const handleMarkAllRead = () => {
+    const now = new Date().toISOString();
+    localStorage.setItem("admin_notifications_read_at", now);
+    setLastReadAt(now);
+    setUnreadCount(0);
+  };
+
+  const isUnread = (orderCreatedAt: string) => {
+    if (!lastReadAt) return true;
+    return new Date(orderCreatedAt) > new Date(lastReadAt);
   };
 
   const timeAgo = (date: string) => {
@@ -92,7 +122,6 @@ export default function AdminHeader({ session }: { session: any }) {
   return (
     <>
       <header className="bg-card border-b border-border px-4 md:px-6 h-16 flex items-center justify-between sticky top-0 z-40">
-        {/* Mobile menu button */}
         <button
           className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -110,26 +139,30 @@ export default function AdminHeader({ session }: { session: any }) {
           </p>
         </div>
 
-        {/* Right side */}
         <div className="flex items-center gap-2 ml-auto">
-          {/* Bell notification */}
+          {/* Bell */}
           <div ref={bellRef} className="relative">
             <button
               onClick={handleBellClick}
               className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors relative"
             >
               <Bell className="h-4 w-4 text-foreground" />
-              {pendingCount > 0 && (
-                <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-[9px] rounded-full h-4 w-4 flex items-center justify-center font-extrabold">
-                  {pendingCount > 9 ? "9+" : pendingCount}
+              {unreadCount > 0 && (
+                <span
+                  className="absolute -top-1 -right-1 bg-green-500 text-white text-[9px] rounded-full h-4 w-4 flex items-center justify-center font-extrabold"
+                  style={{
+                    boxShadow: "0 0 0 2px white, 0 0 8px #22c55e",
+                    animation: "pulse 2s infinite",
+                  }}
+                >
+                  {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
             </button>
 
-            {/* Notification dropdown */}
             {bellOpen && (
               <div
-                className="absolute right-0 top-full mt-2 w-80 rounded-2xl shadow-xl z-50 overflow-hidden"
+                className="absolute right-0 top-full mt-2 w-96 rounded-2xl shadow-xl z-50 overflow-hidden"
                 style={{
                   background: "var(--card)",
                   border: "1px solid var(--border)",
@@ -145,22 +178,40 @@ export default function AdminHeader({ session }: { session: any }) {
                       Notifications
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {pendingCount} pending orders
+                      {recentOrders.length} orders in last 24h · {pendingCount}{" "}
+                      pending
                     </p>
                   </div>
-                  <Link
-                    href="/admin/orders"
-                    onClick={() => setBellOpen(false)}
-                    className="text-xs font-bold text-primary hover:underline"
-                  >
-                    View all
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={handleMarkAllRead}
+                        className="flex items-center gap-1.5 text-xs font-bold text-primary hover:bg-primary/10 px-2.5 py-1.5 rounded-lg transition-colors"
+                        title="Mark all as read"
+                      >
+                        <Check className="h-3 w-3" />
+                        Mark all read
+                      </button>
+                    )}
+                    <Link
+                      href="/admin/orders"
+                      onClick={() => setBellOpen(false)}
+                      className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      View all
+                    </Link>
+                  </div>
                 </div>
 
-                {/* Orders list */}
+                {/* Orders */}
                 <div
-                  className="max-h-80 overflow-y-auto"
-                  style={{ background: "var(--card)" }}
+                  className="overflow-y-auto"
+                  style={{
+                    background: "var(--card)",
+                    maxHeight: "380px",
+                    scrollbarWidth: "thin",
+                    scrollbarColor: "#E07B54 transparent",
+                  }}
                 >
                   {loading ? (
                     <div className="px-4 py-8 text-center">
@@ -170,63 +221,91 @@ export default function AdminHeader({ session }: { session: any }) {
                       </p>
                     </div>
                   ) : recentOrders.length === 0 ? (
-                    <div className="px-4 py-8 text-center">
+                    <div className="px-4 py-10 text-center">
                       <ShoppingBag className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-40" />
                       <p className="text-sm font-bold text-foreground">
                         No orders in last 24h
                       </p>
                     </div>
                   ) : (
-                    recentOrders.map((order) => (
-                      <Link
-                        key={order.id}
-                        href="/admin/orders"
-                        onClick={() => setBellOpen(false)}
-                        className="flex items-start gap-3 px-4 py-3 hover:bg-secondary transition-colors border-b border-border last:border-0"
-                      >
-                        {/* Icon */}
-                        <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                          <ShoppingBag className="h-4 w-4 text-primary" />
-                        </div>
+                    recentOrders.map((order) => {
+                      const unread = isUnread(order.createdAt);
+                      return (
+                        <Link
+                          key={order.id}
+                          href="/admin/orders"
+                          onClick={() => setBellOpen(false)}
+                          className="flex items-start gap-3 px-4 py-3 hover:bg-secondary transition-colors border-b border-border last:border-0 relative"
+                          style={{
+                            background: unread
+                              ? "var(--secondary)"
+                              : "var(--card)",
+                          }}
+                        >
+                          {/* Unread dot */}
+                          {unread && (
+                            <div
+                              className="absolute left-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-green-500 rounded-full"
+                              style={{ boxShadow: "0 0 6px #22c55e" }}
+                            />
+                          )}
 
-                        {/* Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="text-xs font-extrabold text-foreground truncate">
-                              {order.user.name ||
-                                order.user.email ||
-                                "Customer"}
-                            </p>
-                            <span className="text-xs font-extrabold text-primary shrink-0">
-                              ৳{order.total.toLocaleString()}
-                            </span>
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-0.5 font-mono">
-                            #{order.id}
-                          </p>
-                          <div className="flex items-center justify-between mt-1">
-                            <span
-                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                order.status === "PENDING"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : order.status === "PROCESSING"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : order.status === "SHIPPED"
-                                      ? "bg-purple-100 text-purple-800"
-                                      : order.status === "DELIVERED"
-                                        ? "bg-green-100 text-green-800"
-                                        : "bg-red-100 text-red-800"
+                          {/* Icon */}
+                          <div
+                            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                              order.status === "CANCELLED"
+                                ? "bg-red-100"
+                                : "bg-primary/10"
+                            }`}
+                          >
+                            <ShoppingBag
+                              className={`h-4 w-4 ${
+                                order.status === "CANCELLED"
+                                  ? "text-destructive"
+                                  : "text-primary"
                               }`}
-                            >
-                              {order.status}
-                            </span>
-                            <span className="text-[10px] text-muted-foreground">
-                              {timeAgo(order.createdAt)}
-                            </span>
+                            />
                           </div>
-                        </div>
-                      </Link>
-                    ))
+
+                          {/* Info */}
+                          <div className="flex-1 min-w-0 ml-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-xs font-extrabold text-foreground truncate">
+                                {order.user.name ||
+                                  order.user.email ||
+                                  "Customer"}
+                              </p>
+                              <span className="text-xs font-extrabold text-primary shrink-0">
+                                ৳{order.total.toLocaleString()}
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-0.5 font-mono">
+                              #{order.id}
+                            </p>
+                            <div className="flex items-center justify-between mt-1.5">
+                              <span
+                                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                  order.status === "PENDING"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : order.status === "PROCESSING"
+                                      ? "bg-blue-100 text-blue-800"
+                                      : order.status === "SHIPPED"
+                                        ? "bg-purple-100 text-purple-800"
+                                        : order.status === "DELIVERED"
+                                          ? "bg-green-100 text-green-800"
+                                          : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {order.status}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground">
+                                {timeAgo(order.createdAt)}
+                              </span>
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })
                   )}
                 </div>
 
@@ -248,7 +327,7 @@ export default function AdminHeader({ session }: { session: any }) {
             )}
           </div>
 
-          {/* Admin info + signout */}
+          {/* Admin info */}
           <div className="flex items-center gap-3 pl-3 border-l border-border ml-1">
             <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center text-xs font-extrabold text-primary-foreground">
               {session?.user?.name?.[0]?.toUpperCase() || "A"}

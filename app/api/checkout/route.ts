@@ -109,50 +109,19 @@ export async function POST(req: NextRequest) {
       return newOrder;
     });
 
-    // Send admin notification email directly
-    if (process.env.ADMIN_EMAIL && process.env.RESEND_API_KEY) {
-      try {
-        await resend.emails.send({
-          from: process.env.RESEND_FROM_EMAIL!,
-          to: process.env.ADMIN_EMAIL!,
-          subject: `🛍️ New order! #${order.id} — ৳${total.toLocaleString()}`,
-          html: `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
-              <div style="background:#3D2B1F;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px;">
-                <h1 style="color:#F0EBE3;margin:0;font-size:22px;">🛍️ New Order Received!</h1>
-                <p style="color:#E07B54;margin:8px 0 0;">RONGONSAAJ</p>
-              </div>
-              <div style="background:#F9F5F1;padding:20px;border-radius:12px;margin-bottom:16px;">
-                <p style="margin:4px 0;color:#3D2B1F;"><strong>Order ID:</strong> #${order.id}</p>
-                <p style="margin:4px 0;color:#3D2B1F;"><strong>Customer:</strong> ${session.user.name || session.user.email}</p>
-                <p style="margin:4px 0;color:#3D2B1F;"><strong>Total:</strong> ৳${total.toLocaleString()}</p>
-                <p style="margin:4px 0;color:#3D2B1F;"><strong>Payment:</strong> Cash on delivery</p>
-                <p style="margin:4px 0;color:#3D2B1F;"><strong>Address:</strong> ${address.street}, ${address.city}, ${address.district}</p>
-                <p style="margin:4px 0;color:#3D2B1F;"><strong>Phone:</strong> ${address.phone}</p>
-              </div>
-              <div style="background:#fff;border:1px solid #E8DDD4;padding:20px;border-radius:12px;margin-bottom:16px;">
-                <h3 style="color:#3D2B1F;margin:0 0 12px;">Items Ordered</h3>
-                ${items.map((item: any) => `
-                  <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F0EBE3;">
-                    <span style="color:#3D2B1F;font-weight:600;">${item.name}</span>
-                    <span style="color:#E07B54;font-weight:700;">৳${item.price.toLocaleString()} × ${item.quantity}</span>
-                  </div>
-                `).join("")}
-              </div>
-              <div style="text-align:center;">
-                <a href="${process.env.NEXTAUTH_URL}/admin/orders"
-                  style="background:#E07B54;color:white;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:700;display:inline-block;">
-                  View in Admin Panel →
-                </a>
-              </div>
-            </div>
-          `,
-        });
-      } catch (emailError) {
-        console.error("Admin email error:", emailError);
-        // Don't fail the order if email fails
-      }
-    }
+   // Send admin notification email directly
+if (process.env.ADMIN_EMAIL && process.env.RESEND_API_KEY) {
+  try {
+    await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL!,
+      to: process.env.ADMIN_EMAIL!,
+      subject: `🛍️ New order! #${order.id}`,
+      html: `...`
+    });
+  } catch (emailError) {
+    console.error("Admin email error:", emailError);
+  }
+}
 
     return NextResponse.json({ orderId: order.id });
   } catch (error) {
