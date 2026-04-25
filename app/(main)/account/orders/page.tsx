@@ -22,16 +22,26 @@ export default async function OrdersPage() {
   if (!session?.user?.id) redirect("/sign-in");
 
   const orders = await db.order.findMany({
-    where: { userId: session.user.id },
-    include: {
-      items: {
-        include: { product: true },
+    where: {
+      userId: session.user.id as string,
+      // Hide cancelled orders older than 24 hours
+      NOT: {
+        AND: [
+          { status: "CANCELLED" },
+          {
+            createdAt: {
+              lt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+            },
+          },
+        ],
       },
+    },
+    include: {
+      items: { include: { product: true } },
       address: true,
     },
     orderBy: { createdAt: "desc" },
   });
-
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 py-10">

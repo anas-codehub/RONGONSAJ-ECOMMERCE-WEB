@@ -16,6 +16,7 @@ import {
   XCircle,
   Circle,
 } from "lucide-react";
+import CancelOrderButton from "@/components/shared/CancelOrderButton";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -329,6 +330,22 @@ export default async function OrderDetailPage({ params }: Props) {
                 </div>
               </div>
             </div>
+
+            {/* Cancel order — only if PENDING and within 1 hour */}
+            {order.status === "PENDING" &&
+              Date.now() - new Date(order.createdAt).getTime() <
+                60 * 60 * 1000 && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-5">
+                  <p className="text-sm font-extrabold text-yellow-800 mb-1">
+                    ⏱ Cancel window open
+                  </p>
+                  <p className="text-xs text-yellow-700 mb-3 leading-relaxed">
+                    You can still cancel this order. Once processing begins,
+                    cancellation is no longer possible.
+                  </p>
+                  <CancelOrderButton orderId={order.id} />
+                </div>
+              )}
 
             {/* Need help */}
             <div className="bg-secondary border border-border rounded-2xl p-5">
