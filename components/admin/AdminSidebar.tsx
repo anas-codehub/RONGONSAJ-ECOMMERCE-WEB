@@ -12,6 +12,7 @@ import {
   FolderOpen,
   ChevronRight,
   BookOpen,
+  Truck,
 } from "lucide-react";
 
 const navItems = [
@@ -50,6 +51,8 @@ const navItems = [
     href: "/admin/slides",
     icon: Image,
   },
+
+  { label: "Delivery", href: "/admin/delivery", icon: Truck },
 
   { label: "Admin guide", href: "/admin/guide", icon: BookOpen },
 ];

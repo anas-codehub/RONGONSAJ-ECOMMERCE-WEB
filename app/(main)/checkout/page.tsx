@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCartStore } from "@/store/cart-store";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -23,6 +23,11 @@ export default function CheckoutPage() {
   const [couponLoading, setCouponLoading] = useState(false);
   const [discount, setDiscount] = useState(0);
   const [couponId, setCouponId] = useState<string | null>(null);
+  const [deliverySettings, setDeliverySettings] = useState({
+    insideDhaka: 60,
+    outsideDhaka: 120,
+    freeDeliveryMin: 2000,
+  });
 
   const [address, setAddress] = useState({
     fullName: "",
@@ -36,10 +41,28 @@ export default function CheckoutPage() {
     setAddress({ ...address, [e.target.name]: e.target.value });
   };
 
-  const deliveryFee = total() >= 2000 ? 0 : 100;
+  // Fetch delivery settings on load
+  useEffect(() => {
+    fetch("/api/admin/delivery-settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.insideDhaka) setDeliverySettings(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Dynamic delivery charge based on district
   const subtotal = total();
+  const isInsideDhaka = address.district.toLowerCase().includes("dhaka");
+  const deliveryCharge =
+    subtotal >= deliverySettings.freeDeliveryMin
+      ? 0
+      : isInsideDhaka
+        ? deliverySettings.insideDhaka
+        : deliverySettings.outsideDhaka;
+
   const discountAmount = couponId ? Math.round((subtotal * discount) / 100) : 0;
-  const grandTotal = subtotal + deliveryFee - discountAmount;
+  const grandTotal = subtotal + deliveryCharge - discountAmount;
 
   const applyCoupon = async () => {
     if (!couponCode.trim()) return;
@@ -62,7 +85,6 @@ export default function CheckoutPage() {
   };
 
   const handleCheckout = async () => {
-    // Task 5: Require sign-in
     if (!session) {
       toast.error("Please sign in to place an order");
       router.push("/sign-in");
@@ -100,7 +122,6 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Task 6: Cash on Delivery — no payment redirect, go to order success
       clearCart();
       toast.success("Order placed successfully!");
       router.push(`/order-success?orderId=${data.orderId}`);
@@ -127,9 +148,11 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 py-10">
-        <h1 className="text-3xl font-medium text-foreground mb-2">Checkout</h1>
+        <h1 className="text-3xl font-extrabold text-foreground mb-2 tracking-tight">
+          Checkout
+        </h1>
 
-        {/* Task 6: Cash on Delivery notice */}
+        {/* Cash on Delivery notice */}
         <div className="flex items-center gap-3 bg-primary/10 border border-primary/20 rounded-2xl px-5 py-3 mb-8">
           <Package className="h-5 w-5 text-primary shrink-0" />
           <p className="text-sm text-primary font-semibold">
@@ -142,68 +165,73 @@ export default function CheckoutPage() {
           {/* Left — Address form */}
           <div className="space-y-6">
             <div className="bg-card border border-border rounded-2xl p-6">
-              <h2 className="text-lg font-medium text-foreground mb-5">
+              <h2 className="text-lg font-extrabold text-foreground mb-5">
                 Delivery address
               </h2>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-foreground block mb-1.5">
+                  <label className="text-sm font-semibold text-foreground block mb-1.5">
                     Full name
                   </label>
                   <Input
+                    id="fullName"
                     name="fullName"
                     placeholder="Your full name"
                     value={address.fullName}
                     onChange={handleAddressChange}
                     className="border-border"
-                    onKeyDown={(e) => handleEnterKey(e, "password")}
+                    onKeyDown={(e) => handleEnterKey(e, "phone")}
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground block mb-1.5">
+                  <label className="text-sm font-semibold text-foreground block mb-1.5">
                     Phone number
                   </label>
                   <Input
+                    id="phone"
                     name="phone"
                     placeholder="01XXXXXXXXX"
                     value={address.phone}
                     onChange={handleAddressChange}
                     className="border-border"
-                    onKeyDown={(e) => handleEnterKey(e, "password")}
+                    onKeyDown={(e) => handleEnterKey(e, "street")}
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground block mb-1.5">
+                  <label className="text-sm font-semibold text-foreground block mb-1.5">
                     Street address
                   </label>
                   <Input
+                    id="street"
                     name="street"
                     placeholder="House, road, area"
                     value={address.street}
                     onChange={handleAddressChange}
                     className="border-border"
-                    onKeyDown={(e) => handleEnterKey(e, "password")}
+                    onKeyDown={(e) => handleEnterKey(e, "city")}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-foreground block mb-1.5">
+                    <label className="text-sm font-semibold text-foreground block mb-1.5">
                       City
                     </label>
                     <Input
+                      id="city"
                       name="city"
                       placeholder="Dhaka"
                       value={address.city}
                       onChange={handleAddressChange}
                       className="border-border"
-                      onKeyDown={(e) => handleEnterKey(e, "password")}
+                      onKeyDown={(e) => handleEnterKey(e, "district")}
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground block mb-1.5">
+                    <label className="text-sm font-semibold text-foreground block mb-1.5">
                       District
                     </label>
                     <Input
+                      id="district"
                       name="district"
                       placeholder="Dhaka"
                       value={address.district}
@@ -217,7 +245,7 @@ export default function CheckoutPage() {
 
             {/* Coupon */}
             <div className="bg-card border border-border rounded-2xl p-6">
-              <h2 className="text-lg font-medium text-foreground mb-4">
+              <h2 className="text-lg font-extrabold text-foreground mb-4">
                 Coupon code
               </h2>
               <div className="flex gap-3">
@@ -243,7 +271,7 @@ export default function CheckoutPage() {
                 </Button>
               </div>
               {couponId && (
-                <p className="text-sm text-green-600 mt-2">
+                <p className="text-sm text-green-600 mt-2 font-medium">
                   ✓ Coupon applied — {discount}% discount
                 </p>
               )}
@@ -253,7 +281,7 @@ export default function CheckoutPage() {
           {/* Right — Order summary */}
           <div>
             <div className="bg-card border border-border rounded-2xl p-6 sticky top-24">
-              <h2 className="text-lg font-medium text-foreground mb-5">
+              <h2 className="text-lg font-extrabold text-foreground mb-5">
                 Order summary
               </h2>
 
@@ -267,7 +295,7 @@ export default function CheckoutPage() {
                           src={item.image}
                           alt={item.name}
                           fill
-                          className="object-cover"
+                          className="object-contain p-1"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
@@ -276,14 +304,14 @@ export default function CheckoutPage() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground line-clamp-1">
+                      <p className="text-sm font-bold text-foreground line-clamp-1">
                         {item.name}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         Qty: {item.quantity}
                       </p>
                     </div>
-                    <p className="text-sm font-medium text-foreground shrink-0">
+                    <p className="text-sm font-bold text-foreground shrink-0">
                       ৳{(item.price * item.quantity).toLocaleString()}
                     </p>
                   </div>
@@ -296,20 +324,48 @@ export default function CheckoutPage() {
               <div className="space-y-3 text-sm mb-5">
                 <div className="flex justify-between text-muted-foreground">
                   <span>Subtotal</span>
-                  <span className="text-foreground">
+                  <span className="text-foreground font-medium">
                     ৳{subtotal.toLocaleString()}
                   </span>
                 </div>
+
+                {/* Dynamic delivery charge */}
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Delivery</span>
-                  <span className="text-foreground">
-                    {deliveryFee === 0 ? (
-                      <span className="text-green-600">Free</span>
-                    ) : (
-                      `৳${deliveryFee}`
+                  <div>
+                    <span>Delivery</span>
+                    {address.district && (
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {isInsideDhaka ? "Inside Dhaka" : "Outside Dhaka"}
+                      </p>
                     )}
-                  </span>
+                  </div>
+                  <div className="text-right">
+                    {deliveryCharge === 0 ? (
+                      <span className="text-green-600 font-bold">Free</span>
+                    ) : (
+                      <span className="text-foreground font-medium">
+                        ৳{deliveryCharge}
+                      </span>
+                    )}
+                  </div>
                 </div>
+
+                {/* Free delivery hint */}
+                {subtotal < deliverySettings.freeDeliveryMin && (
+                  <div className="bg-secondary rounded-xl p-3">
+                    <p className="text-xs text-muted-foreground">
+                      Add{" "}
+                      <span className="font-bold text-foreground">
+                        ৳
+                        {(
+                          deliverySettings.freeDeliveryMin - subtotal
+                        ).toLocaleString()}
+                      </span>{" "}
+                      more for free delivery!
+                    </p>
+                  </div>
+                )}
+
                 {discountAmount > 0 && (
                   <div className="flex justify-between text-green-600">
                     <span>Discount ({discount}%)</span>
@@ -320,7 +376,7 @@ export default function CheckoutPage() {
 
               <Separator className="bg-border mb-4" />
 
-              <div className="flex justify-between font-medium text-foreground mb-6">
+              <div className="flex justify-between font-extrabold text-foreground mb-6">
                 <span>Total</span>
                 <span className="text-primary text-lg">
                   ৳{grandTotal.toLocaleString()}
@@ -335,11 +391,10 @@ export default function CheckoutPage() {
                 {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
                 {loading
                   ? "Placing order..."
-                  : "Place Order — Cash on Delivery"}
+                  : "Place order — Cash on delivery"}
                 {!loading && <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
 
-              {/* Task 6: Updated payment note */}
               <p className="text-xs text-muted-foreground text-center mt-3">
                 💵 You will pay in cash when your order is delivered
               </p>

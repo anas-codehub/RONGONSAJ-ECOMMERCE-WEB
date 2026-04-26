@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { LogOut, Menu, Bell, ShoppingBag, X, Check } from "lucide-react";
+import { LogOut, Menu, Bell, ShoppingBag, X, Check, Truck } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
@@ -23,6 +23,7 @@ const navItems = [
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Coupons", href: "/admin/coupons", icon: Tag },
   { label: "Hero slides", href: "/admin/slides", icon: Image },
+  { label: "Delivery", href: "/admin/delivery", icon: Truck },
   { label: "Admin guide", href: "/admin/guide", icon: BookOpen },
 ];
 
