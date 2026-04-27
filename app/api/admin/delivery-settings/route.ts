@@ -1,32 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
-import {auth} from "@/lib/auth"
-import {db} from "@/lib/db"
-
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-    try {
-        let settings = await db.deliverySettings.findFirst();
+  try {
+    let settings = await db.deliverySettings.findFirst();
 
-        if (!settings) {
-            settings = await db.deliverySettings.create({
-                data: {
-                    insideDhaka: 80,
-                    outsideDhaka: 150,
-                    freeDeliveryMin: 2000,
-                },
-            });
-        }
-
-        return NextResponse.json(settings)
-    } catch (error) {
-        console.error("Delivery settings error:", error);
-        return NextResponse.json(
-            {error: "Failed to fetch settings"},
-            {status: 500}
-        );
+    if (!settings) {
+      settings = await db.deliverySettings.create({
+        data: {
+          insideDhaka: 60,
+          subDhaka: 120,
+          outsideDhaka: 150,
+        },
+      });
     }
+
+    return NextResponse.json(settings);
+  } catch (error) {
+    console.error("Delivery settings error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch settings" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function PATCH(req: NextRequest) {
@@ -38,7 +37,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { insideDhaka, outsideDhaka, freeDeliveryMin } = body;
+    const { insideDhaka, subDhaka, outsideDhaka } = body;
 
     let settings = await db.deliverySettings.findFirst();
 
@@ -46,8 +45,8 @@ export async function PATCH(req: NextRequest) {
       settings = await db.deliverySettings.create({
         data: {
           insideDhaka: parseFloat(insideDhaka),
+          subDhaka: parseFloat(subDhaka),
           outsideDhaka: parseFloat(outsideDhaka),
-          freeDeliveryMin: parseFloat(freeDeliveryMin),
         },
       });
     } else {
@@ -55,8 +54,8 @@ export async function PATCH(req: NextRequest) {
         where: { id: settings.id },
         data: {
           insideDhaka: parseFloat(insideDhaka),
+          subDhaka: parseFloat(subDhaka),
           outsideDhaka: parseFloat(outsideDhaka),
-          freeDeliveryMin: parseFloat(freeDeliveryMin),
         },
       });
     }

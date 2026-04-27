@@ -12,6 +12,11 @@ import { Loader2, Tag, ArrowRight, Package } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { handleEnterKey } from "@/hooks/useEnterToNext";
+import {
+  DELIVERY_ZONES,
+  getDeliveryCharge,
+  getZoneLabel,
+} from "@/lib/districts";
 
 export default function CheckoutPage() {
   const { items, total, clearCart } = useCartStore();
@@ -25,8 +30,8 @@ export default function CheckoutPage() {
   const [couponId, setCouponId] = useState<string | null>(null);
   const [deliverySettings, setDeliverySettings] = useState({
     insideDhaka: 60,
-    outsideDhaka: 120,
-    freeDeliveryMin: 2000,
+    subDhaka: 120,
+    outsideDhaka: 150,
   });
 
   const [address, setAddress] = useState({
@@ -41,26 +46,22 @@ export default function CheckoutPage() {
     setAddress({ ...address, [e.target.name]: e.target.value });
   };
 
-  // Fetch delivery settings on load
+  // Fetch delivery settings
   useEffect(() => {
     fetch("/api/admin/delivery-settings")
       .then((res) => res.json())
       .then((data) => {
-        if (data.insideDhaka) setDeliverySettings(data);
+        if (data.insideDhaka !== undefined) setDeliverySettings(data);
       })
       .catch(() => {});
   }, []);
 
-  // Dynamic delivery charge based on district
+  // Calculate delivery charge based on selected district
   const subtotal = total();
-  const isInsideDhaka = address.district.toLowerCase().includes("dhaka");
-  const deliveryCharge =
-    subtotal >= deliverySettings.freeDeliveryMin
-      ? 0
-      : isInsideDhaka
-        ? deliverySettings.insideDhaka
-        : deliverySettings.outsideDhaka;
-
+  const deliveryCharge = address.district
+    ? getDeliveryCharge(address.district, deliverySettings)
+    : 0;
+  const zoneLabel = address.district ? getZoneLabel(address.district) : "";
   const discountAmount = couponId ? Math.round((subtotal * discount) / 100) : 0;
   const grandTotal = subtotal + deliveryCharge - discountAmount;
 
@@ -152,17 +153,17 @@ export default function CheckoutPage() {
           Checkout
         </h1>
 
-        {/* Cash on Delivery notice */}
+        {/* COD notice */}
         <div className="flex items-center gap-3 bg-primary/10 border border-primary/20 rounded-2xl px-5 py-3 mb-8">
           <Package className="h-5 w-5 text-primary shrink-0" />
           <p className="text-sm text-primary font-semibold">
-            Cash on Delivery — Pay when your order arrives at your door. No
-            advance payment needed.
+            Cash on Delivery — Pay when your order arrives. No advance payment
+            needed.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {/* Left — Address form */}
+          {/* Left — Address */}
           <div className="space-y-6">
             <div className="bg-card border border-border rounded-2xl p-6">
               <h2 className="text-lg font-extrabold text-foreground mb-5">
@@ -183,6 +184,7 @@ export default function CheckoutPage() {
                     onKeyDown={(e) => handleEnterKey(e, "phone")}
                   />
                 </div>
+
                 <div>
                   <label className="text-sm font-semibold text-foreground block mb-1.5">
                     Phone number
@@ -197,6 +199,7 @@ export default function CheckoutPage() {
                     onKeyDown={(e) => handleEnterKey(e, "street")}
                   />
                 </div>
+
                 <div>
                   <label className="text-sm font-semibold text-foreground block mb-1.5">
                     Street address
@@ -204,41 +207,83 @@ export default function CheckoutPage() {
                   <Input
                     id="street"
                     name="street"
-                    placeholder="House, road, area"
+                    placeholder="House no, road no, area"
                     value={address.street}
                     onChange={handleAddressChange}
                     className="border-border"
                     onKeyDown={(e) => handleEnterKey(e, "city")}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-semibold text-foreground block mb-1.5">
-                      City
-                    </label>
-                    <Input
-                      id="city"
-                      name="city"
-                      placeholder="Dhaka"
-                      value={address.city}
-                      onChange={handleAddressChange}
-                      className="border-border"
-                      onKeyDown={(e) => handleEnterKey(e, "district")}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold text-foreground block mb-1.5">
-                      District
-                    </label>
-                    <Input
-                      id="district"
-                      name="district"
-                      placeholder="Dhaka"
-                      value={address.district}
-                      onChange={handleAddressChange}
-                      className="border-border"
-                    />
-                  </div>
+
+                <div>
+                  <label className="text-sm font-semibold text-foreground block mb-1.5">
+                    City / Upazila
+                  </label>
+                  <Input
+                    id="city"
+                    name="city"
+                    placeholder="e.g. Mirpur, Uttara, Dhanmondi"
+                    value={address.city}
+                    onChange={handleAddressChange}
+                    className="border-border"
+                  />
+                </div>
+
+                {/* District dropdown */}
+                <div>
+                  <label className="text-sm font-semibold text-foreground block mb-1.5">
+                    District
+                  </label>
+                  <select
+                    name="district"
+                    value={address.district}
+                    onChange={(e) =>
+                      setAddress({ ...address, district: e.target.value })
+                    }
+                    required
+                    className="w-full h-11 px-3 rounded-xl border border-border text-sm outline-none focus:border-primary transition-colors"
+                    style={{
+                      background: "var(--secondary)",
+                      color: "var(--foreground)",
+                    }}
+                  >
+                    <option value="" disabled>
+                      Select your district
+                    </option>
+                    <optgroup label="── Dhaka ──">
+                      {DELIVERY_ZONES.dhaka.districts.map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="── Sub Dhaka ──">
+                      {DELIVERY_ZONES.subDhaka.districts.map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="── Outside Dhaka ──">
+                      {DELIVERY_ZONES.outsideDhaka.districts.map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </optgroup>
+                  </select>
+
+                  {/* Zone + charge preview */}
+                  {address.district && (
+                    <div className="flex items-center justify-between mt-2 bg-secondary rounded-xl px-3 py-2">
+                      <span className="text-xs font-bold text-muted-foreground">
+                        Zone: {zoneLabel}
+                      </span>
+                      <span className="text-xs font-extrabold text-primary">
+                        Delivery charge: ৳{deliveryCharge}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -329,42 +374,21 @@ export default function CheckoutPage() {
                   </span>
                 </div>
 
-                {/* Dynamic delivery charge */}
                 <div className="flex justify-between text-muted-foreground">
                   <div>
-                    <span>Delivery</span>
+                    <p>Delivery charge</p>
                     {address.district && (
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {isInsideDhaka ? "Inside Dhaka" : "Outside Dhaka"}
+                      <p className="text-xs mt-0.5">
+                        {zoneLabel} — {address.district}
                       </p>
                     )}
                   </div>
-                  <div className="text-right">
-                    {deliveryCharge === 0 ? (
-                      <span className="text-green-600 font-bold">Free</span>
-                    ) : (
-                      <span className="text-foreground font-medium">
-                        ৳{deliveryCharge}
-                      </span>
-                    )}
-                  </div>
+                  <span className="text-foreground font-medium">
+                    {address.district
+                      ? `৳${deliveryCharge}`
+                      : "Select district"}
+                  </span>
                 </div>
-
-                {/* Free delivery hint */}
-                {subtotal < deliverySettings.freeDeliveryMin && (
-                  <div className="bg-secondary rounded-xl p-3">
-                    <p className="text-xs text-muted-foreground">
-                      Add{" "}
-                      <span className="font-bold text-foreground">
-                        ৳
-                        {(
-                          deliverySettings.freeDeliveryMin - subtotal
-                        ).toLocaleString()}
-                      </span>{" "}
-                      more for free delivery!
-                    </p>
-                  </div>
-                )}
 
                 {discountAmount > 0 && (
                   <div className="flex justify-between text-green-600">
@@ -385,7 +409,7 @@ export default function CheckoutPage() {
 
               <Button
                 onClick={handleCheckout}
-                disabled={loading}
+                disabled={loading || !address.district}
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 rounded-xl text-base font-bold"
               >
                 {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
@@ -396,7 +420,7 @@ export default function CheckoutPage() {
               </Button>
 
               <p className="text-xs text-muted-foreground text-center mt-3">
-                💵 You will pay in cash when your order is delivered
+                💵 Pay in cash when your order is delivered
               </p>
             </div>
           </div>

@@ -180,9 +180,9 @@ model Wishlist {
 }
 
 model DeliverySettings {
-  id              String   @id @default(cuid())
-  insideDhaka     Float    @default(60)
-  outsideDhaka    Float    @default(120)
-  freeDeliveryMin Float    @default(2000)
-  updatedAt       DateTime @updatedAt
+  id           String   @id @default(cuid())
+  insideDhaka  Float    @default(60)
+  subDhaka     Float    @default(120)
+  outsideDhaka Float    @default(150)
+  updatedAt    DateTime @updatedAt
 }

@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 interface Settings {
   id: string;
   insideDhaka: number;
+  subDhaka: number;
   outsideDhaka: number;
-  freeDeliveryMin: number;
 }
 
 export default function DeliverySettingsForm({
@@ -22,8 +22,8 @@ export default function DeliverySettingsForm({
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     insideDhaka: settings.insideDhaka.toString(),
+    subDhaka: settings.subDhaka.toString(),
     outsideDhaka: settings.outsideDhaka.toString(),
-    freeDeliveryMin: settings.freeDeliveryMin.toString(),
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,8 +35,8 @@ export default function DeliverySettingsForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           insideDhaka: parseFloat(form.insideDhaka),
+          subDhaka: parseFloat(form.subDhaka),
           outsideDhaka: parseFloat(form.outsideDhaka),
-          freeDeliveryMin: parseFloat(form.freeDeliveryMin),
         }),
       });
 
@@ -55,11 +55,12 @@ export default function DeliverySettingsForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        {/* Dhaka */}
         <div>
           <label className="text-sm font-extrabold text-foreground block mb-1.5">
-            Inside Dhaka (৳)
+            Dhaka (৳)
           </label>
           <Input
             type="number"
@@ -71,10 +72,30 @@ export default function DeliverySettingsForm({
             className="border-border bg-secondary h-11"
           />
           <p className="text-xs text-muted-foreground mt-1">
-            Delivery charge for Dhaka district customers
+            Main Dhaka city only
           </p>
         </div>
 
+        {/* Sub Dhaka */}
+        <div>
+          <label className="text-sm font-extrabold text-foreground block mb-1.5">
+            Sub Dhaka (৳)
+          </label>
+          <Input
+            type="number"
+            value={form.subDhaka}
+            onChange={(e) => setForm({ ...form, subDhaka: e.target.value })}
+            placeholder="120"
+            min="0"
+            required
+            className="border-border bg-secondary h-11"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Gazipur, Narayanganj etc.
+          </p>
+        </div>
+
+        {/* Outside Dhaka */}
         <div>
           <label className="text-sm font-extrabold text-foreground block mb-1.5">
             Outside Dhaka (৳)
@@ -83,58 +104,52 @@ export default function DeliverySettingsForm({
             type="number"
             value={form.outsideDhaka}
             onChange={(e) => setForm({ ...form, outsideDhaka: e.target.value })}
-            placeholder="120"
+            placeholder="150"
             min="0"
             required
             className="border-border bg-secondary h-11"
           />
           <p className="text-xs text-muted-foreground mt-1">
-            Delivery charge for all other districts
+            All other districts
           </p>
         </div>
       </div>
 
-      <div>
-        <label className="text-sm font-extrabold text-foreground block mb-1.5">
-          Free delivery minimum order (৳)
-        </label>
-        <Input
-          type="number"
-          value={form.freeDeliveryMin}
-          onChange={(e) =>
-            setForm({ ...form, freeDeliveryMin: e.target.value })
-          }
-          placeholder="2000"
-          min="0"
-          required
-          className="border-border bg-secondary h-11"
-        />
-        <p className="text-xs text-muted-foreground mt-1">
-          Orders above this amount get free delivery regardless of district
-        </p>
-      </div>
-
+      {/* Live preview */}
       <div className="bg-secondary rounded-xl p-4">
-        <p className="text-xs font-extrabold text-foreground mb-2">Preview</p>
-        <div className="space-y-1.5 text-xs text-muted-foreground">
-          <p>
-            🏙️ Dhaka customer ordering ৳
-            {parseFloat(form.freeDeliveryMin || "0") - 100} →{" "}
-            <span className="font-bold text-foreground">
-              ৳{form.insideDhaka} delivery
-            </span>
-          </p>
-          <p>
-            🌍 Outside Dhaka customer ordering ৳
-            {parseFloat(form.freeDeliveryMin || "0") - 100} →{" "}
-            <span className="font-bold text-foreground">
-              ৳{form.outsideDhaka} delivery
-            </span>
-          </p>
-          <p>
-            ✅ Any customer ordering ৳{form.freeDeliveryMin}+ →{" "}
-            <span className="font-bold text-green-600">Free delivery</span>
-          </p>
+        <p className="text-xs font-extrabold text-foreground mb-3 uppercase tracking-wider">
+          Live preview
+        </p>
+        <div className="space-y-2">
+          {[
+            {
+              label: "🏙️ Dhaka customer",
+              charge: form.insideDhaka,
+              color: "text-green-600",
+            },
+            {
+              label: "🌆 Sub Dhaka customer",
+              charge: form.subDhaka,
+              color: "text-blue-600",
+            },
+            {
+              label: "🌍 Outside Dhaka customer",
+              charge: form.outsideDhaka,
+              color: "text-orange-600",
+            },
+          ].map(({ label, charge, color }) => (
+            <div
+              key={label}
+              className="flex items-center justify-between bg-card rounded-xl px-4 py-2.5 border border-border"
+            >
+              <span className="text-sm text-foreground font-medium">
+                {label}
+              </span>
+              <span className={`text-sm font-extrabold ${color}`}>
+                ৳{charge || "0"}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
