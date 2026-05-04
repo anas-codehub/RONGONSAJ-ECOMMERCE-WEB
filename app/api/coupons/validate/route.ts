@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
-    const code = req.nextUrl.searchParams.get("code");
+    const { searchParams } = new URL(req.url);
+    const code = searchParams.get("code");
+    const productId = searchParams.get("productId");
 
     if (!code) {
       return NextResponse.json(
@@ -12,37 +16,52 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const coupon = await db.coupon.findUnique({
-      where: { code },
+    // Find coupon — case insensitive
+    const coupon = await db.coupon.findFirst({
+      where: {
+        code: { equals: code.toUpperCase().trim(), mode: "insensitive" },
+        isActive: true,
+        ...(productId && { productId }),
+      },
+      include: { product: true },
     });
 
     if (!coupon) {
       return NextResponse.json(
-        { error: "Coupon not found" },
+        { error: "Invalid coupon code" },
         { status: 404 }
       );
     }
 
-    if (!coupon.isActive) {
+    // Check expiry
+    if (coupon.expiresAt && new Date() > coupon.expiresAt) {
       return NextResponse.json(
-        { error: "Coupon is no longer active" },
+        { error: "This coupon has expired" },
         { status: 400 }
       );
     }
 
-    if (coupon.expiresAt && coupon.expiresAt < new Date()) {
+    // Check usage limit
+    if (coupon.usageCount >= coupon.usageLimit) {
       return NextResponse.json(
-        { error: "Coupon has expired" },
+        { error: `This coupon has reached its usage limit of ${coupon.usageLimit} users` },
         { status: 400 }
       );
     }
 
     return NextResponse.json({
       id: coupon.id,
+      code: coupon.code,
       discount: coupon.discount,
       isPercent: coupon.isPercent,
+      usageLimit: coupon.usageLimit,
+      usageCount: coupon.usageCount,
+      remainingUses: coupon.usageLimit - coupon.usageCount,
+      productId: coupon.productId,
+      productName: coupon.product.name,
     });
-  } catch {
+  } catch (error) {
+    console.error("Validate coupon error:", error);
     return NextResponse.json(
       { error: "Something went wrong" },
       { status: 500 }

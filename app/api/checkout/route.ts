@@ -109,6 +109,14 @@ export async function POST(req: NextRequest) {
       return newOrder;
     });
 
+    // Increment coupon usage count
+if (couponId) {
+  await db.coupon.update({
+    where: { id: couponId },
+    data: { usageCount: { increment: 1 } },
+  });
+}
+
    // Send admin notification email directly
 if (process.env.ADMIN_EMAIL && process.env.RESEND_API_KEY) {
   try {

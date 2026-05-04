@@ -77,7 +77,10 @@ export default function CheckoutPage() {
       }
       setDiscount(data.discount);
       setCouponId(data.id);
-      toast.success(`Coupon applied! ${data.discount}% off`);
+      const discountText = data.isPercent
+        ? `${data.discount}% off`
+        : `৳${data.discount} off`;
+      toast.success(`Coupon applied! ${discountText} on ${data.productName}`);
     } catch {
       toast.error("Failed to apply coupon");
     } finally {

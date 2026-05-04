@@ -38,6 +38,13 @@ interface Props {
     categoryId: string;
     sizes: string[];
     colors: string[];
+    coupons?: {
+      code: string;
+      discount: number;
+      isPercent: boolean;
+      usageLimit: number;
+      expiresAt: string | Date;
+    }[];
   };
 }
 
@@ -63,6 +70,16 @@ export default function ProductForm({ categories, product }: Props) {
     isFeatured: product?.isFeatured || false,
   });
 
+  const [coupon, setCoupon] = useState({
+    code: product?.coupons?.[0]?.code || "",
+    discount: product?.coupons?.[0]?.discount?.toString() || "",
+    isPercent: product?.coupons?.[0]?.isPercent ?? true,
+    usageLimit: product?.coupons?.[0]?.usageLimit?.toString() || "100",
+    expiresAt: product?.coupons?.[0]?.expiresAt
+      ? new Date(product.coupons[0].expiresAt).toISOString().split("T")[0]
+      : "",
+    remove: false,
+  });
   const [uploadedImages, setUploadedImages] = useState<string[]>(
     product?.images || [],
   );
@@ -147,6 +164,18 @@ export default function ProductForm({ categories, product }: Props) {
         images: uploadedImages,
         sizes,
         colors,
+
+        coupon: coupon.code
+          ? {
+              code: coupon.code,
+              discount: parseFloat(coupon.discount || "0"),
+              isPercent: coupon.isPercent,
+              usageLimit: parseInt(coupon.usageLimit || "100"),
+              expiresAt: coupon.expiresAt || null,
+            }
+          : coupon.remove
+            ? { remove: true }
+            : null,
       };
 
       const res = await fetch(
@@ -439,6 +468,157 @@ export default function ProductForm({ categories, product }: Props) {
                     </div>
                   );
                 })()}
+              </div>
+            )}
+          </div>
+
+          {/* Coupon section */}
+          <div className="border border-border rounded-xl p-4 space-y-4 bg-secondary/50">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-bold text-foreground">
+                Product coupon
+                <span className="text-xs font-normal text-muted-foreground ml-2">
+                  — optional, only works for this product
+                </span>
+              </p>
+              {coupon.code && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCoupon({ ...coupon, code: "", remove: true })
+                  }
+                  className="text-xs text-destructive hover:underline font-medium"
+                >
+                  Remove coupon
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-semibold text-foreground block mb-1.5">
+                  Coupon code
+                </label>
+                <Input
+                  value={coupon.code}
+                  onChange={(e) =>
+                    setCoupon({
+                      ...coupon,
+                      code: e.target.value.toUpperCase(),
+                      remove: false,
+                    })
+                  }
+                  placeholder="e.g. SAVE20"
+                  className="border-border uppercase"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Works in any case — SAVE20, save20, Save20
+                </p>
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-foreground block mb-1.5">
+                  Discount value
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    type="number"
+                    value={coupon.discount}
+                    onChange={(e) =>
+                      setCoupon({ ...coupon, discount: e.target.value })
+                    }
+                    placeholder="20"
+                    min="0"
+                    className="border-border flex-1"
+                  />
+                  <div className="flex rounded-xl border border-border overflow-hidden shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setCoupon({ ...coupon, isPercent: true })}
+                      className={`px-3 py-2 text-sm font-bold transition-colors ${
+                        coupon.isPercent
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-card text-muted-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      %
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCoupon({ ...coupon, isPercent: false })}
+                      className={`px-3 py-2 text-sm font-bold transition-colors ${
+                        !coupon.isPercent
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-card text-muted-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      ৳
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-foreground block mb-1.5">
+                  Usage limit
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    — max users who can use this coupon
+                  </span>
+                </label>
+                <Input
+                  type="number"
+                  value={coupon.usageLimit}
+                  onChange={(e) =>
+                    setCoupon({ ...coupon, usageLimit: e.target.value })
+                  }
+                  placeholder="100"
+                  min="1"
+                  className="border-border"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-foreground block mb-1.5">
+                  Expiry date
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    — optional
+                  </span>
+                </label>
+                <Input
+                  type="date"
+                  value={coupon.expiresAt}
+                  onChange={(e) =>
+                    setCoupon({ ...coupon, expiresAt: e.target.value })
+                  }
+                  className="border-border"
+                  min={new Date().toISOString().split("T")[0]}
+                />
+              </div>
+            </div>
+
+            {/* Coupon preview */}
+            {coupon.code && coupon.discount && (
+              <div className="bg-card border border-border rounded-xl p-3 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <span className="text-primary text-sm">🏷️</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-extrabold text-foreground font-mono">
+                      {coupon.code}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {coupon.discount}
+                      {coupon.isPercent ? "%" : "৳"} off · Max{" "}
+                      {coupon.usageLimit} uses
+                      {coupon.expiresAt &&
+                        ` · Expires ${new Date(coupon.expiresAt).toLocaleDateString("en-BD")}`}
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                  Active
+                </span>
               </div>
             )}
           </div>

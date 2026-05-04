@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, slug, description, price, stock, categoryId, isFeatured, images, sizes, colors } = body;
+    const { name, slug, description, price, stock, categoryId, isFeatured, images, sizes, colors, coupon } = body;
 
     if (!name || !slug || !description || !price || !categoryId) {
       return NextResponse.json(
@@ -45,6 +45,21 @@ const product = await db.product.create({
     colors: colors || [],
   },
 });
+
+ if (coupon?.code) {
+      await db.coupon.create({
+        data: {
+          code: coupon.code.toUpperCase().trim(),
+          discount: parseFloat(coupon.discount),
+          isPercent: coupon.isPercent ?? true,
+          isActive: true,
+          usageLimit: parseInt(coupon.usageLimit || 100),
+          usageCount: 0,
+          expiresAt: coupon.expiresAt ? new Date(coupon.expiresAt) : null,
+          productId: product.id,
+        },
+      });
+    }
 
     return NextResponse.json(product, { status: 201 });
   } catch {

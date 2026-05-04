@@ -21,7 +21,7 @@ const navItems = [
   { label: "Categories", href: "/admin/categories", icon: FolderOpen },
   { label: "Orders", href: "/admin/orders", icon: Orders },
   { label: "Users", href: "/admin/users", icon: Users },
-  { label: "Coupons", href: "/admin/coupons", icon: Tag },
+
   { label: "Hero slides", href: "/admin/slides", icon: Image },
   { label: "Delivery", href: "/admin/delivery", icon: Truck },
   { label: "Admin guide", href: "/admin/guide", icon: BookOpen },

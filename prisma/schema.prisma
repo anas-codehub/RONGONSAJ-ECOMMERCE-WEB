@@ -74,6 +74,7 @@ model Product {
   orderItems OrderItem[]
   reviews    Review[]
   wishlists  Wishlist[]
+  coupons    Coupon[]
 }
 
 model Order {
@@ -136,13 +137,18 @@ model Review {
 }
 
 model Coupon {
-  id        String    @id @default(cuid())
-  code      String    @unique
-  discount  Float
-  isPercent Boolean   @default(true)
-  isActive  Boolean   @default(true)
-  expiresAt DateTime?
-  createdAt DateTime  @default(now())
+  id         String    @id @default(cuid())
+  code       String    @unique
+  discount   Float
+  isPercent  Boolean   @default(true)
+  isActive   Boolean   @default(true)
+  usageLimit Int       @default(100)
+  usageCount Int       @default(0)
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   orders Order[]
 }
@@ -185,4 +191,18 @@ model DeliverySettings {
   subDhaka     Float    @default(120)
   outsideDhaka Float    @default(150)
   updatedAt    DateTime @updatedAt
+}
+
+model Size {
+  id        String   @id @default(cuid())
+  label     String   @unique
+  type      String   @default("letter") // "letter" or "number"
+  createdAt DateTime @default(now())
+}
+
+model Color {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  hex       String   @default("#000000")
+  createdAt DateTime @default(now())
 }

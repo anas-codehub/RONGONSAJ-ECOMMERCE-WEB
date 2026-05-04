@@ -41,11 +41,7 @@ const navItems = [
     href: "/admin/users",
     icon: Users,
   },
-  {
-    label: "Coupons",
-    href: "/admin/coupons",
-    icon: Tag,
-  },
+
   {
     label: "Hero slides",
     href: "/admin/slides",
