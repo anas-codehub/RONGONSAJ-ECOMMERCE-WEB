@@ -13,6 +13,8 @@ import {
   ChevronRight,
   BookOpen,
   Truck,
+  Ruler,
+  Palette,
 } from "lucide-react";
 
 const navItems = [
@@ -47,6 +49,9 @@ const navItems = [
     href: "/admin/slides",
     icon: Image,
   },
+
+  { label: "Sizes", href: "/admin/sizes", icon: Ruler },
+  { label: "Colors", href: "/admin/colors", icon: Palette },
 
   { label: "Delivery", href: "/admin/delivery", icon: Truck },
 

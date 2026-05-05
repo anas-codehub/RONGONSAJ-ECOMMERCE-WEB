@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -87,6 +87,41 @@ export default function ProductForm({ categories, product }: Props) {
   const [colors, setColors] = useState<string[]>(product?.colors || []);
   const [newSize, setNewSize] = useState("");
   const [newColor, setNewColor] = useState("");
+
+  const [availableSizes, setAvailableSizes] = useState<
+    { id: string; label: string; type: string }[]
+  >([]);
+  const [availableColors, setAvailableColors] = useState<
+    { id: string; name: string; hex: string }[]
+  >([]);
+  const [colorInput, setColorInput] = useState("");
+  const [colorSuggestions, setColorSuggestions] = useState<
+    { id: string; name: string; hex: string }[]
+  >([]);
+  const colorInputRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/admin/sizes").then((r) => r.json()),
+      fetch("/api/admin/colors").then((r) => r.json()),
+    ]).then(([sizesData, colorsData]) => {
+      setAvailableSizes(sizesData);
+      setAvailableColors(colorsData);
+    });
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        colorInputRef.current &&
+        !colorInputRef.current.contains(e.target as Node)
+      ) {
+        setColorSuggestions([]);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const addSize = () => {
     const size = newSize.trim().toUpperCase();
@@ -687,129 +722,276 @@ export default function ProductForm({ categories, product }: Props) {
         </div>
 
         {/* Sizes */}
-        <div>
-          <label className="text-sm font-medium text-foreground block mb-1.5">
-            Available sizes
-          </label>
-          <div className="flex gap-2 flex-wrap mb-2">
-            {sizes.map((size) => (
-              <span
-                key={size}
-                className="flex items-center gap-1 bg-secondary text-foreground text-xs font-medium px-3 py-1.5 rounded-full border border-border"
-              >
-                {size}
-                <button
-                  type="button"
-                  onClick={() => removeSize(size)}
-                  className="text-muted-foreground hover:text-destructive ml-1"
+        {/* Sizes */}
+        <div className="border border-border rounded-xl p-4 space-y-4 bg-secondary/50">
+          <p className="text-sm font-bold text-foreground">Sizes</p>
+
+          {/* Letter sizes */}
+          <div>
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+              Letter sizes
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {availableSizes
+                .filter((s) => s.type === "letter")
+                .map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => {
+                      if (sizes.includes(s.label)) {
+                        setSizes(sizes.filter((x) => x !== s.label));
+                      } else {
+                        setSizes([...sizes, s.label]);
+                      }
+                    }}
+                    className={`text-sm font-bold px-3 py-1.5 rounded-xl border transition-all ${
+                      sizes.includes(s.label)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card border-border text-foreground hover:border-primary"
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              {availableSizes.filter((s) => s.type === "letter").length ===
+                0 && (
+                <p className="text-xs text-muted-foreground">
+                  No letter sizes added yet.{" "}
+                  <a href="/admin/sizes" className="text-primary underline">
+                    Add sizes →
+                  </a>
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Number sizes */}
+          <div>
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+              Number sizes
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {availableSizes
+                .filter((s) => s.type === "number")
+                .map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => {
+                      if (sizes.includes(s.label)) {
+                        setSizes(sizes.filter((x) => x !== s.label));
+                      } else {
+                        setSizes([...sizes, s.label]);
+                      }
+                    }}
+                    className={`text-sm font-bold px-3 py-1.5 rounded-xl border transition-all ${
+                      sizes.includes(s.label)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card border-border text-foreground hover:border-primary"
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              {availableSizes.filter((s) => s.type === "number").length ===
+                0 && (
+                <p className="text-xs text-muted-foreground">
+                  No number sizes added yet.{" "}
+                  <a href="/admin/sizes" className="text-primary underline">
+                    Add sizes →
+                  </a>
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Selected sizes preview */}
+          {sizes.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-border">
+              <p className="text-xs font-bold text-muted-foreground">
+                Selected:
+              </p>
+              {sizes.map((s) => (
+                <span
+                  key={s}
+                  className="text-xs font-extrabold bg-primary/10 text-primary px-2.5 py-1 rounded-lg"
                 >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <Input
-              value={newSize}
-              onChange={(e) => setNewSize(e.target.value)}
-              placeholder="e.g. S, M, L, XL"
-              className="border-border"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addSize();
-                }
-              }}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={addSize}
-              className="border-border shrink-0"
-            >
-              Add
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Quick add:
-            {["S", "M", "L", "XL", "XXL"].map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => {
-                  if (!sizes.includes(s)) setSizes([...sizes, s]);
-                }}
-                className="ml-1 text-primary hover:underline"
-              >
-                {s}
-              </button>
-            ))}
-          </p>
+                  {s}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Colors */}
-        <div>
-          <label className="text-sm font-medium text-foreground block mb-1.5">
-            Available colors
-          </label>
-          <div className="flex gap-2 flex-wrap mb-2">
-            {colors.map((color) => (
-              <span
-                key={color}
-                className="flex items-center gap-1.5 bg-secondary text-foreground text-xs font-medium px-3 py-1.5 rounded-full border border-border"
-              >
-                <span
-                  className="w-3 h-3 rounded-full border border-border"
-                  style={{ backgroundColor: color.toLowerCase() }}
-                />
-                {color}
-                <button
-                  type="button"
-                  onClick={() => removeColor(color)}
-                  className="text-muted-foreground hover:text-destructive ml-1"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-          <div className="flex gap-2">
+        {/* Colors */}
+        <div className="border border-border rounded-xl p-4 space-y-4 bg-secondary/50">
+          <p className="text-sm font-bold text-foreground">Colors</p>
+
+          {/* Color search input */}
+          <div ref={colorInputRef} className="relative">
+            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-2">
+              Search and add colors
+            </label>
             <Input
-              value={newColor}
-              onChange={(e) => setNewColor(e.target.value)}
-              placeholder="e.g. Red, Blue, Black"
-              className="border-border"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addColor();
+              placeholder="Type color name e.g. 'G' for Green, Grey..."
+              value={colorInput}
+              onChange={(e) => {
+                const val = e.target.value;
+                setColorInput(val);
+                if (val.trim()) {
+                  const filtered = availableColors.filter(
+                    (c) =>
+                      c.name.toLowerCase().includes(val.toLowerCase()) &&
+                      !colors.includes(c.name),
+                  );
+                  setColorSuggestions(filtered);
+                } else {
+                  setColorSuggestions([]);
                 }
               }}
+              className="border-border bg-card"
             />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={addColor}
-              className="border-border shrink-0"
-            >
-              Add
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Quick add:
-            {["Black", "White", "Red", "Blue", "Green", "Yellow"].map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => {
-                  if (!colors.includes(c)) setColors([...colors, c]);
+
+            {/* Suggestions */}
+            {colorSuggestions.length > 0 && (
+              <div
+                className="absolute left-0 right-0 top-full mt-1 rounded-xl overflow-hidden shadow-lg z-50 max-h-48 overflow-y-auto"
+                style={{
+                  background: "var(--card)",
+                  border: "1px solid var(--border)",
                 }}
-                className="ml-1 text-primary hover:underline"
               >
-                {c}
-              </button>
-            ))}
-          </p>
+                {colorSuggestions.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => {
+                      setColors([...colors, c.name]);
+                      setColorInput("");
+                      setColorSuggestions([]);
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-secondary transition-colors text-left"
+                  >
+                    <div
+                      className="w-6 h-6 rounded-lg border border-border shrink-0"
+                      style={{ background: c.hex }}
+                    />
+                    <span className="text-sm font-medium text-foreground">
+                      {c.name}
+                    </span>
+                    <span className="text-xs text-muted-foreground font-mono ml-auto">
+                      {c.hex}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {colorInput && colorSuggestions.length === 0 && (
+              <div
+                className="absolute left-0 right-0 top-full mt-1 rounded-xl p-3 z-50"
+                style={{
+                  background: "var(--card)",
+                  border: "1px solid var(--border)",
+                }}
+              >
+                <p className="text-xs text-muted-foreground text-center">
+                  No colors found.{" "}
+                  <a href="/admin/colors" className="text-primary underline">
+                    Add "{colorInput}" to colors →
+                  </a>
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* All available colors — quick click */}
+          <div>
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+              All colors — click to add
+            </p>
+            {availableColors.length === 0 ? (
+              <p className="text-xs text-muted-foreground">
+                No colors added yet.{" "}
+                <a href="/admin/colors" className="text-primary underline">
+                  Add colors →
+                </a>
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {availableColors.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => {
+                      if (colors.includes(c.name)) {
+                        setColors(colors.filter((x) => x !== c.name));
+                      } else {
+                        setColors([...colors, c.name]);
+                      }
+                    }}
+                    className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl border transition-all ${
+                      colors.includes(c.name)
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-card text-foreground hover:border-primary"
+                    }`}
+                  >
+                    <div
+                      className="w-3.5 h-3.5 rounded-full border border-border/50 shrink-0"
+                      style={{ background: c.hex }}
+                    />
+                    {c.name}
+                    {colors.includes(c.name) && (
+                      <span className="text-primary">✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Selected colors preview */}
+          {colors.length > 0 && (
+            <div className="pt-2 border-t border-border">
+              <p className="text-xs font-bold text-muted-foreground mb-2">
+                Selected colors:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {colors.map((colorName) => {
+                  const colorData = availableColors.find(
+                    (c) => c.name === colorName,
+                  );
+                  return (
+                    <div
+                      key={colorName}
+                      className="flex items-center gap-2 bg-secondary border border-border rounded-xl px-3 py-1.5"
+                    >
+                      {colorData && (
+                        <div
+                          className="w-4 h-4 rounded-full border border-border"
+                          style={{ background: colorData.hex }}
+                        />
+                      )}
+                      <span className="text-xs font-extrabold text-foreground">
+                        {colorName}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setColors(colors.filter((c) => c !== colorName))
+                        }
+                        className="text-muted-foreground hover:text-destructive transition-colors ml-1"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
