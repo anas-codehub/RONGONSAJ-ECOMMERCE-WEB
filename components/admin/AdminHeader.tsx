@@ -366,31 +366,131 @@ export default function AdminHeader({ session }: { session: any }) {
       {/* Mobile sidebar */}
       {mobileOpen && (
         <>
+          {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            className="fixed inset-0 z-40 md:hidden"
+            style={{ background: "rgba(0,0,0,0.6)" }}
             onClick={() => setMobileOpen(false)}
           />
+
+          {/* Sidebar */}
           <div
-            className="md:hidden fixed left-0 top-16 bottom-0 w-72 z-50 overflow-y-auto"
+            className="md:hidden fixed left-0 z-50 overflow-y-auto"
             style={{
+              top: "64px",
+              bottom: 0,
+              width: "280px",
               background: "#3D2B1F",
               borderRight: "1px solid rgba(255,255,255,0.1)",
             }}
           >
-            <nav className="px-3 py-4 space-y-1">
+            {/* Logo inside sidebar */}
+            <div
+              style={{
+                padding: "16px 20px",
+                borderBottom: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: "sans-serif",
+                  fontSize: "16px",
+                  fontWeight: 800,
+                  color: "#F0EBE3",
+                  letterSpacing: "2px",
+                }}
+              >
+                RONGO<span style={{ color: "#E07B54" }}>N</span>SAAJ
+              </p>
+              <p
+                style={{
+                  fontSize: "11px",
+                  color: "rgba(240,235,227,0.4)",
+                  marginTop: "2px",
+                }}
+              >
+                Admin panel
+              </p>
+            </div>
+
+            {/* Nav items */}
+            <nav style={{ padding: "12px" }}>
               {navItems.map(({ label, href, icon: Icon }) => (
                 <Link
                   key={href}
                   href={href}
                   onClick={() => setMobileOpen(false)}
                 >
-                  <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-background/60 hover:bg-background/10 hover:text-background transition-all">
-                    <Icon className="h-4 w-4 shrink-0" />
-                    <span className="text-sm font-medium">{label}</span>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      padding: "12px 16px",
+                      borderRadius: "12px",
+                      marginBottom: "4px",
+                      color: "rgba(240,235,227,0.7)",
+                      transition: "all 0.15s",
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLDivElement).style.background =
+                        "rgba(255,255,255,0.1)";
+                      (e.currentTarget as HTMLDivElement).style.color =
+                        "#F0EBE3";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLDivElement).style.background =
+                        "transparent";
+                      (e.currentTarget as HTMLDivElement).style.color =
+                        "rgba(240,235,227,0.7)";
+                    }}
+                  >
+                    <Icon
+                      style={{
+                        width: "18px",
+                        height: "18px",
+                        flexShrink: 0,
+                        color: "#E07B54",
+                      }}
+                    />
+                    <span>{label}</span>
                   </div>
                 </Link>
               ))}
             </nav>
+
+            {/* Back to store */}
+            <div
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                padding: "16px",
+                borderTop: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              <Link href="/" onClick={() => setMobileOpen(false)}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    padding: "10px 16px",
+                    borderRadius: "12px",
+                    color: "rgba(240,235,227,0.5)",
+                    fontSize: "13px",
+                    fontWeight: 500,
+                  }}
+                >
+                  <span>←</span>
+                  <span>Back to store</span>
+                </div>
+              </Link>
+            </div>
           </div>
         </>
       )}
