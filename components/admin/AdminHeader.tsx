@@ -173,169 +173,180 @@ export default function AdminHeader({ session }: { session: any }) {
             </button>
 
             {bellOpen && (
-              <div
-                className="absolute right-0 top-full mt-2 w-96 rounded-2xl shadow-xl z-50 overflow-hidden"
-                style={{
-                  background: "var(--card)",
-                  border: "1px solid var(--border)",
-                }}
-              >
-                {/* Header */}
+              <>
+                {/* Backdrop for mobile */}
                 <div
-                  className="px-4 py-3 flex items-center justify-between border-b border-border"
-                  style={{ background: "var(--secondary)" }}
+                  className="fixed inset-0 z-40 md:hidden"
+                  onClick={() => setBellOpen(false)}
+                />
+
+                <div
+                  style={{
+                    position: "fixed",
+                    top: "64px",
+                    right: "12px",
+                    left: "12px",
+                    maxWidth: "380px",
+                    marginLeft: "auto",
+                    zIndex: 9999,
+                    borderRadius: "16px",
+                    overflow: "hidden",
+                    boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+                    background: "var(--card)",
+                    border: "1px solid var(--border)",
+                  }}
                 >
-                  <div>
-                    <p className="text-sm font-extrabold text-foreground">
-                      Notifications
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {recentOrders.length} orders in last 24h · {pendingCount}{" "}
-                      pending
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {unreadCount > 0 && (
-                      <button
-                        onClick={handleMarkAllRead}
-                        className="flex items-center gap-1.5 text-xs font-bold text-primary hover:bg-primary/10 px-2.5 py-1.5 rounded-lg transition-colors"
-                        title="Mark all as read"
+                  {/* Header */}
+                  <div
+                    className="px-4 py-3 flex items-center justify-between border-b border-border"
+                    style={{ background: "var(--secondary)" }}
+                  >
+                    <div>
+                      <p className="text-sm font-extrabold text-foreground">
+                        Notifications
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {recentOrders.length} orders in last 24h ·{" "}
+                        {pendingCount} pending
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={handleMarkAllRead}
+                          className="flex items-center gap-1.5 text-xs font-bold text-primary hover:bg-primary/10 px-2.5 py-1.5 rounded-lg transition-colors"
+                        >
+                          <Check className="h-3 w-3" />
+                          Mark all read
+                        </button>
+                      )}
+                      <Link
+                        href="/admin/orders"
+                        onClick={() => setBellOpen(false)}
+                        className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
                       >
-                        <Check className="h-3 w-3" />
-                        Mark all read
-                      </button>
+                        View all
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Orders list */}
+                  <div
+                    className="overflow-y-auto"
+                    style={{
+                      background: "var(--card)",
+                      maxHeight: "320px",
+                      scrollbarWidth: "thin",
+                      scrollbarColor: "#E07B54 transparent",
+                    }}
+                  >
+                    {loading ? (
+                      <div className="px-4 py-8 text-center">
+                        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Loading...
+                        </p>
+                      </div>
+                    ) : recentOrders.length === 0 ? (
+                      <div className="px-4 py-10 text-center">
+                        <ShoppingBag className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-40" />
+                        <p className="text-sm font-bold text-foreground">
+                          No orders in last 24h
+                        </p>
+                      </div>
+                    ) : (
+                      recentOrders.map((order) => {
+                        const unread = isUnread(order.createdAt);
+                        return (
+                          <Link
+                            key={order.id}
+                            href="/admin/orders"
+                            onClick={() => setBellOpen(false)}
+                            className="flex items-start gap-3 px-4 py-3 hover:bg-secondary transition-colors border-b border-border last:border-0 relative"
+                            style={{
+                              background: unread
+                                ? "var(--secondary)"
+                                : "var(--card)",
+                            }}
+                          >
+                            {unread && (
+                              <div
+                                className="absolute left-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-green-500 rounded-full"
+                                style={{ boxShadow: "0 0 6px #22c55e" }}
+                              />
+                            )}
+                            <div
+                              className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                                order.status === "CANCELLED"
+                                  ? "bg-red-100"
+                                  : "bg-primary/10"
+                              }`}
+                            >
+                              <ShoppingBag
+                                className={`h-4 w-4 ${
+                                  order.status === "CANCELLED"
+                                    ? "text-destructive"
+                                    : "text-primary"
+                                }`}
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0 ml-1">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="text-xs font-extrabold text-foreground truncate">
+                                  {order.user.name ||
+                                    order.user.email ||
+                                    "Customer"}
+                                </p>
+                                <span className="text-xs font-extrabold text-primary shrink-0">
+                                  ৳{order.total.toLocaleString()}
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-0.5 font-mono truncate">
+                                #{order.id}
+                              </p>
+                              <div className="flex items-center justify-between mt-1.5">
+                                <span
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                    order.status === "PENDING"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : order.status === "PROCESSING"
+                                        ? "bg-blue-100 text-blue-800"
+                                        : order.status === "SHIPPED"
+                                          ? "bg-purple-100 text-purple-800"
+                                          : order.status === "DELIVERED"
+                                            ? "bg-green-100 text-green-800"
+                                            : "bg-red-100 text-red-800"
+                                  }`}
+                                >
+                                  {order.status}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">
+                                  {timeAgo(order.createdAt)}
+                                </span>
+                              </div>
+                            </div>
+                          </Link>
+                        );
+                      })
                     )}
+                  </div>
+
+                  {/* Footer */}
+                  <div
+                    className="px-4 py-3 border-t border-border"
+                    style={{ background: "var(--secondary)" }}
+                  >
                     <Link
                       href="/admin/orders"
                       onClick={() => setBellOpen(false)}
-                      className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
+                      className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground text-xs font-extrabold py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
                     >
-                      View all
+                      <ShoppingBag className="h-3.5 w-3.5" />
+                      Go to orders
                     </Link>
                   </div>
                 </div>
-
-                {/* Orders */}
-                <div
-                  className="overflow-y-auto"
-                  style={{
-                    background: "var(--card)",
-                    maxHeight: "380px",
-                    scrollbarWidth: "thin",
-                    scrollbarColor: "#E07B54 transparent",
-                  }}
-                >
-                  {loading ? (
-                    <div className="px-4 py-8 text-center">
-                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Loading...
-                      </p>
-                    </div>
-                  ) : recentOrders.length === 0 ? (
-                    <div className="px-4 py-10 text-center">
-                      <ShoppingBag className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-40" />
-                      <p className="text-sm font-bold text-foreground">
-                        No orders in last 24h
-                      </p>
-                    </div>
-                  ) : (
-                    recentOrders.map((order) => {
-                      const unread = isUnread(order.createdAt);
-                      return (
-                        <Link
-                          key={order.id}
-                          href="/admin/orders"
-                          onClick={() => setBellOpen(false)}
-                          className="flex items-start gap-3 px-4 py-3 hover:bg-secondary transition-colors border-b border-border last:border-0 relative"
-                          style={{
-                            background: unread
-                              ? "var(--secondary)"
-                              : "var(--card)",
-                          }}
-                        >
-                          {/* Unread dot */}
-                          {unread && (
-                            <div
-                              className="absolute left-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-green-500 rounded-full"
-                              style={{ boxShadow: "0 0 6px #22c55e" }}
-                            />
-                          )}
-
-                          {/* Icon */}
-                          <div
-                            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-                              order.status === "CANCELLED"
-                                ? "bg-red-100"
-                                : "bg-primary/10"
-                            }`}
-                          >
-                            <ShoppingBag
-                              className={`h-4 w-4 ${
-                                order.status === "CANCELLED"
-                                  ? "text-destructive"
-                                  : "text-primary"
-                              }`}
-                            />
-                          </div>
-
-                          {/* Info */}
-                          <div className="flex-1 min-w-0 ml-1">
-                            <div className="flex items-center justify-between gap-2">
-                              <p className="text-xs font-extrabold text-foreground truncate">
-                                {order.user.name ||
-                                  order.user.email ||
-                                  "Customer"}
-                              </p>
-                              <span className="text-xs font-extrabold text-primary shrink-0">
-                                ৳{order.total.toLocaleString()}
-                              </span>
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-0.5 font-mono">
-                              #{order.id}
-                            </p>
-                            <div className="flex items-center justify-between mt-1.5">
-                              <span
-                                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                  order.status === "PENDING"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : order.status === "PROCESSING"
-                                      ? "bg-blue-100 text-blue-800"
-                                      : order.status === "SHIPPED"
-                                        ? "bg-purple-100 text-purple-800"
-                                        : order.status === "DELIVERED"
-                                          ? "bg-green-100 text-green-800"
-                                          : "bg-red-100 text-red-800"
-                                }`}
-                              >
-                                {order.status}
-                              </span>
-                              <span className="text-[10px] text-muted-foreground">
-                                {timeAgo(order.createdAt)}
-                              </span>
-                            </div>
-                          </div>
-                        </Link>
-                      );
-                    })
-                  )}
-                </div>
-
-                {/* Footer */}
-                <div
-                  className="px-4 py-3 border-t border-border"
-                  style={{ background: "var(--secondary)" }}
-                >
-                  <Link
-                    href="/admin/orders"
-                    onClick={() => setBellOpen(false)}
-                    className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground text-xs font-extrabold py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
-                  >
-                    <ShoppingBag className="h-3.5 w-3.5" />
-                    Go to orders
-                  </Link>
-                </div>
-              </div>
+              </>
             )}
           </div>
 
@@ -380,23 +391,22 @@ export default function AdminHeader({ session }: { session: any }) {
               top: "64px",
               bottom: 0,
               width: "280px",
-              background: "#3D2B1F",
-              borderRight: "1px solid rgba(255,255,255,0.1)",
+              background: "var(--card)",
+              borderRight: "1px solid var(--border)",
             }}
           >
-            {/* Logo inside sidebar */}
+            {/* Logo */}
             <div
               style={{
                 padding: "16px 20px",
-                borderBottom: "1px solid rgba(255,255,255,0.1)",
+                borderBottom: "1px solid var(--border)",
               }}
             >
               <p
                 style={{
-                  fontFamily: "sans-serif",
                   fontSize: "16px",
                   fontWeight: 800,
-                  color: "#F0EBE3",
+                  color: "var(--foreground)",
                   letterSpacing: "2px",
                 }}
               >
@@ -405,7 +415,7 @@ export default function AdminHeader({ session }: { session: any }) {
               <p
                 style={{
                   fontSize: "11px",
-                  color: "rgba(240,235,227,0.4)",
+                  color: "var(--muted-foreground)",
                   marginTop: "2px",
                 }}
               >
@@ -429,7 +439,7 @@ export default function AdminHeader({ session }: { session: any }) {
                       padding: "12px 16px",
                       borderRadius: "12px",
                       marginBottom: "4px",
-                      color: "rgba(240,235,227,0.7)",
+                      color: "var(--muted-foreground)",
                       transition: "all 0.15s",
                       fontSize: "14px",
                       fontWeight: 500,
@@ -437,15 +447,15 @@ export default function AdminHeader({ session }: { session: any }) {
                     }}
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLDivElement).style.background =
-                        "rgba(255,255,255,0.1)";
+                        "var(--secondary)";
                       (e.currentTarget as HTMLDivElement).style.color =
-                        "#F0EBE3";
+                        "var(--foreground)";
                     }}
                     onMouseLeave={(e) => {
                       (e.currentTarget as HTMLDivElement).style.background =
                         "transparent";
                       (e.currentTarget as HTMLDivElement).style.color =
-                        "rgba(240,235,227,0.7)";
+                        "var(--muted-foreground)";
                     }}
                   >
                     <Icon
@@ -470,7 +480,7 @@ export default function AdminHeader({ session }: { session: any }) {
                 left: 0,
                 right: 0,
                 padding: "16px",
-                borderTop: "1px solid rgba(255,255,255,0.1)",
+                borderTop: "1px solid var(--border)",
               }}
             >
               <Link href="/" onClick={() => setMobileOpen(false)}>
@@ -481,7 +491,7 @@ export default function AdminHeader({ session }: { session: any }) {
                     gap: "10px",
                     padding: "10px 16px",
                     borderRadius: "12px",
-                    color: "rgba(240,235,227,0.5)",
+                    color: "var(--muted-foreground)",
                     fontSize: "13px",
                     fontWeight: 500,
                   }}
