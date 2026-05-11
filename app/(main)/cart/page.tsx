@@ -71,7 +71,7 @@ export default function CartPage() {
                       src={item.image}
                       alt={item.name}
                       fill
-                      className="object-cover"
+                      className="object-contain p-1"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
@@ -153,30 +153,23 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between text-muted-foreground">
                   <span>Delivery</span>
-                  <span className="text-foreground font-medium">
-                    {total() >= 2000 ? (
-                      <span className="text-green-600 font-bold">Free</span>
-                    ) : (
-                      "৳100"
-                    )}
+                  <span className="text-muted-foreground italic text-xs">
+                    Calculated at checkout
                   </span>
                 </div>
-                {total() < 2000 && (
-                  <p className="text-xs text-muted-foreground bg-secondary rounded-xl p-3">
-                    Add ৳{(2000 - total()).toLocaleString()} more for free
-                    delivery!
-                  </p>
-                )}
               </div>
 
               <Separator className="my-4 bg-border" />
 
-              <div className="flex justify-between font-extrabold text-foreground mb-6">
-                <span>Total</span>
+              <div className="flex justify-between font-extrabold text-foreground mb-2">
+                <span>Subtotal</span>
                 <span className="text-primary text-lg">
-                  ৳{(total() + (total() >= 2000 ? 0 : 100)).toLocaleString()}
+                  ৳{total().toLocaleString()}
                 </span>
               </div>
+              <p className="text-xs text-muted-foreground mb-6">
+                Delivery charge will be added at checkout based on your district
+              </p>
 
               <Link href="/checkout">
                 <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 rounded-xl text-base font-bold">

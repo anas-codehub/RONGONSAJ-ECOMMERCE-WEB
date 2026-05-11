@@ -25,6 +25,8 @@ export default function MobileNav() {
   const [accountOpen, setAccountOpen] = useState(false);
   const isAdmin = (session?.user as any)?.role === "ADMIN";
 
+  if (pathname.startsWith("/admin")) return null;
+
   // Sign out using API call directly — most reliable method
   const handleSignOut = () => {
     setAccountOpen(false);

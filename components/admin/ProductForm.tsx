@@ -39,11 +39,13 @@ interface Props {
     sizes: string[];
     colors: string[];
     coupons?: {
+      id: string;
       code: string;
       discount: number;
       isPercent: boolean;
       usageLimit: number;
-      expiresAt: string | Date;
+      usageCount: number;
+      expiresAt: Date | null;
     }[];
   };
 }
@@ -70,16 +72,6 @@ export default function ProductForm({ categories, product }: Props) {
     isFeatured: product?.isFeatured || false,
   });
 
-  const [coupon, setCoupon] = useState({
-    code: product?.coupons?.[0]?.code || "",
-    discount: product?.coupons?.[0]?.discount?.toString() || "",
-    isPercent: product?.coupons?.[0]?.isPercent ?? true,
-    usageLimit: product?.coupons?.[0]?.usageLimit?.toString() || "100",
-    expiresAt: product?.coupons?.[0]?.expiresAt
-      ? new Date(product.coupons[0].expiresAt).toISOString().split("T")[0]
-      : "",
-    remove: false,
-  });
   const [uploadedImages, setUploadedImages] = useState<string[]>(
     product?.images || [],
   );
@@ -99,6 +91,19 @@ export default function ProductForm({ categories, product }: Props) {
     { id: string; name: string; hex: string }[]
   >([]);
   const colorInputRef = useRef<HTMLDivElement>(null);
+
+  const existingCoupon = product?.coupons?.[0];
+
+  const [coupon, setCoupon] = useState({
+    code: existingCoupon?.code || "",
+    discount: existingCoupon?.discount?.toString() || "",
+    isPercent: existingCoupon?.isPercent ?? true,
+    usageLimit: existingCoupon?.usageLimit?.toString() || "100",
+    expiresAt: existingCoupon?.expiresAt
+      ? new Date(existingCoupon.expiresAt).toISOString().split("T")[0]
+      : "",
+    remove: false,
+  });
 
   useEffect(() => {
     Promise.all([
