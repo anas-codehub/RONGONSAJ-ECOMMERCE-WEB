@@ -18,9 +18,19 @@ const nextConfig: NextConfig = {
     ],
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 3600,
+    dangerouslyAllowSVG: false,
   },
   compress: true,
   poweredByHeader: false,
+  experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "framer-motion",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-select",
+      "@radix-ui/react-separator",
+    ],
+  },
 };
 
 export default nextConfig;

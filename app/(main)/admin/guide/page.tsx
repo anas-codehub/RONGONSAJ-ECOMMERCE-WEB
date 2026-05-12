@@ -18,6 +18,9 @@ import {
   CheckCircle,
   AlertCircle,
   Info,
+  Palette,
+  Ruler,
+  Truck,
 } from "lucide-react";
 
 function Section({
@@ -807,6 +810,211 @@ export default async function AdminGuidePage() {
         <Tip
           type="info"
           text="Monthly profit on the dashboard is calculated from all orders placed this calendar month that are not cancelled."
+        />
+      </Section>
+
+      {/* Sizes */}
+      <Section title="Managing sizes" icon={Ruler}>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          Sizes are managed globally and can be assigned to any product. There
+          are two types — letter sizes and number sizes.
+        </p>
+
+        <h3 className="text-sm font-extrabold text-foreground mt-2">
+          How to add sizes
+        </h3>
+        <div className="space-y-3">
+          <Step
+            number={1}
+            title="Go to Sizes from the sidebar"
+            description="Click 'Sizes' in the admin panel sidebar."
+          />
+          <Step
+            number={2}
+            title="Add letter sizes"
+            description="Type a size like XL or XXL and click Add. Or use the quick add buttons for common sizes like S, M, L, XL, XXL."
+          />
+          <Step
+            number={3}
+            title="Add number sizes"
+            description="Type a number like 32 or 34 and click Add. Or use quick add buttons for common trouser sizes."
+          />
+          <Step
+            number={4}
+            title="Use in product form"
+            description="When adding or editing a product, click any size to select it for that product."
+          />
+        </div>
+
+        <Tip
+          type="info"
+          text="Sizes are shared across all products. If you delete a size from the Sizes page, it won't affect products that already have it assigned."
+        />
+      </Section>
+
+      {/* Colors */}
+      <Section title="Managing colors" icon={Palette}>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          Colors are managed globally with a color picker. Each color has a name
+          and a hex color code for visual display.
+        </p>
+
+        <h3 className="text-sm font-extrabold text-foreground mt-2">
+          How to add colors
+        </h3>
+        <div className="space-y-3">
+          <Step
+            number={1}
+            title="Go to Colors from the sidebar"
+            description="Click 'Colors' in the admin panel sidebar."
+          />
+          <Step
+            number={2}
+            title="Type color name"
+            description="Start typing a color name like 'G' — suggestions will appear automatically (Green, Grey, Gold etc.)"
+          />
+          <Step
+            number={3}
+            title="Pick the color"
+            description="Use the color picker to select the exact shade, or type the hex code directly."
+          />
+          <Step
+            number={4}
+            title="Quick add"
+            description="Use the quick add buttons to instantly add common colors like White, Black, Red, Blue etc."
+          />
+        </div>
+
+        <Tip
+          type="success"
+          text="When you type a color name in the search box, the hex color is auto-filled if it matches a common color. For example typing 'Red' automatically sets the hex to #EF4444."
+        />
+      </Section>
+
+      {/* Product coupons */}
+      <Section title="Product coupons" icon={Tag}>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          Each product can have its own coupon code. The coupon only works for
+          that specific product and has a usage limit.
+        </p>
+
+        <h3 className="text-sm font-extrabold text-foreground mt-2">
+          How to add a coupon to a product
+        </h3>
+        <div className="space-y-3">
+          <Step
+            number={1}
+            title="Open the product form"
+            description="Go to Products → Add product or edit an existing product."
+          />
+          <Step
+            number={2}
+            title="Scroll to coupon section"
+            description="Find the 'Product coupon' section in the form."
+          />
+          <Step
+            number={3}
+            title="Enter coupon code"
+            description="Type the code — it will automatically convert to uppercase. e.g. SAVE20"
+          />
+          <Step
+            number={4}
+            title="Set discount value"
+            description="Enter the discount amount and choose % or ৳ using the toggle buttons."
+          />
+          <Step
+            number={5}
+            title="Set usage limit"
+            description="How many customers can use this coupon. Default is 100."
+          />
+          <Step
+            number={6}
+            title="Set expiry date (optional)"
+            description="Leave empty for no expiry, or set a date when the coupon stops working."
+          />
+        </div>
+
+        <div className="border border-border rounded-xl overflow-hidden mt-2">
+          <Field
+            name="Coupon code"
+            description="Case insensitive — SAVE20, save20, Save20 all work the same way."
+            required
+          />
+          <Field
+            name="Discount value"
+            description="Enter a number. Toggle % for percentage off or ৳ for fixed amount off."
+            required
+          />
+          <Field
+            name="Usage limit"
+            description="Maximum number of customers who can use this coupon. Once reached, coupon stops working automatically."
+            required
+          />
+          <Field
+            name="Expiry date"
+            description="Optional. Coupon stops working after this date."
+          />
+        </div>
+
+        <Tip
+          type="warning"
+          text="Each product can only have ONE coupon at a time. Adding a new coupon to a product replaces the old one."
+        />
+        <Tip
+          type="info"
+          text="The coupon preview shows you exactly how the coupon looks and how many people have used it so far."
+        />
+      </Section>
+
+      {/* Delivery settings */}
+      <Section title="Delivery settings" icon={Truck}>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          Set delivery charges for different zones. Customers select their
+          district at checkout and the correct charge is applied automatically.
+        </p>
+
+        <h3 className="text-sm font-extrabold text-foreground mt-2">
+          Delivery zones
+        </h3>
+        <div className="border border-border rounded-xl overflow-hidden">
+          <Field
+            name="Dhaka"
+            description="Main Dhaka city only. Customers who select 'Dhaka' as their district get this charge."
+          />
+          <Field
+            name="Sub Dhaka"
+            description="Gazipur, Narayanganj, Manikganj, Munshiganj, Narsingdi. Customers in these areas get this charge."
+          />
+          <Field
+            name="Outside Dhaka"
+            description="All other districts across Bangladesh. Customers outside Dhaka and Sub Dhaka get this charge."
+          />
+        </div>
+
+        <h3 className="text-sm font-extrabold text-foreground mt-4">
+          How to update charges
+        </h3>
+        <div className="space-y-3">
+          <Step
+            number={1}
+            title="Go to Delivery from the sidebar"
+            description="Click 'Delivery' in the admin panel sidebar."
+          />
+          <Step
+            number={2}
+            title="Update the charges"
+            description="Enter the new delivery charge for each zone."
+          />
+          <Step
+            number={3}
+            title="Save"
+            description="Click 'Save settings'. Changes take effect immediately for all new orders."
+          />
+        </div>
+
+        <Tip
+          type="info"
+          text="The delivery page also shows a full list of which districts belong to which zone for your reference."
         />
       </Section>
 

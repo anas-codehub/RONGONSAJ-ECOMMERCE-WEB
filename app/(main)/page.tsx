@@ -42,6 +42,8 @@ const getSlides = unstable_cache(
   { revalidate: 300 },
 );
 
+export const revalidate = 300;
+
 export default async function HomePage() {
   const [featuredProducts, categories, slides, recentReviews] =
     await Promise.all([
@@ -188,7 +190,7 @@ export default async function HomePage() {
             <div className="flex gap-4 overflow-x-auto pb-2">
               {categories.map((cat, i) => (
                 <Link key={cat.id} href={`/products?category=${cat.slug}`}>
-                  <div className="shrink-0 px-6 py-5 rounded-3xl bg-secondary border min-w-[140px] text-center font-bold">
+                  <div className="shrink-0 px-6 py-5 rounded-3xl bg-secondary border min-w-35 text-center font-bold">
                     {cat.name}
                   </div>
                 </Link>
