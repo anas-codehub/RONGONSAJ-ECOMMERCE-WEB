@@ -17,8 +17,6 @@ const statusColors: Record<string, string> = {
 export default async function OrdersPage() {
   const session = await auth();
 
-  console.log("SESSION:", session);
-
   if (!session?.user?.id) redirect("/sign-in");
 
   const orders = await db.order.findMany({

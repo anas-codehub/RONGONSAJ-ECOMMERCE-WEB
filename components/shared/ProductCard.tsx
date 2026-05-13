@@ -7,6 +7,8 @@ import { useCartStore } from "@/store/cart-store";
 import { toast } from "sonner";
 import WishlistButton from "@/components/shared/WishlistButton";
 import { ShoppingCart } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: string;
@@ -56,9 +58,17 @@ function ProductCard({ product, size = "default" }: Props) {
         ? `৳${product.discountAmount}`
         : "";
 
+  const { data: session } = useSession();
+  const router = useRouter();
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
-    e.stopPropagation(); // Fix: Stop event propagation to prevent navigation
+    e.stopPropagation();
+    if (!session) {
+      toast.error("Please sign in to add to cart");
+      router.push("/sign-in");
+      return;
+    }
     if (product.stock === 0) return;
 
     addItem({

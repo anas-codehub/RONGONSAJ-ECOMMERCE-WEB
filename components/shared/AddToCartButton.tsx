@@ -61,13 +61,16 @@ export default function AddToCartButton({ product }: { product: Product }) {
   });
 
   const handleAdd = () => {
+    if (!session) {
+      toast.error("Please sign in to add to cart");
+      router.push("/sign-in");
+      return;
+    }
     if (!validateSelections()) return;
     addItem(buildCartItem());
     toast.success(`${product.name} added to cart!`);
   };
 
-  // Task 3: Order Now — add to cart and go directly to checkout
-  // Task 5: Require sign-in before ordering
   const handleOrderNow = () => {
     if (!session) {
       toast.error("Please sign in to place an order");
