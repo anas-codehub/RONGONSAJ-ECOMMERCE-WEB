@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Truck, RefreshCw, Shield, Star } from "lucide-react";
 import AddToCartButton from "@/components/shared/AddToCartButton";
 import ReviewForm from "@/components/shared/ReviewForm";
+import ProductImageGallery from "@/components/shared/ProductImageGallery";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -101,46 +102,17 @@ export default async function ProductDetailPage({ params }: Props) {
         {/* Main content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           {/* Images */}
-          <div className="space-y-4">
-            <div className="relative h-96 lg:h-125 bg-secondary rounded-2xl overflow-hidden">
-              {product.images[0] ? (
-                <Image
-                  src={product.images[0]}
-                  alt={product.name}
-                  fill
-                  className="object-contain p-2"
-                  priority // ← ADD THIS - prioritize main image
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <div className="w-24 h-36 bg-muted rounded-full opacity-60" />
-                </div>
-              )}
-              {product.stock === 0 && (
-                <div className="absolute inset-0 bg-background/70 flex items-center justify-center">
-                  <Badge variant="secondary" className="text-base px-6 py-2">
-                    Sold out
-                  </Badge>
-                </div>
-              )}
-            </div>
-
-            {/* Thumbnail row */}
-            {product.images.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pb-2">
-                {product.images.map((img, i) => (
-                  <div
-                    key={i}
-                    className="relative w-20 h-20 rounded-xl overflow-hidden border-2 border-border shrink-0 cursor-pointer hover:border-primary transition-colors"
-                  >
-                    <Image
-                      src={img}
-                      alt={`${product.name} ${i + 1}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
+          {/* Images */}
+          <div className="relative">
+            <ProductImageGallery
+              images={product.images}
+              productName={product.name}
+            />
+            {product.stock === 0 && (
+              <div className="absolute inset-0 bg-background/70 flex items-center justify-center rounded-2xl z-10">
+                <Badge variant="secondary" className="text-base px-6 py-2">
+                  Sold out
+                </Badge>
               </div>
             )}
           </div>
