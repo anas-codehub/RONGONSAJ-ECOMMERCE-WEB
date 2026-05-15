@@ -9,6 +9,7 @@ import { Truck, RefreshCw, Shield, Star } from "lucide-react";
 import AddToCartButton from "@/components/shared/AddToCartButton";
 import ReviewForm from "@/components/shared/ReviewForm";
 import ProductImageGallery from "@/components/shared/ProductImageGallery";
+import ShareButtons from "@/components/shared/ShareButtons";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -78,7 +79,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 py-10">
+      <div className="max-w-7xl mx-auto px-4 py-10 pb-28 md:pb-10">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
           <Link href="/" className="hover:text-foreground">
@@ -251,6 +252,12 @@ export default async function ProductDetailPage({ params }: Props) {
                 </div>
               ))}
             </div>
+
+            {/* Share buttons */}
+            <ShareButtons
+              productName={product.name}
+              productUrl={`${process.env.NEXTAUTH_URL}/products/${product.slug}`}
+            />
           </div>
         </div>
 
@@ -363,6 +370,33 @@ export default async function ProductDetailPage({ params }: Props) {
             </div>
           </div>
         )}
+      </div>
+      {/* Sticky bottom bar — mobile only */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-40 md:hidden border-t border-border px-4 py-3"
+        style={{ background: "var(--background)" }}
+      >
+        <div className="flex items-center gap-4">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-muted-foreground truncate">
+              {product.name}
+            </p>
+            <p className="text-base font-extrabold text-primary">
+              ৳
+              {(product.discount > 0
+                ? Math.round(
+                    product.price - (product.price * product.discount) / 100,
+                  )
+                : product.discountAmount > 0
+                  ? Math.round(product.price - product.discountAmount)
+                  : product.price
+              ).toLocaleString()}
+            </p>
+          </div>
+          <div className="shrink-0 w-40">
+            <AddToCartButton product={product} />
+          </div>
+        </div>
       </div>
     </div>
   );

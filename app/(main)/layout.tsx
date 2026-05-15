@@ -2,6 +2,7 @@ import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import MobileNav from "@/components/shared/MobileNav";
 import FloatingContact from "@/components/shared/FloatingContact";
+import BackToTop from "@/components/shared/BackToTop";
 
 export default function MainLayout({
   children,
@@ -23,6 +24,7 @@ export default function MainLayout({
       <Footer />
       <MobileNav />
       <FloatingContact />
+      <BackToTop />
     </div>
   );
 }
