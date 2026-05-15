@@ -11,6 +11,7 @@ import {
   ArrowRight,
   ArrowUp,
 } from "lucide-react";
+import RevenueChart from "@/components/admin/RevenueChart";
 
 export default async function AdminPage() {
   const session = await auth();
@@ -80,6 +81,39 @@ export default async function AdminPage() {
     const profit = (sellingPrice - item.product.actualPrice) * item.quantity;
     return acc + profit;
   }, 0);
+
+  // Get last 30 days revenue
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+  const dailyOrders = await db.order.findMany({
+    where: {
+      createdAt: { gte: thirtyDaysAgo },
+      status: { not: "CANCELLED" },
+    },
+    select: {
+      total: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  // Group by date
+  const revenueByDay = dailyOrders.reduce(
+    (acc: Record<string, number>, order) => {
+      const date = new Date(order.createdAt).toLocaleDateString("en-BD", {
+        month: "short",
+        day: "numeric",
+      });
+      acc[date] = (acc[date] || 0) + order.total;
+      return acc;
+    },
+    {},
+  );
+
+  const chartData = Object.entries(revenueByDay).map(([date, revenue]) => ({
+    date,
+    revenue,
+  }));
 
   const statusColors: Record<string, string> = {
     PENDING:
@@ -172,6 +206,9 @@ export default async function AdminPage() {
           </p>
         </div>
       </div>
+
+      {/* Revenue chart */}
+      <RevenueChart data={chartData} />
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

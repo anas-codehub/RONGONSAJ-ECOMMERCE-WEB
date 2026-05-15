@@ -3,6 +3,7 @@ import Footer from "@/components/shared/Footer";
 import MobileNav from "@/components/shared/MobileNav";
 import FloatingContact from "@/components/shared/FloatingContact";
 import BackToTop from "@/components/shared/BackToTop";
+import PageTransition from "@/components/shared/PageTransition";
 
 export default function MainLayout({
   children,
@@ -20,7 +21,9 @@ export default function MainLayout({
       }}
     >
       <Navbar />
-      <main className="pb-20 md:pb-0">{children}</main>
+      <main className="pb-20 md:pb-0">
+        <PageTransition>{children}</PageTransition>
+      </main>
       <Footer />
       <MobileNav />
       <FloatingContact />
