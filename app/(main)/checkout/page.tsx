@@ -17,6 +17,7 @@ import {
   getDeliveryCharge,
   getZoneLabel,
 } from "@/lib/districts";
+import DistrictInput from "@/components/shared/DistrictInput";
 
 export default function CheckoutPage() {
   const { items, total, clearCart } = useCartStore();
@@ -205,7 +206,7 @@ export default function CheckoutPage() {
 
                 <div>
                   <label className="text-sm font-semibold text-foreground block mb-1.5">
-                    Street address
+                    Address
                   </label>
                   <Input
                     id="street"
@@ -232,51 +233,17 @@ export default function CheckoutPage() {
                   />
                 </div>
 
-                {/* District dropdown */}
+                {/* District */}
                 <div>
                   <label className="text-sm font-semibold text-foreground block mb-1.5">
                     District
                   </label>
-                  <select
-                    name="district"
+                  <DistrictInput
                     value={address.district}
-                    onChange={(e) =>
-                      setAddress({ ...address, district: e.target.value })
+                    onChange={(value) =>
+                      setAddress({ ...address, district: value })
                     }
-                    required
-                    className="w-full h-11 px-3 rounded-xl border border-border text-sm outline-none focus:border-primary transition-colors"
-                    style={{
-                      background: "var(--secondary)",
-                      color: "var(--foreground)",
-                    }}
-                  >
-                    <option value="" disabled>
-                      Select your district
-                    </option>
-                    <optgroup label="── Dhaka ──">
-                      {DELIVERY_ZONES.dhaka.districts.map((d) => (
-                        <option key={d} value={d}>
-                          {d}
-                        </option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="── Sub Dhaka ──">
-                      {DELIVERY_ZONES.subDhaka.districts.map((d) => (
-                        <option key={d} value={d}>
-                          {d}
-                        </option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="── Outside Dhaka ──">
-                      {DELIVERY_ZONES.outsideDhaka.districts.map((d) => (
-                        <option key={d} value={d}>
-                          {d}
-                        </option>
-                      ))}
-                    </optgroup>
-                  </select>
-
-                  {/* Zone + charge preview */}
+                  />
                   {address.district && (
                     <div className="flex items-center justify-between mt-2 bg-secondary rounded-xl px-3 py-2">
                       <span className="text-xs font-bold text-muted-foreground">
