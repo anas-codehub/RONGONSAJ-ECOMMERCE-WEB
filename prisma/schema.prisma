@@ -78,11 +78,14 @@ model Product {
 }
 
 model Order {
-  id        String      @id
-  status    OrderStatus @default(PENDING)
-  total     Float
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id              String      @id
+  status          OrderStatus @default(PENDING)
+  total           Float
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  trackingCode    String?
+  steadfastId     Int?
+  steadfastStatus String?
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
@@ -126,14 +129,16 @@ model Address {
 model Review {
   id        String   @id @default(cuid())
   rating    Int
-  comment   String
+  comment   String?
+  images    String[]
+  approved  Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
   productId String
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Coupon {

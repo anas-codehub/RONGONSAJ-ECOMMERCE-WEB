@@ -347,6 +347,34 @@ export default async function OrderDetailPage({ params }: Props) {
                 </div>
               )}
 
+            {/* Tracking */}
+            {order.trackingCode && (
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5">
+                <h2 className="text-sm font-extrabold text-blue-800 mb-3 uppercase tracking-wider flex items-center gap-2">
+                  <Truck className="h-4 w-4" />
+                  Tracking information
+                </h2>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-blue-700">Tracking code</span>
+                    <span className="font-mono text-sm font-extrabold text-blue-800 bg-blue-100 px-3 py-1 rounded-lg">
+                      {order.trackingCode}
+                    </span>
+                  </div>
+
+                  <a
+                    href={`https://steadfast.com.bd/t/${order.trackingCode}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-blue-700 transition-colors mt-3 focus:ring-2 focus:ring-blue-300 focus:outline-none"
+                  >
+                    <Truck className="h-4 w-4" />
+                    Track on Steadfast
+                  </a>
+                </div>
+              </div>
+            )}
+
             {/* Need help */}
             <div className="bg-secondary border border-border rounded-2xl p-5">
               <p className="text-sm font-extrabold text-foreground mb-1">

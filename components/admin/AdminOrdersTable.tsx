@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search } from "lucide-react";
+import { Loader2, Search, Truck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 const statusColors: Record<string, string> = {
@@ -32,6 +32,8 @@ interface Order {
   status: string;
   total: number;
   createdAt: Date;
+  trackingCode: string | null;
+  steadfastId: number | null;
   user: { name: string | null; email: string | null };
   address: { city: string; district: string; phone: string };
   items: { id: string; quantity: number; product: { name: string } }[];
@@ -62,6 +64,26 @@ export default function AdminOrdersTable({ orders }: { orders: Order[] }) {
         return;
       }
       toast.success("Order status updated!");
+      router.refresh();
+    } catch {
+      toast.error("Something went wrong");
+    } finally {
+      setUpdating(null);
+    }
+  };
+
+  const handleDispatch = async (orderId: string) => {
+    setUpdating(orderId);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/dispatch`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "Dispatch failed");
+        return;
+      }
+      toast.success(`Dispatched! Tracking: ${data.trackingCode}`);
       router.refresh();
     } catch {
       toast.error("Something went wrong");
@@ -179,6 +201,31 @@ export default function AdminOrdersTable({ orders }: { orders: Order[] }) {
                         ))}
                       </SelectContent>
                     </Select>
+
+                    {/* Steadfast dispatch button */}
+                    {order.status === "PROCESSING" && !order.trackingCode && (
+                      <button
+                        onClick={() => handleDispatch(order.id)}
+                        disabled={updating === order.id}
+                        className="flex items-center gap-1.5 text-xs font-bold bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 mt-2"
+                      >
+                        {updating === order.id ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Truck className="h-3 w-3" />
+                        )}
+                        Dispatch via Steadfast
+                      </button>
+                    )}
+
+                    {/* Show tracking code if dispatched */}
+                    {order.trackingCode && (
+                      <div className="flex items-center gap-1.5 mt-2">
+                        <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg font-mono">
+                          📦 {order.trackingCode}
+                        </span>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
