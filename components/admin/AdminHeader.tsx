@@ -11,6 +11,7 @@ import {
   Truck,
   Ruler,
   Palette,
+  Star,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -30,6 +31,7 @@ const navItems = [
   { label: "Products", href: "/admin/products", icon: Package },
   { label: "Categories", href: "/admin/categories", icon: FolderOpen },
   { label: "Orders", href: "/admin/orders", icon: Orders },
+  { label: "Reviews", href: "/admin/reviews", icon: Star },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Sizes", href: "/admin/sizes", icon: Ruler },
   { label: "Colors", href: "/admin/colors", icon: Palette },

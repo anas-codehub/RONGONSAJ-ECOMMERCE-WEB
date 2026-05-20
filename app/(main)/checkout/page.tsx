@@ -57,7 +57,6 @@ export default function CheckoutPage() {
       .catch(() => {});
   }, []);
 
-  // Calculate delivery charge based on selected district
   const subtotal = total();
   const deliveryCharge = address.district
     ? getDeliveryCharge(address.district, deliverySettings)
@@ -90,14 +89,8 @@ export default function CheckoutPage() {
   };
 
   const handleCheckout = async () => {
-    if (!session) {
-      toast.error("Please sign in to place an order");
-      router.push("/sign-in");
-      return;
-    }
-
     const { fullName, phone, street, city, district } = address;
-    if (!fullName || !phone || !street || !city || !district) {
+    if (!fullName || !phone || !street || !district) {
       toast.error("Please fill in all address fields");
       return;
     }

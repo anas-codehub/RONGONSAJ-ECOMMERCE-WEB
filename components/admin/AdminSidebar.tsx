@@ -15,6 +15,7 @@ import {
   Truck,
   Ruler,
   Palette,
+  Star,
 } from "lucide-react";
 
 const navItems = [
@@ -38,6 +39,7 @@ const navItems = [
     href: "/admin/orders",
     icon: ShoppingBag,
   },
+  { label: "Reviews", href: "/admin/reviews", icon: Star },
   {
     label: "Users",
     href: "/admin/users",

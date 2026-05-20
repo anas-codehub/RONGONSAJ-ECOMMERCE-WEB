@@ -58,17 +58,10 @@ function ProductCard({ product, size = "default" }: Props) {
         ? `৳${product.discountAmount}`
         : "";
 
-  const { data: session } = useSession();
-  const router = useRouter();
-
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!session) {
-      toast.error("Please sign in to add to cart");
-      router.push("/sign-in");
-      return;
-    }
+
     if (product.stock === 0) return;
 
     addItem({

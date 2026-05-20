@@ -53,6 +53,7 @@ export default async function ProductDetailPage({ params }: Props) {
     include: {
       category: true,
       reviews: {
+        where: { approved: true },
         include: { user: true },
         orderBy: { createdAt: "desc" },
       },
@@ -102,7 +103,6 @@ export default async function ProductDetailPage({ params }: Props) {
 
         {/* Main content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-          {/* Images */}
           {/* Images */}
           <div className="relative">
             <ProductImageGallery
@@ -320,9 +320,26 @@ export default async function ProductDetailPage({ params }: Props) {
                     </div>
                   </div>
                   {review.comment && (
-                    <p className="text-muted-foreground text-sm leading-relaxed">
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-3">
                       {review.comment}
                     </p>
+                  )}
+                  {review.images && review.images.length > 0 && (
+                    <div className="flex gap-2 flex-wrap mt-3">
+                      {review.images.map((img: string, i: number) => (
+                        <div
+                          key={1}
+                          className="relative w-16 h-16 rounded-xl overflow-hidden border border-border"
+                        >
+                          <Image
+                            src={img}
+                            alt={`Review photo ${i + 1}`}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
               ))}
