@@ -21,7 +21,7 @@ import DistrictInput from "@/components/shared/DistrictInput";
 
 export default function CheckoutPage() {
   const { items, total, clearCart } = useCartStore();
-  const { data: session } = useSession();
+
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);

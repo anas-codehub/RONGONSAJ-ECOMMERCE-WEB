@@ -29,6 +29,8 @@ export default auth((req) => {
   if (isAuthRoute && isLoggedIn) {
     return NextResponse.redirect(new URL("/", req.url));
   }
+
+   return NextResponse.next();
 });
 
 export const config = {

@@ -29,7 +29,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
     product.colors.length > 0 ? null : "one-color",
   );
   const { addItem } = useCartStore();
-  const { data: session } = useSession();
+
   const router = useRouter();
 
   const finalPrice =
@@ -61,22 +61,12 @@ export default function AddToCartButton({ product }: { product: Product }) {
   });
 
   const handleAdd = () => {
-    if (!session) {
-      toast.error("Please sign in to add to cart");
-      router.push("/sign-in");
-      return;
-    }
     if (!validateSelections()) return;
     addItem(buildCartItem());
     toast.success(`${product.name} added to cart!`);
   };
 
   const handleOrderNow = () => {
-    if (!session) {
-      toast.error("Please sign in to place an order");
-      router.push("/sign-in");
-      return;
-    }
     if (!validateSelections()) return;
     addItem(buildCartItem());
     router.push("/checkout");

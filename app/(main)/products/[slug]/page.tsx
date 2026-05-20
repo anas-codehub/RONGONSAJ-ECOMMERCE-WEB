@@ -72,7 +72,6 @@ export default async function ProductDetailPage({ params }: Props) {
     where: {
       categoryId: product.categoryId,
       NOT: { id: product.id },
-      //   isPublished: true, // ← ADD THIS - only show published products
     },
     include: { category: true },
     take: 4,
