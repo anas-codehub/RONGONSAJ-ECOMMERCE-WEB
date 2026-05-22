@@ -5,10 +5,11 @@ import Image from "next/image";
 import { memo } from "react";
 import { useCartStore } from "@/store/cart-store";
 import { toast } from "sonner";
-import WishlistButton from "@/components/shared/WishlistButton";
+
 import { ShoppingCart } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { addToCart } from "@/lib/pixel";
 
 interface Product {
   id: string;
@@ -72,6 +73,11 @@ function ProductCard({ product, size = "default" }: Props) {
       quantity: 1,
       productId: "",
     });
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: finalPrice,
+    });
     toast.success(`${product.name} added to cart!`);
   };
 
@@ -115,11 +121,6 @@ function ProductCard({ product, size = "default" }: Props) {
                 Sold out
               </span>
             )}
-          </div>
-
-          {/* Wishlist */}
-          <div className="absolute top-2 right-2 w-7 h-7 bg-card rounded-full flex items-center justify-center shadow-sm">
-            <WishlistButton productId={product.id} />
           </div>
 
           {/* Add to cart */}

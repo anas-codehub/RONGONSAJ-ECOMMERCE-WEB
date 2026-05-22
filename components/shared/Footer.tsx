@@ -65,7 +65,7 @@ export default function Footer() {
                 { label: "Sign in", href: "/sign-in" },
                 { label: "Create account", href: "/sign-up" },
                 { label: "My orders", href: "/account/orders" },
-                { label: "My wishlist", href: "/account/wishlist" },
+
                 { label: "My profile", href: "/account/profile" },
               ].map(({ label, href }) => (
                 <li key={label}>

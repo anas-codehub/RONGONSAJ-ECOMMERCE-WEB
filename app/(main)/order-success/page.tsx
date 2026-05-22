@@ -3,10 +3,17 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Package, ArrowRight, Banknote } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { purchase } from "@/lib/pixel";
 
 export default function OrderSuccessPage() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
+  useEffect(() => {
+    if (orderId) {
+      purchase(orderId, 0, 0); // Add real values if available
+    }
+  }, [orderId]);
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">

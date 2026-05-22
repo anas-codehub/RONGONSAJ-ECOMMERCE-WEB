@@ -10,6 +10,7 @@ import AddToCartButton from "@/components/shared/AddToCartButton";
 import ReviewForm from "@/components/shared/ReviewForm";
 import ProductImageGallery from "@/components/shared/ProductImageGallery";
 import ShareButtons from "@/components/shared/ShareButtons";
+import ScrollToOrder from "@/components/shared/ScrollToOrder";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -230,7 +231,9 @@ export default async function ProductDetailPage({ params }: Props) {
             </div>
 
             {/* Add to cart */}
-            <AddToCartButton product={product} />
+            <div id="add-to-cart-section">
+              <AddToCartButton product={product} />
+            </div>
 
             <Separator className="bg-border" />
 
@@ -387,6 +390,7 @@ export default async function ProductDetailPage({ params }: Props) {
           </div>
         )}
       </div>
+      <ScrollToOrder />
     </div>
   );
 }

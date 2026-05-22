@@ -4,6 +4,8 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import SessionProvider from "@/components/shared/SessionProvider";
 import { auth } from "@/lib/auth";
+import MetaPixel from "@/components/shared/MetaPixel";
+import { Suspense } from "react";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -57,6 +59,8 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning style={{ overflowY: "scroll" }}>
       <body className={`${geist.variable} antialiased min-h-screen`}>
+        <MetaPixel />
+
         <SessionProvider session={session}>
           {children}
           <Toaster richColors position="top-right" />

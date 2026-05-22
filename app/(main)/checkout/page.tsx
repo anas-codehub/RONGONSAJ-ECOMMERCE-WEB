@@ -18,6 +18,7 @@ import {
   getZoneLabel,
 } from "@/lib/districts";
 import DistrictInput from "@/components/shared/DistrictInput";
+import { initiateCheckout } from "@/lib/pixel";
 
 export default function CheckoutPage() {
   const { items, total, clearCart } = useCartStore();
@@ -99,6 +100,9 @@ export default function CheckoutPage() {
       toast.error("Your cart is empty");
       return;
     }
+
+    // Fire Meta Pixel event when user actually initiates checkout
+    initiateCheckout(total(), items.length);
 
     setLoading(true);
     try {

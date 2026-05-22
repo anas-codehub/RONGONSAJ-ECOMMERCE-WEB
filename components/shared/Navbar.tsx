@@ -99,11 +99,6 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Announcement bar — desktop only */}
-      {/* <div className="hidden sm:block bg-[#3D2B1F] text-[#F0EBE3] text-center text-xs py-2 tracking-widest">
-        Free delivery on orders over ৳2,000 · New drops every week
-      </div> */}
-
       <nav
         className="sticky top-0 z-50 border-b border-border"
         style={{ background: "var(--background)" }}
@@ -227,13 +222,6 @@ export default function Navbar() {
               </button>
             </Link>
 
-            {/* Wishlist */}
-            <Link href="/account/wishlist">
-              <button className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors">
-                <Heart className="h-5 w-5 text-foreground" />
-              </button>
-            </Link>
-
             {/* Auth */}
             {session ? (
               <div ref={profileRef} className="relative">
@@ -291,11 +279,7 @@ export default function Navbar() {
                           icon: ShoppingBag,
                           label: "My orders",
                         },
-                        {
-                          href: "/account/wishlist",
-                          icon: Heart,
-                          label: "My wishlist",
-                        },
+
                         {
                           href: "/account/profile",
                           icon: User,
