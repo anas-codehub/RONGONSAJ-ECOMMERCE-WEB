@@ -363,7 +363,7 @@ export default async function OrderDetailPage({ params }: Props) {
                   </div>
 
                   <a
-                    href={`https://steadfast.com.bd/t/${order.trackingCode}`}
+                    href={`https://portal.packzy.com/track/${order.trackingCode}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-blue-700 transition-colors mt-3 focus:ring-2 focus:ring-blue-300 focus:outline-none"

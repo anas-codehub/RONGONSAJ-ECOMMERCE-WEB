@@ -1,4 +1,4 @@
-const STEADFAST_BASE_URL = "https://portal.steadfast.com.bd/api/v1";
+const STEADFAST_BASE_URL = "https://portal.packzy.com/api/v1";
 
 interface SteadfastOrder {
   invoice: string;
