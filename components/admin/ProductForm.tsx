@@ -693,17 +693,15 @@ export default function ProductForm({ categories, product }: Props) {
             <option value="" disabled>
               Select a category
             </option>
-            {categories.map((cat) => (
-              <option
-                key={cat.id}
-                value={cat.id}
-                style={{
-                  background: "var(--card)",
-                  color: "var(--foreground)",
-                }}
-              >
-                {cat.name}
-              </option>
+            {categories.map((cat: any) => (
+              <optgroup key={cat.id} label={cat.name}>
+                <option value={cat.id}>{cat.name} (main)</option>
+                {cat.children?.map((sub: any) => (
+                  <option key={sub.id} value={sub.id}>
+                    &nbsp;&nbsp;↳ {sub.name}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </div>

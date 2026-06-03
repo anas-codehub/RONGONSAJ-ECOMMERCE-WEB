@@ -1,21 +1,28 @@
-import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { db } from "@/lib/db";
 import AdminCategoriesTable from "@/components/admin/AdminCategoriesTable";
 import { Plus, FolderOpen } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default async function AdminCategoriesPage() {
   const session = await auth();
-
   if (!session?.user || (session.user as any).role !== "ADMIN") {
     redirect("/");
   }
 
   const categories = await db.category.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { _count: { select: { products: true } } },
+    where: { parentId: null },
+    include: {
+      children: {
+        include: {
+          _count: { select: { products: true } },
+        },
+      },
+      _count: { select: { products: true } },
+    },
+    orderBy: { createdAt: "asc" },
   });
 
   return (
@@ -26,7 +33,7 @@ export default async function AdminCategoriesPage() {
             Categories
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {categories.length} categories total
+            {categories.length} main categories
           </p>
         </div>
         <Link href="/admin/categories/new">

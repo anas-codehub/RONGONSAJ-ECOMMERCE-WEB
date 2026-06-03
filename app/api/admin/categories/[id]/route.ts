@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
 
 export async function DELETE(
   req: NextRequest,
@@ -16,7 +18,9 @@ export async function DELETE(
 
     const category = await db.category.findUnique({
       where: { id },
-      include: { _count: { select: { products: true } } },
+      include: {
+        _count: { select: { products: true, children: true } },
+      },
     });
 
     if (!category) {
@@ -33,13 +37,16 @@ export async function DELETE(
       );
     }
 
-    await db.category.delete({ where: { id } });
+    if (category._count.children > 0) {
+      return NextResponse.json(
+        { error: "Cannot delete category with subcategories. Delete subcategories first." },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json({ message: "Category deleted" });
+    await db.category.delete({ where: { id } });
+    return NextResponse.json({ message: "Deleted" });
   } catch {
-    return NextResponse.json(
-      { error: "Something went wrong" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }

@@ -8,6 +8,7 @@ import {
   ShoppingBag,
   Heart,
   X,
+  ChevronDown,
 } from "lucide-react";
 import { useCartStore } from "@/store/cart-store";
 import { useSession, signOut } from "next-auth/react";
@@ -35,6 +36,7 @@ export default function Navbar() {
   const searchRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const mobileInputRef = useRef<HTMLInputElement>(null);
+  const [navCategories, setNavCategories] = useState<any[]>([]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -57,6 +59,13 @@ export default function Navbar() {
       setTimeout(() => mobileInputRef.current?.focus(), 50);
     }
   }, [mobileSearchOpen]);
+
+  useEffect(() => {
+    fetch("/api/admin/categories")
+      .then((r) => r.json())
+      .then((data) => setNavCategories(data))
+      .catch(() => {});
+  }, []);
 
   const handleSearch = useCallback(
     (e: React.FormEvent) => {
@@ -113,15 +122,46 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop category links */}
+
           <div className="hidden md:flex items-center gap-5 ml-4">
-            {categories.map((cat) => (
-              <Link
-                key={cat.slug}
-                href={`/products?category=${cat.slug}`}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
-              >
-                {cat.name}
-              </Link>
+            {navCategories.map((cat) => (
+              <div key={cat.slug} className="relative group">
+                <Link
+                  href={`/products?category=${cat.slug}`}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium py-2 flex items-center gap-1"
+                >
+                  {cat.name}
+                  {cat.children?.length > 0 && (
+                    <ChevronDown className="h-3 w-3" />
+                  )}
+                </Link>
+
+                {/* Subcategory dropdown */}
+                {cat.children?.length > 0 && (
+                  <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                    <div
+                      className="rounded-xl overflow-hidden shadow-xl min-w-[160px]"
+                      style={{
+                        background: "var(--card)",
+                        border: "1px solid var(--border)",
+                      }}
+                    >
+                      {cat.children.map((sub: any) => (
+                        <Link
+                          key={sub.slug}
+                          href={`/products?category=${sub.slug}`}
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-secondary transition-colors font-medium"
+                        >
+                          <span className="text-muted-foreground text-xs">
+                            ↳
+                          </span>
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
             <Link
               href="/products?sort=newest"
@@ -130,7 +170,6 @@ export default function Navbar() {
               New arrivals
             </Link>
           </div>
-
           {/* Search — takes full remaining width on mobile */}
           <div ref={searchRef} className="flex-1 relative">
             {/* Desktop search */}
@@ -175,16 +214,53 @@ export default function Navbar() {
                   <p className="text-xs font-extrabold text-muted-foreground uppercase tracking-widest mb-2">
                     Categories
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((cat) => (
-                      <button
-                        key={cat.slug}
-                        onClick={() => handleCategoryClick(cat.slug)}
-                        className="text-xs font-bold px-3 py-1.5 rounded-full bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
-                      >
-                        {cat.name}
-                      </button>
+                  {/* Desktop nav links */}
+                  <div className="hidden md:flex items-center gap-5 ml-4">
+                    {navCategories.map((cat) => (
+                      <div key={cat.slug} className="relative group">
+                        <Link
+                          href={`/products?category=${cat.slug}`}
+                          className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium py-2 flex items-center gap-1"
+                        >
+                          {cat.name}
+                          {cat.children?.length > 0 && (
+                            <ChevronDown className="h-3 w-3" />
+                          )}
+                        </Link>
+
+                        {/* Subcategory dropdown */}
+                        {cat.children?.length > 0 && (
+                          <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                            <div
+                              className="rounded-xl overflow-hidden shadow-xl min-w-[160px]"
+                              style={{
+                                background: "var(--card)",
+                                border: "1px solid var(--border)",
+                              }}
+                            >
+                              {cat.children.map((sub: any) => (
+                                <Link
+                                  key={sub.slug}
+                                  href={`/products?category=${sub.slug}`}
+                                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-secondary transition-colors font-medium"
+                                >
+                                  <span className="text-muted-foreground text-xs">
+                                    ↳
+                                  </span>
+                                  {sub.name}
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ))}
+                    <Link
+                      href="/products?sort=newest"
+                      className="text-sm text-primary font-extrabold"
+                    >
+                      New arrivals
+                    </Link>
                   </div>
                 </div>
                 <div className="p-3">
@@ -375,17 +451,53 @@ export default function Navbar() {
               <p className="text-xs font-extrabold text-muted-foreground uppercase tracking-widest mb-3">
                 Shop by category
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                {categories.map((cat) => (
-                  <button
-                    key={cat.slug}
-                    onClick={() => handleCategoryClick(cat.slug)}
-                    className="text-sm font-bold px-4 py-3 rounded-xl border border-border text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all text-left"
-                    style={{ background: "var(--secondary)" }}
-                  >
-                    {cat.name}
-                  </button>
+              {/* Desktop nav links */}
+              <div className="hidden md:flex items-center gap-5 ml-4">
+                {navCategories.map((cat) => (
+                  <div key={cat.slug} className="relative group">
+                    <Link
+                      href={`/products?category=${cat.slug}`}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium py-2 flex items-center gap-1"
+                    >
+                      {cat.name}
+                      {cat.children?.length > 0 && (
+                        <ChevronDown className="h-3 w-3" />
+                      )}
+                    </Link>
+
+                    {/* Subcategory dropdown */}
+                    {cat.children?.length > 0 && (
+                      <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                        <div
+                          className="rounded-xl overflow-hidden shadow-xl min-w-[160px]"
+                          style={{
+                            background: "var(--card)",
+                            border: "1px solid var(--border)",
+                          }}
+                        >
+                          {cat.children.map((sub: any) => (
+                            <Link
+                              key={sub.slug}
+                              href={`/products?category=${sub.slug}`}
+                              className="flex items-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-secondary transition-colors font-medium"
+                            >
+                              <span className="text-muted-foreground text-xs">
+                                ↳
+                              </span>
+                              {sub.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 ))}
+                <Link
+                  href="/products?sort=newest"
+                  className="text-sm text-primary font-extrabold"
+                >
+                  New arrivals
+                </Link>
               </div>
             </div>
 

@@ -15,13 +15,14 @@ export default async function AdminProductsPage() {
 
   const [products, categories] = await Promise.all([
     db.product.findMany({
-      include: {
-        category: true,
-        coupons: true,
-      },
+      include: { category: true, coupons: true },
       orderBy: { createdAt: "desc" },
     }),
-    db.category.findMany(),
+    db.category.findMany({
+      where: { parentId: null },
+      include: { children: true },
+      orderBy: { createdAt: "asc" },
+    }),
   ]);
   return (
     <div className="space-y-6">
