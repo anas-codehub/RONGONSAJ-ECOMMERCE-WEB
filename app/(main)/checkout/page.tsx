@@ -40,7 +40,6 @@ export default function CheckoutPage() {
     fullName: "",
     phone: "",
     street: "",
-
     district: "",
   });
 
