@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
 
-    if (!address?.fullName || !address?.phone || !address?.street || !address?.city || !address?.district) {
+    if (!address?.fullName || !address?.phone || !address?.street ||  !address?.district) {
       return NextResponse.json({ error: "Please fill in all address fields" }, { status: 400 });
     }
 
@@ -123,9 +123,7 @@ export async function POST(req: NextRequest) {
                 <p style="margin:4px 0;color:#3D2B1F;"><strong>Phone:</strong> ${address.phone}</p>
               <p style="margin:4px 0;color:#3D2B1F;">
   <strong>Address:</strong>
-  ${address.street}
-  ${address.city ? `, ${address.city}` : ""}
-  , ${address.district}
+  ${address.street}, ${address.district}
 </p>
                 <p style="margin:4px 0;color:#3D2B1F;"><strong>Total:</strong> ৳${total.toLocaleString()}</p>
                 <p style="margin:4px 0;color:#3D2B1F;"><strong>Type:</strong> ${session ? "Registered customer" : "Guest order"}</p>

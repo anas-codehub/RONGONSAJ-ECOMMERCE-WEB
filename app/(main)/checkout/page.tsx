@@ -105,23 +105,66 @@ export default function CheckoutPage() {
   const handleCheckout = async () => {
     const { fullName, phone, street, district } = address;
 
+    console.log({
+      fullName,
+      phone,
+      street,
+      district,
+    });
+
+    // Validate required fields
     if (!fullName || !phone || !street || !district) {
       toast.error("Please fill in all address fields");
       return;
     }
 
-    if (phone.length !== 11) {
-      toast.error("Phone number must be exactly 11 digits");
+    // Validate phone number
+    if (!/^01\d{9}$/.test(phone)) {
+      toast.error("Please enter a valid 11-digit Bangladeshi mobile number");
       return;
     }
 
+    // Check cart
     if (items.length === 0) {
       toast.error("Your cart is empty");
       return;
     }
 
-    // Fire Meta Pixel event when user actually initiates checkout
+    // Fire Meta Pixel event
     initiateCheckout(total(), items.length);
+
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items,
+          address,
+          couponId,
+          total: grandTotal,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || "Order failed");
+        return;
+      }
+
+      clearCart();
+      toast.success("Order placed successfully!");
+      router.push(`/order-success?orderId=${data.orderId}`);
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
   if (items.length === 0) {
     return (

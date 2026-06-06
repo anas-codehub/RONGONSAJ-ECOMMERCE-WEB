@@ -24,8 +24,8 @@ export default function OrderSuccessPage() {
           Order placed!
         </h1>
         <p className="text-muted-foreground mb-8 leading-relaxed">
-          Thank you for your purchase. We'll send you a confirmation and notify
-          you when your order ships.
+          Thank you for your purchase. A member of our team will be in touch
+          with you shortly.
         </p>
 
         {/* Order ID */}
