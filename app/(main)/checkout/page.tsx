@@ -45,7 +45,21 @@ export default function CheckoutPage() {
   });
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAddress({ ...address, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "fullName") {
+      const filteredValue = value.replace(/[^a-zA-Z\u0980-\u09FF\s]/g, "");
+      setAddress({ ...address, [name]: filteredValue });
+      return;
+    }
+
+    if (name === "phone") {
+      const filteredValue = value.replace(/\D/g, "").slice(0, 11);
+      setAddress({ ...address, [name]: filteredValue });
+      return;
+    }
+
+    setAddress({ ...address, [name]: value });
   };
 
   // Fetch delivery settings
@@ -91,10 +105,17 @@ export default function CheckoutPage() {
 
   const handleCheckout = async () => {
     const { fullName, phone, street, district } = address;
+
     if (!fullName || !phone || !street || !district) {
       toast.error("Please fill in all address fields");
       return;
     }
+
+    if (phone.length !== 11) {
+      toast.error("Phone number must be exactly 11 digits");
+      return;
+    }
+
     if (items.length === 0) {
       toast.error("Your cart is empty");
       return;
@@ -102,37 +123,7 @@ export default function CheckoutPage() {
 
     // Fire Meta Pixel event when user actually initiates checkout
     initiateCheckout(total(), items.length);
-
-    setLoading(true);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items,
-          address,
-          couponId,
-          total: grandTotal,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data.error || "Order failed");
-        return;
-      }
-
-      clearCart();
-      toast.success("Order placed successfully!");
-      router.push(`/order-success?orderId=${data.orderId}`);
-    } catch {
-      toast.error("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
   };
-
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
@@ -172,7 +163,7 @@ export default function CheckoutPage() {
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-semibold text-foreground block mb-1.5">
-                    Full name
+                    Full name (আপনার নাম)
                   </label>
                   <Input
                     id="fullName"
@@ -187,12 +178,15 @@ export default function CheckoutPage() {
 
                 <div>
                   <label className="text-sm font-semibold text-foreground block mb-1.5">
-                    Phone number
+                    Phone number (মোবাইল নম্বর)
                   </label>
                   <Input
                     id="phone"
                     name="phone"
+                    type="tel"
+                    inputMode="numeric"
                     placeholder="01XXXXXXXXX"
+                    maxLength={11}
                     value={address.phone}
                     onChange={handleAddressChange}
                     className="border-border"
@@ -202,7 +196,7 @@ export default function CheckoutPage() {
 
                 <div>
                   <label className="text-sm font-semibold text-foreground block mb-1.5">
-                    Address
+                    Address (ঠিকানা)
                   </label>
                   <Input
                     id="street"
@@ -218,7 +212,7 @@ export default function CheckoutPage() {
                 {/* District */}
                 <div>
                   <label className="text-sm font-semibold text-foreground block mb-1.5">
-                    District
+                    District (জেলা)
                   </label>
                   <DistrictInput
                     value={address.district}
