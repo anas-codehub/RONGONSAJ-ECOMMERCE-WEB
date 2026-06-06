@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
         fullName: address.fullName,
         phone: address.phone,
         street: address.street,
-        city: address.city,
+     
         district: address.district,
         userId,
       },

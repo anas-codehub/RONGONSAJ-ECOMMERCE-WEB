@@ -89,6 +89,7 @@ model Order {
   trackingCode    String?
   steadfastId     Int?
   steadfastStatus String?
+  isRead          Boolean     @default(false)
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
@@ -115,18 +116,14 @@ model OrderItem {
 }
 
 model Address {
-  id        String  @id @default(cuid())
-  fullName  String
-  phone     String
-  street    String
-  city      String
-  district  String
-  isDefault Boolean @default(false)
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  orders Order[]
+  id       String  @id @default(cuid())
+  fullName String
+  phone    String
+  street   String
+  district String
+  userId   String
+  user     User    @relation(fields: [userId], references: [id])
+  orders   Order[]
 }
 
 model Review {

@@ -96,7 +96,18 @@ export default async function OrderDetailPage({ params }: Props) {
             </span>
             <InvoiceButton
               order={{
-                ...order,
+                id: order.id,
+                createdAt: order.createdAt,
+                total: order.total,
+                status: order.status,
+                items: order.items,
+                address: {
+                  fullName: order.address.fullName,
+                  phone: order.address.phone,
+                  street: order.address.street,
+                  district: order.address.district,
+                  city: "",
+                },
                 user: {
                   name: order.user.name,
                   email: order.user.email,
@@ -285,7 +296,7 @@ export default async function OrderDetailPage({ params }: Props) {
                 </p>
                 <p className="text-muted-foreground">{order.address.street}</p>
                 <p className="text-muted-foreground">
-                  {order.address.city}, {order.address.district}
+                  {order.address.district}
                 </p>
                 <p className="text-muted-foreground">{order.address.phone}</p>
               </div>

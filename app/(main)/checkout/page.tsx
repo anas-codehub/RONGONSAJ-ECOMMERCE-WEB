@@ -40,7 +40,7 @@ export default function CheckoutPage() {
     fullName: "",
     phone: "",
     street: "",
-    city: "",
+
     district: "",
   });
 
@@ -90,12 +90,11 @@ export default function CheckoutPage() {
   };
 
   const handleCheckout = async () => {
-    const { fullName, phone, street, city, district } = address;
+    const { fullName, phone, street, district } = address;
     if (!fullName || !phone || !street || !district) {
       toast.error("Please fill in all address fields");
       return;
     }
-
     if (items.length === 0) {
       toast.error("Your cart is empty");
       return;
@@ -213,20 +212,6 @@ export default function CheckoutPage() {
                     onChange={handleAddressChange}
                     className="border-border"
                     onKeyDown={(e) => handleEnterKey(e, "city")}
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-semibold text-foreground block mb-1.5">
-                    City / Upazila
-                  </label>
-                  <Input
-                    id="city"
-                    name="city"
-                    placeholder="e.g. Mirpur, Uttara, Dhanmondi"
-                    value={address.city}
-                    onChange={handleAddressChange}
-                    className="border-border"
                   />
                 </div>
 
@@ -374,17 +359,59 @@ export default function CheckoutPage() {
                 </span>
               </div>
 
-              <Button
+              <button
                 onClick={handleCheckout}
                 disabled={loading || !address.district}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 rounded-xl text-base font-bold"
+                className="w-full relative overflow-hidden py-4 rounded-xl text-base font-extrabold transition-all duration-300 disabled:opacity-50"
+                style={{
+                  background: loading
+                    ? "var(--primary)"
+                    : "linear-gradient(135deg, #E07B54 0%, #C85E35 50%, #E07B54 100%)",
+                  backgroundSize: "200% 200%",
+                  color: "white",
+                  boxShadow: loading
+                    ? "none"
+                    : "0 8px 30px rgba(224,123,84,0.4)",
+                  animation: loading
+                    ? "none"
+                    : "gradientShift 3s ease infinite",
+                }}
               >
-                {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                {loading
-                  ? "Placing order..."
-                  : "Place order — Cash on delivery"}
-                {!loading && <ArrowRight className="ml-2 h-4 w-4" />}
-              </Button>
+                {/* Shimmer effect */}
+                {!loading && (
+                  <div
+                    className="absolute inset-0 opacity-20"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, transparent 0%, white 50%, transparent 100%)",
+                      animation: "shimmer 2s infinite",
+                    }}
+                  />
+                )}
+
+                <span className="relative flex items-center justify-center gap-2">
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Placing order...
+                    </>
+                  ) : (
+                    <>
+                      💳 Place order — Cash on delivery
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                      >
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                      </svg>
+                    </>
+                  )}
+                </span>
+              </button>
 
               <p className="text-xs text-muted-foreground text-center mt-3">
                 💵 Pay in cash when your order is delivered

@@ -132,16 +132,23 @@ export default function SlideForm() {
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-foreground block mb-1.5">
-              Button link (optional)
+            <label className="text-sm font-semibold text-foreground block mb-1.5">
+              Button link
+              <span className="text-xs font-normal text-muted-foreground ml-2">
+                — use /products for all products or /products/slug for specific
+                product
+              </span>
             </label>
             <Input
-              name="buttonLink"
               value={form.buttonLink}
-              onChange={handleChange}
-              placeholder="e.g. /products"
-              className="border-border"
+              onChange={(e) => setForm({ ...form, buttonLink: e.target.value })}
+              placeholder="e.g. /products or /products/white-panjabi"
+              className="border-border bg-secondary"
             />
+            <p className="text-xs text-muted-foreground mt-1">
+              💡 To link to a specific product, go to that product page and copy
+              the URL after rongonsaaj.vercel.app
+            </p>
           </div>
         </div>
 

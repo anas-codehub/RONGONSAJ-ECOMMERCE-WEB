@@ -42,7 +42,7 @@ export async function POST(
       invoice: order.id,
       recipient_name: order.address.fullName,
       recipient_phone: order.address.phone,
-      recipient_address: `${order.address.street}, ${order.address.city}, ${order.address.district}`,
+      recipient_address: `${order.address.street},  ${order.address.district}`,
       cod_amount: order.total,
       note: `Order from Rongonsaaj — ${order.items.map((i) => i.product.name).join(", ")}`,
     });

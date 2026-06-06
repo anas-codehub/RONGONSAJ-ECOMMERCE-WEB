@@ -118,7 +118,7 @@ export default async function OrdersPage() {
                 <div className="flex items-center justify-between pt-4 border-t border-border">
                   <div>
                     <p className="text-xs text-muted-foreground">
-                      Deliver to: {order.address.city}, {order.address.district}
+                      Deliver to: {order.address.district}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
@@ -128,6 +128,10 @@ export default async function OrdersPage() {
                         user: {
                           name: session.user?.name || null,
                           email: session.user?.email || null,
+                        },
+                        address: {
+                          ...order.address,
+                          city: (order.address as any).city ?? "",
                         },
                       }}
                     />
