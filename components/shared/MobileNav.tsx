@@ -182,7 +182,7 @@ export default function MobileNav() {
                   <div
                     className="w-10 h-8 rounded-xl flex items-center justify-center transition-all"
                     style={{
-                      background: active ? "#E07B5420" : "transparent",
+                      background: active ? "#6B1A2820" : "transparent",
                     }}
                   >
                     <Icon
@@ -229,7 +229,7 @@ export default function MobileNav() {
               <div
                 className="w-10 h-8 rounded-xl flex items-center justify-center transition-all"
                 style={{
-                  background: accountOpen ? "#E07B5420" : "transparent",
+                  background: accountOpen ? "#6B1A2820" : "transparent",
                 }}
               >
                 {session && (session.user as any)?.image ? (

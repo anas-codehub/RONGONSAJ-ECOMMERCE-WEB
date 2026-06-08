@@ -120,7 +120,7 @@ export default function RevenueChart({ data }: Props) {
           />
           <Bar
             dataKey="revenue"
-            fill="#E07B54"
+            fill="#6B1A28"
             radius={[6, 6, 0, 0]}
             maxBarSize={40}
           />

@@ -4,23 +4,42 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #F9F5F1;
-  --foreground: #3D2B1F;
-  --primary: #E07B54;
-  --primary-foreground: #FFFFFF;
-  --secondary: #F0EBE3;
-  --secondary-foreground: #7A5C4F;
-  --muted: #E8DDD4;
-  --muted-foreground: #7A5C4F;
-  --accent: #E07B54;
-  --accent-foreground: #FFFFFF;
+  /* Backgrounds */
+  --background: #FBF7F0;
+  --foreground: #2C1308;
+
+  /* Cards */
   --card: #FFFFFF;
-  --card-foreground: #3D2B1F;
-  --border: #E8DDD4;
-  --input: #E8DDD4;
-  --ring: #E07B54;
+  --card-foreground: #2C1308;
+  --popover: #FFFFFF;
+  --popover-foreground: #2C1308;
+
+  /* Primary — Burgundy */
+  --primary: #6B1A28;
+  --primary-foreground: #FBF7F0;
+
+  /* Secondary — Warm Cream */
+  --secondary: #F5EDD9;
+  --secondary-foreground: #2C1308;
+
+  /* Accent — Antique Gold */
+  --accent: #B8922A;
+  --accent-foreground: #FBF7F0;
+
+  /* Muted */
+  --muted: #EBD9BE;
+  --muted-foreground: #9C7B6B;
+
+  /* Border */
+  --border: #EBD9BE;
+  --input: #EBD9BE;
+  --ring: #6B1A28;
+
+  /* Destructive */
   --destructive: #DC2626;
   --destructive-foreground: #FFFFFF;
+
+  /* Radius */
   --radius: 0.75rem;
 }
 
@@ -43,6 +62,14 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.gold-text {
+  color: #B8922A;
+}
+
+.gold-border {
+  border-color: #B8922A;
 }
 
 img {

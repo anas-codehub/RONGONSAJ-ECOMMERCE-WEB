@@ -239,7 +239,7 @@ export default function AdminHeader({ session }: { session: any }) {
                       background: "var(--card)",
                       maxHeight: "320px",
                       scrollbarWidth: "thin",
-                      scrollbarColor: "#E07B54 transparent",
+                      scrollbarColor: "#6B1A28 transparent",
                     }}
                   >
                     {loading ? (
@@ -412,7 +412,7 @@ export default function AdminHeader({ session }: { session: any }) {
                   letterSpacing: "2px",
                 }}
               >
-                RONGO<span style={{ color: "#E07B54" }}>N</span>SAAJ
+                RONGO<span style={{ color: "#6B1A28" }}>N</span>SAAJ
               </p>
               <p
                 style={{
@@ -465,7 +465,7 @@ export default function AdminHeader({ session }: { session: any }) {
                         width: "18px",
                         height: "18px",
                         flexShrink: 0,
-                        color: "#E07B54",
+                        color: "#6B1A28",
                       }}
                     />
                     <span>{label}</span>

@@ -95,17 +95,17 @@ export async function POST(
                 <p style="margin:4px 0;color:#991B1B;"><strong>Cancelled at:</strong> ${new Date().toLocaleString("en-BD")}</p>
               </div>
               <div style="background:#fff;border:1px solid #E8DDD4;padding:20px;border-radius:12px;margin-bottom:16px;">
-                <h3 style="color:#3D2B1F;margin:0 0 12px;">Cancelled Items (Stock Restored)</h3>
+                <h3 style="color:#2C1A10;margin:0 0 12px;">Cancelled Items (Stock Restored)</h3>
                 ${order.items.map((item: any) => `
-                  <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F0EBE3;">
-                    <span style="color:#3D2B1F;font-weight:600;">${item.product.name}</span>
+                  <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #FAF6EF;">
+                    <span style="color:#2C1A10;font-weight:600;">${item.product.name}</span>
                     <span style="color:#DC2626;font-weight:700;">×${item.quantity} restored</span>
                   </div>
                 `).join("")}
               </div>
               <div style="text-align:center;">
                 <a href="${process.env.NEXTAUTH_URL}/admin/orders"
-                  style="background:#3D2B1F;color:white;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:700;display:inline-block;">
+                  style="background:#2C1A10;color:white;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:700;display:inline-block;">
                   View in Admin Panel →
                 </a>
               </div>

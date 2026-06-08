@@ -41,7 +41,7 @@ export default function BackToTop() {
         transition: "all 0.2s ease",
       }}
       onMouseEnter={(e) => {
-        (e.currentTarget as HTMLButtonElement).style.background = "#E07B54";
+        (e.currentTarget as HTMLButtonElement).style.background = "#6B1A28";
         (e.currentTarget as HTMLButtonElement).style.transform =
           "translateY(-3px)";
       }}

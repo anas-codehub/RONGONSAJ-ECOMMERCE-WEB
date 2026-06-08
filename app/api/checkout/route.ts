@@ -125,24 +125,24 @@ export async function POST(req: NextRequest) {
           subject: `🛍️ New order! #${order.id} — ৳${total.toLocaleString()}`,
           html: `
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
-              <div style="background:#3D2B1F;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px;">
-                <h1 style="color:#F0EBE3;margin:0;font-size:22px;">🛍️ New Order!</h1>
-                <p style="color:#E07B54;margin:8px 0 0;">RONGONSAAJ</p>
+              <div style="background:#2C1A10;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px;">
+                <h1 style="color:#FAF6EF;margin:0;font-size:22px;">🛍️ New Order!</h1>
+                <p style="color:#6B1A28;margin:8px 0 0;">RONGONSAAJ</p>
               </div>
-              <div style="background:#F9F5F1;padding:20px;border-radius:12px;margin-bottom:16px;">
-                <p style="margin:4px 0;color:#3D2B1F;"><strong>Order ID:</strong> #${order.id}</p>
-                <p style="margin:4px 0;color:#3D2B1F;"><strong>Customer:</strong> ${address.fullName}</p>
-                <p style="margin:4px 0;color:#3D2B1F;"><strong>Phone:</strong> ${address.phone}</p>
-              <p style="margin:4px 0;color:#3D2B1F;">
+              <div style="background:#FAF6EF;padding:20px;border-radius:12px;margin-bottom:16px;">
+                <p style="margin:4px 0;color:#2C1A10;"><strong>Order ID:</strong> #${order.id}</p>
+                <p style="margin:4px 0;color:#2C1A10;"><strong>Customer:</strong> ${address.fullName}</p>
+                <p style="margin:4px 0;color:#2C1A10;"><strong>Phone:</strong> ${address.phone}</p>
+              <p style="margin:4px 0;color:#2C1A10;">
   <strong>Address:</strong>
   ${address.street}, ${address.district}
 </p>
-                <p style="margin:4px 0;color:#3D2B1F;"><strong>Total:</strong> ৳${total.toLocaleString()}</p>
-                <p style="margin:4px 0;color:#3D2B1F;"><strong>Type:</strong> ${session ? "Registered customer" : "Guest order"}</p>
+                <p style="margin:4px 0;color:#2C1A10;"><strong>Total:</strong> ৳${total.toLocaleString()}</p>
+                <p style="margin:4px 0;color:#2C1A10;"><strong>Type:</strong> ${session ? "Registered customer" : "Guest order"}</p>
               </div>
               <div style="text-align:center;">
                 <a href="${process.env.NEXTAUTH_URL}/admin/orders"
-                  style="background:#E07B54;color:white;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:700;display:inline-block;">
+                  style="background:#6B1A28;color:white;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:700;display:inline-block;">
                   View in Admin Panel →
                 </a>
               </div>

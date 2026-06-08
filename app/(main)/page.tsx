@@ -30,11 +30,17 @@ const getFeaturedProducts = unstable_cache(
 const getCategories = unstable_cache(
   async () =>
     db.category.findMany({
-      include: { _count: { select: { products: true } } },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        image: true,
+        _count: { select: { products: true } },
+      },
       take: 8,
     }),
   ["categories"],
-  { revalidate: 300 },
+  { revalidate: 60 },
 );
 const getSlides = unstable_cache(
   async () =>
@@ -209,7 +215,7 @@ export default async function HomePage() {
                   <div className="group relative bg-card border border-border rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                     {/* Image */}
                     <div className="relative h-48 bg-secondary overflow-hidden">
-                      {(cat as any).image ? (
+                      {cat.image ? (
                         <Image
                           src={(cat as any).image}
                           alt={cat.name}

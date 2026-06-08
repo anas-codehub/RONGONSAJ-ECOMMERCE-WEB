@@ -402,12 +402,12 @@ export default function CheckoutPage() {
                 style={{
                   background: loading
                     ? "var(--primary)"
-                    : "linear-gradient(135deg, #E07B54 0%, #C85E35 50%, #E07B54 100%)",
+                    : "linear-gradient(135deg, #6B1A28 0%, #C85E35 50%, #6B1A28 100%)",
                   backgroundSize: "200% 200%",
                   color: "white",
                   boxShadow: loading
                     ? "none"
-                    : "0 8px 30px rgba(224,123,84,0.4)",
+                    : "0 8px 30px rgba(107,26,40,0.4)",
                   animation: loading
                     ? "none"
                     : "gradientShift 3s ease infinite",

@@ -114,66 +114,24 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-3">
           {/* Logo — always visible */}
-          <Link
-            href="/"
-            className="shrink-0 font-extrabold text-lg text-foreground tracking-widest"
-          >
-            RONGO<span className="text-primary">N</span>SAAJ
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/images/logo.png"
+              alt="Rongonsaaj"
+              width={400}
+              height={160}
+              className="object-contain h-24 w-auto"
+              priority
+            />
           </Link>
 
-          {/* Desktop category links */}
-
-          <div className="hidden md:flex items-center gap-5 ml-4">
-            {navCategories.map((cat) => (
-              <div key={cat.slug} className="relative group">
-                <Link
-                  href={`/products?category=${cat.slug}`}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium py-2 flex items-center gap-1"
-                >
-                  {cat.name}
-                  {cat.children?.length > 0 && (
-                    <ChevronDown className="h-3 w-3" />
-                  )}
-                </Link>
-
-                {/* Subcategory dropdown */}
-                {cat.children?.length > 0 && (
-                  <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                    <div
-                      className="rounded-xl overflow-hidden shadow-xl min-w-[160px]"
-                      style={{
-                        background: "var(--card)",
-                        border: "1px solid var(--border)",
-                      }}
-                    >
-                      {cat.children.map((sub: any) => (
-                        <Link
-                          key={sub.slug}
-                          href={`/products?category=${sub.slug}`}
-                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-secondary transition-colors font-medium"
-                        >
-                          <span className="text-muted-foreground text-xs">
-                            ↳
-                          </span>
-                          {sub.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-            <Link
-              href="/products?sort=newest"
-              className="text-sm text-primary font-extrabold"
-            >
-              New arrivals
-            </Link>
-          </div>
           {/* Search — takes full remaining width on mobile */}
           <div ref={searchRef} className="flex-1 relative">
             {/* Desktop search */}
-            <form onSubmit={handleSearch} className="hidden md:block relative">
+            <form
+              onSubmit={handleSearch}
+              className="hidden md:block relative w-80 mx-auto"
+            >
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <input
                 type="text"
