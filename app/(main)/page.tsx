@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { unstable_cache } from "next/cache";
 import AllProductsSection from "@/components/shared/AllProductsSection";
+import Image from "next/image";
 
 const getFeaturedProducts = unstable_cache(
   async () =>
@@ -27,11 +28,14 @@ const getFeaturedProducts = unstable_cache(
 );
 
 const getCategories = unstable_cache(
-  async () => db.category.findMany({ take: 6 }),
+  async () =>
+    db.category.findMany({
+      include: { _count: { select: { products: true } } },
+      take: 8,
+    }),
   ["categories"],
   { revalidate: 300 },
 );
-
 const getSlides = unstable_cache(
   async () =>
     db.heroSlide.findMany({
@@ -175,23 +179,70 @@ export default async function HomePage() {
       </section>
 
       {/* CATEGORIES */}
+
       {categories.length > 0 && (
-        <section className="py-12 border-b">
+        <section className="py-20">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-              <h2 className="text-2xl sm:text-3xl font-extrabold">
-                Shop by category
-              </h2>
-              <Link href="/products" className="text-sm font-bold">
-                All products <ArrowRight className="inline h-4 w-4" />
+            <div className="flex items-end justify-between mb-12">
+              <div>
+                <span className="text-primary text-xs font-bold tracking-[4px] uppercase block mb-3">
+                  Collections
+                </span>
+                <h2 className="text-4xl font-extrabold text-foreground tracking-tight leading-tight">
+                  Shop by
+                  <br />
+                  category
+                </h2>
+              </div>
+              <Link
+                href="/products"
+                className="group flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors"
+              >
+                All products
+                <ArrowUpRight className="h-4 w-4" />
               </Link>
             </div>
 
-            <div className="flex gap-4 overflow-x-auto pb-2">
-              {categories.map((cat, i) => (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+              {categories.map((cat) => (
                 <Link key={cat.id} href={`/products?category=${cat.slug}`}>
-                  <div className="shrink-0 px-6 py-5 rounded-3xl bg-secondary border min-w-35 text-center font-bold">
-                    {cat.name}
+                  <div className="group relative bg-card border border-border rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    {/* Image */}
+                    <div className="relative h-48 bg-secondary overflow-hidden">
+                      {(cat as any).image ? (
+                        <Image
+                          src={(cat as any).image}
+                          alt={cat.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-secondary to-background">
+                          <span className="text-5xl font-extrabold text-primary/20">
+                            {cat.name[0]}
+                          </span>
+                        </div>
+                      )}
+                      {/* Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      {/* Category name on image */}
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <p className="text-white font-extrabold text-lg leading-tight">
+                          {cat.name}
+                        </p>
+                        <p className="text-white/70 text-xs mt-0.5">
+                          {(cat as any)._count?.products || 0} products
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Browse button */}
+                    <div className="px-4 py-3 flex items-center justify-between">
+                      <span className="text-sm font-bold text-foreground">
+                        Browse collection
+                      </span>
+                      <ArrowUpRight className="h-4 w-4 text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    </div>
                   </div>
                 </Link>
               ))}

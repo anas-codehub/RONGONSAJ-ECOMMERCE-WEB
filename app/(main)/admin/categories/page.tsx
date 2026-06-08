@@ -13,13 +13,7 @@ export default async function AdminCategoriesPage() {
   }
 
   const categories = await db.category.findMany({
-    where: { parentId: null },
     include: {
-      children: {
-        include: {
-          _count: { select: { products: true } },
-        },
-      },
       _count: { select: { products: true } },
     },
     orderBy: { createdAt: "asc" },

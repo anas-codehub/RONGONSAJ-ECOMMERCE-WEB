@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
+import { ZoomIn, ZoomOut, X } from "lucide-react";
 
 export default function ProductImageGallery({
   images,
@@ -11,45 +12,42 @@ export default function ProductImageGallery({
   productName: string;
 }) {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [zoomed, setZoomed] = useState(false);
+  const [zoomOpen, setZoomOpen] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
   const imageRef = useRef<HTMLDivElement>(null);
-  const touchStartX = useRef<number>(0);
-  const touchEndX = useRef<number>(0);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
-  const handleSwipeStart = (e: React.TouchEvent) => {
+  // Swipe handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
   };
 
-  const handleSwipeEnd = (e: React.TouchEvent) => {
+  const handleTouchEnd = (e: React.TouchEvent) => {
     touchEndX.current = e.changedTouches[0].clientX;
     const diff = touchStartX.current - touchEndX.current;
-
-    // Only swipe if not zoomed and swipe distance > 50px
-    if (!zoomed && Math.abs(diff) > 50) {
+    if (Math.abs(diff) > 50) {
       if (diff > 0 && selectedImage < images.length - 1) {
-        setSelectedImage(selectedImage + 1); // Swipe left → next
+        setSelectedImage((prev) => prev + 1);
       } else if (diff < 0 && selectedImage > 0) {
-        setSelectedImage(selectedImage - 1); // Swipe right → prev
+        setSelectedImage((prev) => prev - 1);
       }
     }
   };
 
-  // Desktop hover zoom
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  // Zoom move handlers
+  const handleZoomMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageRef.current) return;
     const rect = imageRef.current.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setZoomPos({ x, y });
+    setZoomPos({
+      x: Math.min(100, Math.max(0, x)),
+      y: Math.min(100, Math.max(0, y)),
+    });
   };
 
-  // Mobile touch zoom
-  const handleTouchStart = () => {
-    setZoomed(true);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+  const handleZoomTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
     if (!imageRef.current) return;
     const touch = e.touches[0];
     const rect = imageRef.current.getBoundingClientRect();
@@ -59,146 +57,186 @@ export default function ProductImageGallery({
       x: Math.min(100, Math.max(0, x)),
       y: Math.min(100, Math.max(0, y)),
     });
-    e.preventDefault(); // Prevent page scroll while zooming
-  };
-
-  const handleTouchEnd = () => {
-    setZoomed(false);
-    setZoomPos({ x: 50, y: 50 });
+    e.preventDefault();
   };
 
   return (
-    <div className="space-y-4">
-      {/* Main image */}
-      <div
-        ref={imageRef}
-        className="relative h-96 lg:h-[500px] bg-secondary rounded-2xl overflow-hidden select-none"
-        style={{ cursor: zoomed ? "zoom-in" : "zoom-in", touchAction: "none" }}
-        onMouseEnter={() => setZoomed(true)}
-        onMouseLeave={() => {
-          setZoomed(false);
-          setZoomPos({ x: 50, y: 50 });
-        }}
-        onMouseMove={handleMouseMove}
-        onTouchStart={(e) => {
-          handleTouchStart();
-          handleSwipeStart(e);
-        }}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={(e) => {
-          handleTouchEnd();
-          handleSwipeEnd(e);
-        }}
-      >
-        {images[selectedImage] ? (
-          <Image
-            src={images[selectedImage]}
-            alt={productName}
-            fill
-            className="object-contain p-2"
-            style={{
-              transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
-              transform: zoomed ? "scale(2.5)" : "scale(1)",
-              transition: zoomed
-                ? "transform 0.1s ease"
-                : "transform 0.3s ease",
-              pointerEvents: "none",
-            }}
-            priority
-            draggable={false}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="w-24 h-36 bg-muted rounded-full opacity-60" />
-          </div>
-        )}
+    <>
+      <div className="space-y-4">
+        {/* Main image */}
+        <div
+          className="relative h-96 lg:h-[500px] bg-secondary rounded-2xl overflow-hidden select-none"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          {images[selectedImage] ? (
+            <Image
+              src={images[selectedImage]}
+              alt={productName}
+              fill
+              className="object-contain p-2"
+              priority
+              draggable={false}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="w-24 h-36 bg-muted rounded-full opacity-60" />
+            </div>
+          )}
 
-        {/* Zoom hint */}
-        {!zoomed && images[selectedImage] && (
-          <div className="absolute bottom-3 left-3 bg-black/40 text-white text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5">
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
+          {/* Zoom button — top right */}
+          {images[selectedImage] && (
+            <button
+              onClick={() => {
+                setZoomOpen(true);
+                setZoomPos({ x: 50, y: 50 });
+              }}
+              className="absolute top-3 right-3 w-9 h-9 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-all z-10"
+              title="Zoom image"
             >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35M11 8v6M8 11h6" />
-            </svg>
-            <span className="hidden md:inline">Hover to zoom</span>
-            <span className="md:hidden">Hold to zoom</span>
-          </div>
-        )}
+              <ZoomIn className="h-4 w-4 text-foreground" />
+            </button>
+          )}
 
-        {/* Image counter */}
+          {/* Swipe hint */}
+          {images.length > 1 && (
+            <div className="absolute bottom-3 left-3 bg-black/40 text-white text-xs font-medium px-2.5 py-1 rounded-full md:hidden">
+              ← swipe →
+            </div>
+          )}
+
+          {/* Image counter */}
+          {images.length > 1 && (
+            <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+              {selectedImage + 1} / {images.length}
+            </div>
+          )}
+
+          {/* Desktop arrows */}
+          {images.length > 1 && selectedImage > 0 && (
+            <button
+              onClick={() => setSelectedImage(selectedImage - 1)}
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-all z-10 hidden md:flex"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+          )}
+          {images.length > 1 && selectedImage < images.length - 1 && (
+            <button
+              onClick={() => setSelectedImage(selectedImage + 1)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-all z-10 hidden md:flex"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          )}
+        </div>
+
+        {/* Thumbnails */}
         {images.length > 1 && (
-          <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs font-bold px-2.5 py-1 rounded-full">
-            {selectedImage + 1} / {images.length}
+          <div className="flex gap-3 overflow-x-auto pb-2">
+            {images.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => setSelectedImage(i)}
+                className={`relative w-20 h-20 rounded-xl overflow-hidden shrink-0 border-2 transition-all duration-200 ${
+                  selectedImage === i
+                    ? "border-primary shadow-md scale-105"
+                    : "border-border hover:border-primary/50 opacity-70 hover:opacity-100"
+                }`}
+              >
+                <Image
+                  src={img}
+                  alt={`${productName} ${i + 1}`}
+                  fill
+                  className="object-contain p-1"
+                />
+              </button>
+            ))}
           </div>
-        )}
-
-        {/* Arrows */}
-        {images.length > 1 && selectedImage > 0 && !zoomed && (
-          <button
-            onClick={() => setSelectedImage(selectedImage - 1)}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-all z-10"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-          </button>
-        )}
-        {images.length > 1 && selectedImage < images.length - 1 && !zoomed && (
-          <button
-            onClick={() => setSelectedImage(selectedImage + 1)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-all z-10"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <path d="M9 18l6-6-6-6" />
-            </svg>
-          </button>
         )}
       </div>
 
-      {/* Thumbnails */}
-      {images.length > 1 && (
-        <div className="flex gap-3 overflow-x-auto pb-2">
-          {images.map((img, i) => (
-            <button
-              key={i}
-              onClick={() => setSelectedImage(i)}
-              className={`relative w-20 h-20 rounded-xl overflow-hidden shrink-0 border-2 transition-all duration-200 ${
-                selectedImage === i
-                  ? "border-primary shadow-md scale-105"
-                  : "border-border hover:border-primary/50 opacity-70 hover:opacity-100"
-              }`}
-            >
+      {/* Zoom modal */}
+      {zoomOpen && (
+        <div
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center"
+          onClick={() => setZoomOpen(false)}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setZoomOpen(false)}
+            className="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center z-10 transition-colors"
+          >
+            <X className="h-5 w-5 text-white" />
+          </button>
+
+          {/* Zoom hint */}
+          <p className="absolute top-4 left-1/2 -translate-x-1/2 text-white/60 text-xs">
+            Move finger / cursor to zoom
+          </p>
+
+          {/* Zoomed image container */}
+          <div
+            ref={imageRef}
+            className="w-full h-full cursor-crosshair overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+            onMouseMove={handleZoomMouseMove}
+            onTouchMove={handleZoomTouchMove}
+            style={{ touchAction: "none" }}
+          >
+            <div className="relative w-full h-full">
               <Image
-                src={img}
-                alt={`${productName} ${i + 1}`}
+                src={images[selectedImage]}
+                alt={productName}
                 fill
-                className="object-contain p-1"
+                className="object-contain"
+                style={{
+                  transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                  transform: "scale(2.5)",
+                  transition: "transform-origin 0.05s ease",
+                }}
+                draggable={false}
               />
-            </button>
-          ))}
+            </div>
+          </div>
+
+          {/* Image counter in zoom */}
+          {images.length > 1 && (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+              {images.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedImage(i);
+                  }}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    i === selectedImage ? "bg-white scale-125" : "bg-white/40"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
-    </div>
+    </>
   );
 }

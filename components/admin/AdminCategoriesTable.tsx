@@ -1,18 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import {
-  Trash2,
-  Plus,
-  ChevronDown,
-  ChevronRight,
-  FolderOpen,
-  Folder,
-} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Trash2, Plus, ImagePlus, Loader2 } from "lucide-react";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -21,20 +14,11 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-interface SubCategory {
-  id: string;
-  name: string;
-  slug: string;
-  createdAt: Date;
-  _count: { products: number };
-}
-
 interface Category {
   id: string;
   name: string;
   slug: string;
-  createdAt: Date;
-  children: SubCategory[];
+  image: string | null;
   _count: { products: number };
 }
 
@@ -44,18 +28,36 @@ export default function AdminCategoriesTable({
   categories: Category[];
 }) {
   const router = useRouter();
+  const [newName, setNewName] = useState("");
+  const [adding, setAdding] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState("");
   const [deleting, setDeleting] = useState(false);
-  const [expanded, setExpanded] = useState<string[]>([]);
-  const [addingSubFor, setAddingSubFor] = useState<string | null>(null);
-  const [subName, setSubName] = useState("");
-  const [addingLoading, setAddingLoading] = useState(false);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const fileRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  const toggleExpand = (id: string) => {
-    setExpanded((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
+  const handleAdd = async () => {
+    if (!newName.trim()) return;
+    setAdding(true);
+    try {
+      const res = await fetch("/api/admin/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newName.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "Failed");
+        return;
+      }
+      toast.success(`Category "${data.name}" added!`);
+      setNewName("");
+      router.refresh();
+    } catch {
+      toast.error("Something went wrong");
+    } finally {
+      setAdding(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -68,7 +70,7 @@ export default function AdminCategoriesTable({
       });
       const data = await res.json();
       if (!res.ok) {
-        setDeleteError(data.error || "Failed to delete");
+        setDeleteError(data.error || "Failed");
         return;
       }
       toast.success("Category deleted!");
@@ -81,201 +83,163 @@ export default function AdminCategoriesTable({
     }
   };
 
-  const handleAddSub = async (parentId: string) => {
-    if (!subName.trim()) return;
-    setAddingLoading(true);
+  const handleImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    categoryId: string,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingId(categoryId);
     try {
-      const res = await fetch("/api/admin/categories", {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("type", "category");
+
+      const uploadRes = await fetch("/api/admin/upload", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: subName.trim(), parentId }),
+        body: formData,
       });
-      const data = await res.json();
-      if (!res.ok) {
-        toast.error(data.error || "Failed to add subcategory");
+      const uploadData = await uploadRes.json();
+      if (!uploadRes.ok) {
+        toast.error("Upload failed");
         return;
       }
-      toast.success(`Subcategory "${data.name}" added!`);
-      setSubName("");
-      setAddingSubFor(null);
-      if (!expanded.includes(parentId)) {
-        setExpanded([...expanded, parentId]);
+
+      const res = await fetch(`/api/admin/categories/${categoryId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: uploadData.url }),
+      });
+      if (!res.ok) {
+        toast.error("Failed to save image");
+        return;
       }
+
+      toast.success("Category image updated!");
       router.refresh();
     } catch {
       toast.error("Something went wrong");
     } finally {
-      setAddingLoading(false);
+      setUploadingId(null);
+      if (fileRefs.current[categoryId]) {
+        fileRefs.current[categoryId]!.value = "";
+      }
     }
   };
 
   return (
     <>
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
-        <div className="divide-y divide-border">
-          {categories.map((cat) => (
-            <div key={cat.id}>
-              {/* Main category row */}
-              <div className="flex items-center gap-3 px-5 py-4 hover:bg-secondary/50 transition-colors">
-                {/* Expand toggle */}
-                <button
-                  onClick={() => toggleExpand(cat.id)}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors shrink-0"
-                >
-                  {cat.children.length > 0 ? (
-                    expanded.includes(cat.id) ? (
-                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    )
-                  ) : (
-                    <span className="w-4" />
-                  )}
-                </button>
+      {/* Add category */}
+      <div className="bg-card border border-border rounded-2xl p-5 mb-6">
+        <p className="text-sm font-extrabold text-foreground mb-3">
+          Add new category
+        </p>
+        <div className="flex gap-3">
+          <Input
+            placeholder="Category name e.g. Male, Female, Kids..."
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            className="border-border bg-secondary"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleAdd();
+            }}
+          />
+          <button
+            onClick={handleAdd}
+            disabled={adding || !newName.trim()}
+            className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-primary/90 transition-colors disabled:opacity-50 shrink-0"
+          >
+            {adding ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="h-4 w-4" />
+            )}
+            Add
+          </button>
+        </div>
+      </div>
 
-                {/* Icon */}
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <FolderOpen className="h-4 w-4 text-primary" />
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-extrabold text-foreground">
-                    {cat.name}
-                  </p>
-                  <div className="flex items-center gap-3 mt-0.5">
-                    <span className="text-xs text-muted-foreground font-mono">
-                      {cat.slug}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {cat._count.products} products
-                    </span>
-                    {cat.children.length > 0 && (
-                      <span className="text-xs font-bold text-primary">
-                        {cat.children.length} subcategories
-                      </span>
-                    )}
+      {/* Categories grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {categories.map((cat) => (
+          <div
+            key={cat.id}
+            className="bg-card border border-border rounded-2xl overflow-hidden group"
+          >
+            {/* Image */}
+            <div className="relative h-36 bg-secondary">
+              {cat.image ? (
+                <Image
+                  src={cat.image}
+                  alt={cat.name}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-center">
+                    <ImagePlus className="h-8 w-8 text-muted-foreground/40 mx-auto mb-1" />
+                    <p className="text-xs text-muted-foreground">No image</p>
                   </div>
                 </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => {
-                      setAddingSubFor(addingSubFor === cat.id ? null : cat.id);
-                      setSubName("");
-                    }}
-                    className="flex items-center gap-1.5 text-xs font-bold text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    Add sub
-                  </button>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="h-8 w-8 border-border rounded-lg text-destructive hover:text-destructive"
-                    onClick={() => {
-                      setDeleteError("");
-                      setDeleteId(cat.id);
-                    }}
-                    disabled={
-                      cat._count.products > 0 || cat.children.length > 0
-                    }
-                    title={
-                      cat.children.length > 0
-                        ? "Delete subcategories first"
-                        : cat._count.products > 0
-                          ? "Cannot delete with products"
-                          : "Delete"
-                    }
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Add subcategory input */}
-              {addingSubFor === cat.id && (
-                <div className="px-5 py-3 bg-primary/5 border-t border-border flex items-center gap-3">
-                  <div className="w-7 shrink-0" />
-                  <div className="w-8 shrink-0" />
-                  <Input
-                    placeholder={`Add subcategory under "${cat.name}"...`}
-                    value={subName}
-                    onChange={(e) => setSubName(e.target.value)}
-                    className="border-border bg-card flex-1"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleAddSub(cat.id);
-                      if (e.key === "Escape") setAddingSubFor(null);
-                    }}
-                    autoFocus
-                  />
-                  <button
-                    onClick={() => handleAddSub(cat.id)}
-                    disabled={addingLoading || !subName.trim()}
-                    className="flex items-center gap-1.5 bg-primary text-primary-foreground text-xs font-bold px-4 py-2 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 shrink-0"
-                  >
-                    {addingLoading ? "Adding..." : "Add"}
-                  </button>
-                  <button
-                    onClick={() => setAddingSubFor(null)}
-                    className="text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
-                  >
-                    Cancel
-                  </button>
-                </div>
               )}
 
-              {/* Subcategories */}
-              {expanded.includes(cat.id) && cat.children.length > 0 && (
-                <div className="border-t border-border">
-                  {cat.children.map((sub) => (
-                    <div
-                      key={sub.id}
-                      className="flex items-center gap-3 px-5 py-3 bg-secondary/30 hover:bg-secondary/60 transition-colors border-b border-border last:border-0"
-                    >
-                      <div className="w-7 shrink-0" />
-                      <div className="w-px h-6 bg-border shrink-0 ml-3" />
-                      <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-                        <Folder className="h-3.5 w-3.5 text-muted-foreground" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-foreground">
-                          {sub.name}
-                        </p>
-                        <div className="flex items-center gap-3 mt-0.5">
-                          <span className="text-xs text-muted-foreground font-mono">
-                            {sub.slug}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {sub._count.products} products
-                          </span>
-                        </div>
-                      </div>
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        className="h-7 w-7 border-border rounded-lg text-destructive hover:text-destructive"
-                        onClick={() => {
-                          setDeleteError("");
-                          setDeleteId(sub.id);
-                        }}
-                        disabled={sub._count.products > 0}
-                        title={
-                          sub._count.products > 0
-                            ? "Cannot delete with products"
-                            : "Delete"
-                        }
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
+              {/* Upload overlay */}
+              <button
+                onClick={() => fileRefs.current[cat.id]?.click()}
+                className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+              >
+                {uploadingId === cat.id ? (
+                  <Loader2 className="h-6 w-6 text-white animate-spin" />
+                ) : (
+                  <div className="text-center">
+                    <ImagePlus className="h-6 w-6 text-white mx-auto mb-1" />
+                    <p className="text-xs text-white font-bold">
+                      {cat.image ? "Change image" : "Add image"}
+                    </p>
+                  </div>
+                )}
+              </button>
+
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={(el) => {
+                  fileRefs.current[cat.id] = el;
+                }}
+                onChange={(e) => handleImageUpload(e, cat.id)}
+              />
             </div>
-          ))}
-        </div>
+
+            {/* Info */}
+            <div className="p-3">
+              <p className="text-sm font-extrabold text-foreground truncate">
+                {cat.name}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {cat._count.products} products
+              </p>
+              <button
+                onClick={() => {
+                  setDeleteError("");
+                  setDeleteId(cat.id);
+                }}
+                disabled={cat._count.products > 0}
+                className="flex items-center gap-1.5 text-xs text-destructive hover:bg-destructive/10 px-2 py-1.5 rounded-lg transition-colors mt-2 w-full justify-center disabled:opacity-30 disabled:cursor-not-allowed"
+                title={
+                  cat._count.products > 0
+                    ? "Cannot delete with products"
+                    : "Delete"
+                }
+              >
+                <Trash2 className="h-3 w-3" />
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Delete dialog */}
@@ -301,23 +265,22 @@ export default function AdminCategoriesTable({
             </p>
           )}
           <div className="flex justify-end gap-3 mt-2">
-            <Button
-              variant="outline"
+            <button
               onClick={() => {
                 setDeleteId(null);
                 setDeleteError("");
               }}
-              className="border-border rounded-xl"
+              className="px-4 py-2 text-sm font-bold border border-border rounded-xl hover:bg-secondary transition-colors text-foreground"
             >
               Cancel
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={handleDelete}
               disabled={deleting}
-              className="bg-destructive text-white hover:bg-destructive/90 rounded-xl"
+              className="px-4 py-2 text-sm font-bold bg-destructive text-white rounded-xl hover:bg-destructive/90 transition-colors"
             >
               {deleting ? "Deleting..." : "Delete"}
-            </Button>
+            </button>
           </div>
         </DialogContent>
       </Dialog>

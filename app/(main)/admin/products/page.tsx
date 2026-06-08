@@ -19,8 +19,6 @@ export default async function AdminProductsPage() {
       orderBy: { createdAt: "desc" },
     }),
     db.category.findMany({
-      where: { parentId: null },
-      include: { children: true },
       orderBy: { createdAt: "asc" },
     }),
   ]);
