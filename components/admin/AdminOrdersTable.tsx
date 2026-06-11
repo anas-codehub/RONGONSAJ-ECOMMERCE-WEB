@@ -10,7 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Loader2, Truck, CheckCheck, Check } from "lucide-react";
+import {
+  Search,
+  Loader2,
+  Truck,
+  CheckCheck,
+  Check,
+  Pencil,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 const statusColors: Record<string, string> = {
@@ -47,6 +54,14 @@ export default function AdminOrdersTable({ orders }: { orders: Order[] }) {
   const [search, setSearch] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [markingAll, setMarkingAll] = useState(false);
+  const [editingOrder, setEditingOrder] = useState<string | null>(null);
+  const [editAddress, setEditAddress] = useState({
+    fullName: "",
+    phone: "",
+    street: "",
+    district: "",
+  });
+  const [savingAddress, setSavingAddress] = useState(false);
 
   const filtered = orders.filter((o) => {
     const matchesSearch =
@@ -129,6 +144,28 @@ export default function AdminOrdersTable({ orders }: { orders: Order[] }) {
       toast.error("Something went wrong");
     } finally {
       setMarkingAll(false);
+    }
+  };
+
+  const handleSaveAddress = async (orderId: string) => {
+    setSavingAddress(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: editAddress }),
+      });
+      if (!res.ok) {
+        toast.error("Failed to update address");
+        return;
+      }
+      toast.success("Address updated!");
+      setEditingOrder(null);
+      router.refresh();
+    } catch {
+      toast.error("Something went wrong");
+    } finally {
+      setSavingAddress(false);
     }
   };
 
@@ -267,12 +304,99 @@ export default function AdminOrdersTable({ orders }: { orders: Order[] }) {
                       <p className="text-xs text-muted-foreground">
                         {order.user.email}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        📍 {order.address.district}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        📞 {order.address.phone}
-                      </p>
+
+                      {editingOrder === order.id ? (
+                        // Edit form
+                        <div className="mt-2 space-y-2 bg-secondary rounded-xl p-3 border border-border">
+                          <input
+                            value={editAddress.fullName}
+                            onChange={(e) =>
+                              setEditAddress({
+                                ...editAddress,
+                                fullName: e.target.value,
+                              })
+                            }
+                            placeholder="Full name"
+                            className="w-full text-xs px-2 py-1.5 rounded-lg border border-border bg-card text-foreground outline-none focus:border-primary"
+                          />
+                          <input
+                            value={editAddress.phone}
+                            onChange={(e) =>
+                              setEditAddress({
+                                ...editAddress,
+                                phone: e.target.value,
+                              })
+                            }
+                            placeholder="Phone"
+                            className="w-full text-xs px-2 py-1.5 rounded-lg border border-border bg-card text-foreground outline-none focus:border-primary"
+                          />
+                          <input
+                            value={editAddress.street}
+                            onChange={(e) =>
+                              setEditAddress({
+                                ...editAddress,
+                                street: e.target.value,
+                              })
+                            }
+                            placeholder="Street address"
+                            className="w-full text-xs px-2 py-1.5 rounded-lg border border-border bg-card text-foreground outline-none focus:border-primary"
+                          />
+                          <input
+                            value={editAddress.district}
+                            onChange={(e) =>
+                              setEditAddress({
+                                ...editAddress,
+                                district: e.target.value,
+                              })
+                            }
+                            placeholder="District"
+                            className="w-full text-xs px-2 py-1.5 rounded-lg border border-border bg-card text-foreground outline-none focus:border-primary"
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleSaveAddress(order.id)}
+                              disabled={savingAddress}
+                              className="flex-1 text-xs font-bold bg-primary text-primary-foreground py-1.5 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+                            >
+                              {savingAddress ? "Saving..." : "Save"}
+                            </button>
+                            <button
+                              onClick={() => setEditingOrder(null)}
+                              className="flex-1 text-xs font-bold border border-border text-foreground py-1.5 rounded-lg hover:bg-secondary transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        // Address display
+                        <div className="mt-1">
+                          <p className="text-xs text-muted-foreground">
+                            📍 {order.address.street}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {order.address.district}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            📞 {order.address.phone}
+                          </p>
+                          <button
+                            onClick={() => {
+                              setEditingOrder(order.id);
+                              setEditAddress({
+                                fullName: order.user.name || "",
+                                phone: order.address.phone,
+                                street: order.address.street,
+                                district: order.address.district,
+                              });
+                            }}
+                            className="flex items-center gap-1 text-xs text-primary hover:underline mt-1 font-bold"
+                          >
+                            <Pencil className="h-3 w-3" />
+                            Edit address
+                          </button>
+                        </div>
+                      )}
                     </td>
                     <td className="px-5 py-4">
                       <div className="space-y-1">

@@ -1,63 +1,65 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
-import { sendWelcomeEmail } from "@/lib/email";
-import { checkRateLimit } from "@/lib/ratelimits";
 
 export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
-
-  
-
-  const ip = req.headers.get("x-forwarded-for") ?? "anonymous";
-const { success, minutesLeft } = checkRateLimit(ip);
-
-if (!success) {
-  return NextResponse.json(
-    { error: `Too many attempts. Please try again in ${minutesLeft} minutes.` },
-    { status: 429 }
-  );
-}
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, phone, password } = await req.json();
 
     if (!name || !email || !password) {
       return NextResponse.json(
-        { error: "All fields are required" },
+        { error: "Name, email and password are required" },
         { status: 400 }
       );
     }
 
-    const existingUser = await db.user.findUnique({ where: { email } });
-
-    if (existingUser) {
+    if (password.length < 6) {
       return NextResponse.json(
-        { error: "Email already in use" },
+        { error: "Password must be at least 6 characters" },
         { status: 400 }
       );
+    }
+
+    // Check existing email
+    const existingEmail = await db.user.findUnique({ where: { email } });
+    if (existingEmail) {
+      return NextResponse.json(
+        { error: "Email already registered" },
+        { status: 400 }
+      );
+    }
+
+    // Check existing phone
+    if (phone) {
+      const existingPhone = await db.user.findFirst({ where: { phone } });
+      if (existingPhone) {
+        return NextResponse.json(
+          { error: "Phone number already registered" },
+          { status: 400 }
+        );
+      }
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await db.user.create({
-      data: { name, email, password: hashedPassword },
+      data: {
+        name,
+        email,
+        phone: phone || null,
+        password: hashedPassword,
+        role: "USER",
+      },
     });
 
-    // Send welcome email
-    await sendWelcomeEmail({ to: email, customerName: name });
-    // Send welcome email
-try {
-  await sendWelcomeEmail({ to: email, customerName: name });
-  console.log("Welcome email sent to:", email);
-} catch (emailError) {
-  console.error("Email error:", emailError);
-}
-
-    return NextResponse.json(
-      { message: "Account created successfully", userId: user.id },
-      { status: 201 }
-    );
+    return NextResponse.json({
+      message: "Account created successfully!",
+      userId: user.id,
+    });
   } catch (error) {
+    console.error("Register error:", error);
     return NextResponse.json(
       { error: "Something went wrong" },
       { status: 500 }

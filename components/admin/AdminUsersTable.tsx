@@ -11,6 +11,7 @@ interface User {
   id: string;
   name: string | null;
   email: string | null;
+  phone: string | null;
   role: string;
   createdAt: Date;
   _count: { orders: number };
@@ -101,19 +102,20 @@ export default function AdminUsersTable({
                   className="hover:bg-secondary/50 transition-colors"
                 >
                   <td className="px-5 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center shrink-0">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-foreground">
-                          {user.name || "No name"}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
+                    <p className="text-sm font-bold text-foreground">
+                      {user.name || "No name"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {user.email}
+                    </p>
+                    {user.phone && (
+                      <p className="text-xs text-muted-foreground">
+                        📞 {user.phone}
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      {user._count.orders} orders
+                    </p>
                   </td>
                   <td className="px-5 py-4">
                     <span

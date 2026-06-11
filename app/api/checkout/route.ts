@@ -103,6 +103,20 @@ export async function POST(req: NextRequest) {
 
       return newOrder;
     });
+
+    // Save phone to user account if they don't have one
+if (session?.user?.id && address.phone) {
+  const user = await db.user.findUnique({
+    where: { id: session.user.id as string },
+    select: { phone: true },
+  });
+  if (!user?.phone) {
+    await db.user.update({
+      where: { id: session.user.id as string },
+      data: { phone: address.phone },
+    }).catch(() => {}); // Ignore if phone already taken
+  }
+}
     
 
     if (couponId) {
