@@ -59,7 +59,9 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning style={{ overflowY: "scroll" }}>
       <body className={`${geist.variable} antialiased min-h-screen`}>
-        <MetaPixel />
+        <Suspense fallback={null}>
+          <MetaPixel />
+        </Suspense>
 
         <SessionProvider session={session}>
           {children}

@@ -1,32 +1,29 @@
 "use client";
 
-import { useEffect } from "react";
-import { usePathname } from "next/navigation";
 import Script from "next/script";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
-declare global {
-  interface Window {
-    fbq: any;
-    _fbq: any;
-  }
-}
+const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 
 export default function MetaPixel() {
   const pathname = usePathname();
-  const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const searchParams = useSearchParams();
 
-  // Track page views on route change (after initial load)
   useEffect(() => {
-    if (!pixelId || typeof window === "undefined" || !window.fbq) return;
-    window.fbq("track", "PageView");
-  }, [pathname, pixelId]);
+    if (!PIXEL_ID) return;
+    if (typeof window === "undefined") return;
+    if (!(window as any).fbq) return;
 
-  if (!pixelId) return null;
+    (window as any).fbq("track", "PageView");
+  }, [pathname, searchParams]);
+
+  if (!PIXEL_ID) return null;
 
   return (
     <>
       <Script
-        id="meta-pixel"
+        id="facebook-pixel"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
@@ -38,7 +35,7 @@ export default function MetaPixel() {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${pixelId}');
+            fbq('init', '${PIXEL_ID}');
             fbq('track', 'PageView');
           `,
         }}
@@ -48,7 +45,7 @@ export default function MetaPixel() {
           height="1"
           width="1"
           style={{ display: "none" }}
-          src={`https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1`}
+          src={`https://www.facebook.com/tr?id=${PIXEL_ID}&ev=PageView&noscript=1`}
           alt=""
         />
       </noscript>
