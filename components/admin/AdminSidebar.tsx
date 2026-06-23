@@ -16,6 +16,7 @@ import {
   Ruler,
   Palette,
   Star,
+  Settings,
 } from "lucide-react";
 
 const navItems = [
@@ -56,6 +57,8 @@ const navItems = [
   { label: "Colors", href: "/admin/colors", icon: Palette },
 
   { label: "Delivery", href: "/admin/delivery", icon: Truck },
+
+  { label: "Settings", href: "/admin/settings", icon: Settings },
 
   { label: "Admin guide", href: "/admin/guide", icon: BookOpen },
 ];

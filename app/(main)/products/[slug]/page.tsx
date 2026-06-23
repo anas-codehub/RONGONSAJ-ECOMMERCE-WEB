@@ -110,11 +110,9 @@ export default async function ProductDetailPage({ params }: Props) {
               productName={product.name}
             />
             {product.stock === 0 && (
-              <div className="absolute inset-0 bg-background/70 flex items-center justify-center rounded-2xl z-10">
-                <Badge variant="secondary" className="text-base px-6 py-2">
-                  Sold out
-                </Badge>
-              </div>
+              <span className="text-xs font-bold text-destructive">
+                Out of stock
+              </span>
             )}
           </div>
 

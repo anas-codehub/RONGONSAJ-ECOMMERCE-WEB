@@ -81,7 +81,16 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await db.product.delete({ where: { id } });
+
+    // Delete in correct order to avoid foreign key issues
+    await db.$transaction([
+      db.coupon.deleteMany({ where: { productId: id } }),
+      db.review.deleteMany({ where: { productId: id } }),
+      db.wishlist.deleteMany({ where: { productId: id } }),
+      
+      db.product.delete({ where: { id } }),
+    ]);
+
     return NextResponse.json({ message: "Product deleted" });
   } catch (error) {
     console.error("Delete product error:", error);

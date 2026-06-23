@@ -12,6 +12,7 @@ import {
   Ruler,
   Palette,
   Star,
+  Settings,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -37,6 +38,7 @@ const navItems = [
   { label: "Colors", href: "/admin/colors", icon: Palette },
   { label: "Hero slides", href: "/admin/slides", icon: Image },
   { label: "Delivery", href: "/admin/delivery", icon: Truck },
+  { label: "Settings", href: "/admin/settings", icon: Settings },
   { label: "Admin guide", href: "/admin/guide", icon: BookOpen },
 ];
 

@@ -23,6 +23,7 @@ interface Product {
   price: number;
   stock: number;
   isFeatured: boolean;
+  isHidden: boolean;
   images: string[];
   category: { name: string };
 }
@@ -68,6 +69,24 @@ export default function AdminProductsTable({
     } finally {
       setDeleting(false);
       setDeleteId(null);
+    }
+  };
+
+  const handleToggleHide = async (productId: string, isHidden: boolean) => {
+    try {
+      const res = await fetch(`/api/admin/products/${productId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isHidden: !isHidden }),
+      });
+      if (!res.ok) {
+        toast.error("Failed");
+        return;
+      }
+      toast.success(isHidden ? "Product visible!" : "Product hidden!");
+      router.refresh();
+    } catch {
+      toast.error("Something went wrong");
     }
   };
 
@@ -187,6 +206,7 @@ export default function AdminProductsTable({
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-1.5">
+                      {/* View */}
                       <Link href={`/products/${product.slug}`}>
                         <Button
                           size="icon"
@@ -196,6 +216,8 @@ export default function AdminProductsTable({
                           <Eye className="h-3.5 w-3.5" />
                         </Button>
                       </Link>
+
+                      {/* Edit */}
                       <Link href={`/admin/products/${product.id}/edit`}>
                         <Button
                           size="icon"
@@ -205,6 +227,26 @@ export default function AdminProductsTable({
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
                       </Link>
+
+                      {/* 👇 ADD TOGGLE BUTTON HERE */}
+                      <button
+                        onClick={() =>
+                          handleToggleHide(product.id, product.isHidden)
+                        }
+                        className={`flex items-center justify-center h-8 w-8 rounded-lg transition-colors ${
+                          product.isHidden
+                            ? "bg-green-100 text-green-700 hover:bg-green-200"
+                            : "bg-secondary text-muted-foreground hover:bg-muted"
+                        }`}
+                      >
+                        {product.isHidden ? (
+                          <Eye className="h-3.5 w-3.5" />
+                        ) : (
+                          <Eye className="h-3.5 w-3.5 opacity-60" />
+                        )}
+                      </button>
+
+                      {/* Delete */}
                       <Button
                         size="icon"
                         variant="outline"

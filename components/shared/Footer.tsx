@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Footer() {
@@ -9,9 +10,14 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="mb-4">
-              <span className="text-2xl font-extrabold text-background tracking-wider">
-                RONGO<span className="text-primary">N</span>SAAJ
-              </span>
+              <Image
+                src="/images/logo.png"
+                alt="Rongonsaaj"
+                width={500}
+                height={260}
+                className="object-contain h-24 w-auto"
+                priority
+              />
             </div>
             <p className="text-sm text-background/50 leading-relaxed mb-4">
               Fashion for every chapter of your life. Curated with love from
@@ -38,10 +44,6 @@ export default function Footer() {
               {[
                 { label: "All products", href: "/products" },
                 { label: "New arrivals", href: "/products?sort=newest" },
-                { label: "Male", href: "/products?category=male" },
-                { label: "Female", href: "/products?category=female" },
-                { label: "Couple", href: "/products?category=couple" },
-                { label: "Baby", href: "/products?category=baby" },
               ].map(({ label, href }) => (
                 <li key={label}>
                   <Link
@@ -111,17 +113,6 @@ export default function Footer() {
           <p className="text-sm text-background/40">
             © 2026 Rongonsaaj · Dhaka, Bangladesh · All rights reserved
           </p>
-          <div className="flex items-center gap-3">
-            <p className="text-xs text-background/30">Secured by SSLCommerz</p>
-            {["VISA", "MC", "bKash", "Nagad"].map((method) => (
-              <div
-                key={method}
-                className="bg-background/10 text-background/50 text-xs px-2 py-1 rounded font-medium"
-              >
-                {method}
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </footer>

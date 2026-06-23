@@ -14,14 +14,14 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     name: "",
-    email: "",
+
     phone: "",
     password: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.password) {
+    if (!form.name || !form.phone || !form.password) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -77,21 +77,6 @@ export default function SignUpPage() {
                 placeholder="Your full name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="border-border"
-                required
-              />
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="text-sm font-semibold text-foreground block mb-1.5">
-                Email address <span className="text-destructive">*</span>
-              </label>
-              <Input
-                type="email"
-                placeholder="your@email.com"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="border-border"
                 required
               />

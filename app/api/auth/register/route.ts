@@ -6,14 +6,15 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, phone, password } = await req.json();
+    const { name, phone, password } = await req.json();
 
-    if (!name || !email || !password) {
-      return NextResponse.json(
-        { error: "Name, email and password are required" },
-        { status: 400 }
-      );
-    }
+if (!name || !phone || !password) {
+  return NextResponse.json(
+    { error: "All fields are required" },
+    { status: 400 }
+  );
+}
+
 
     if (password.length < 6) {
       return NextResponse.json(
@@ -22,14 +23,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check existing email
-    const existingEmail = await db.user.findUnique({ where: { email } });
-    if (existingEmail) {
-      return NextResponse.json(
-        { error: "Email already registered" },
-        { status: 400 }
-      );
-    }
+    
 
     // Check existing phone
     if (phone) {
@@ -47,8 +41,8 @@ export async function POST(req: NextRequest) {
     const user = await db.user.create({
       data: {
         name,
-        email,
-        phone: phone || null,
+        
+        phone,
         password: hashedPassword,
         role: "USER",
       },

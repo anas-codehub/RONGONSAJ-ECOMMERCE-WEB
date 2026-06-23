@@ -11,6 +11,8 @@ export async function GET(req: NextRequest) {
     const skip = (page - 1) * limit;
 
     const where = {
+
+      isHidden: false,
       ...(category && { category: { slug: category } }),
       ...(search && {
         OR: [

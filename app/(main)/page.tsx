@@ -11,6 +11,8 @@ import {
   Sparkles,
   Star,
   ArrowUpRight,
+  BadgeCheck,
+  HandCoins,
 } from "lucide-react";
 import { unstable_cache } from "next/cache";
 import AllProductsSection from "@/components/shared/AllProductsSection";
@@ -171,9 +173,9 @@ export default async function HomePage() {
       <section className="bg-foreground">
         <div className="max-w-7xl mx-auto px-4 py-4 flex flex-wrap justify-center gap-4 text-center">
           {[
-            { icon: Truck, text: "Free delivery over ৳2,000" },
-            { icon: RefreshCw, text: "Easy 7-day returns" },
-            { icon: Shield, text: "Secure payments" },
+            { icon: Truck, text: "Fast delivery" },
+            { icon: HandCoins, text: "Cash on delivery" },
+            { icon: BadgeCheck, text: "Best products " },
             { icon: Sparkles, text: "Premium quality" },
           ].map(({ icon: Icon, text }) => (
             <div key={text} className="flex items-center gap-2">

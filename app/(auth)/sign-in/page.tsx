@@ -13,7 +13,7 @@ import { handleEnterKey } from "@/hooks/useEnterToNext";
 export default function SignInPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ phone: "", password: "" });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -24,7 +24,7 @@ export default function SignInPage() {
     setLoading(true);
     try {
       const result = await signIn("credentials", {
-        email: form.email,
+        phone: form.phone,
         password: form.password,
         redirect: false,
       });
@@ -94,13 +94,13 @@ export default function SignInPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="text-sm font-semibold text-foreground block mb-1.5">
-                Email address
+                Phone
               </label>
               <Input
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                value={form.email}
+                name="phone"
+                type="tel"
+                placeholder="01XXXXXXXXX"
+                value={form.phone}
                 onChange={handleChange}
                 required
                 className="border-border bg-secondary h-11"

@@ -76,6 +76,7 @@ model Product {
   reviews    Review[]
   wishlists  Wishlist[]
   coupons    Coupon[]
+  isHidden   Boolean     @default(false)
 }
 
 model Order {
@@ -210,4 +211,13 @@ model Color {
   name      String   @unique
   hex       String   @default("#000000")
   createdAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id             String   @id @default("settings")
+  whatsappNumber String   @default("")
+  facebookPage   String   @default("")
+  messengerLink  String   @default("")
+  phone          String   @default("")
+  updatedAt      DateTime @updatedAt
 }
