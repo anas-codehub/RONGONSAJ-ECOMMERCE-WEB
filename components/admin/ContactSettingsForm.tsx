@@ -90,7 +90,7 @@ export default function ContactSettingsForm({
         />
       </div>
 
-      <div>
+      {/* <div>
         <label className="text-sm font-extrabold text-foreground block mb-1.5">
           Phone number (for call button)
         </label>
@@ -100,7 +100,7 @@ export default function ContactSettingsForm({
           placeholder="01XXXXXXXXX"
           className="border-border bg-secondary"
         />
-      </div>
+      </div> */}
 
       <button
         type="submit"
