@@ -6,13 +6,18 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   try {
     const { productId, productName, price, url } = await req.json();
+    const fbp = req.cookies.get("_fbp")?.value;
+const fbc = req.cookies.get("_fbc")?.value;
 
     await sendCAPIEvent({
       eventName: "ViewContent",
       eventTime: Math.floor(Date.now() / 1000),
       eventSourceUrl: url,
       eventId: `view_${productId}_${Date.now()}`,
-      userData: {},
+      userData: {
+        fbc,
+        fbp,
+      },
       customData: {
         currency: "BDT",
         value: price,

@@ -10,6 +10,8 @@ interface CAPIEvent {
     phone?: string;
     email?: string;
     firstName?: string;
+    fbp?: string;
+  fbc?: string;
   };
   customData?: {
     currency?: string;
@@ -49,6 +51,14 @@ export async function sendCAPIEvent(event: CAPIEvent) {
             ...(event.userData.firstName && {
               fn: [hashData(event.userData.firstName)],
             }),
+
+              ...(event.userData.fbp && {
+    fbp: event.userData.fbp,
+  }),
+
+  ...(event.userData.fbc && {
+    fbc: event.userData.fbc,
+  }),
           },
           ...(event.customData && {
             custom_data: {

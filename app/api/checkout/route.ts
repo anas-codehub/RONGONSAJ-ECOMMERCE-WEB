@@ -10,6 +10,8 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
   try {
+    const fbp = req.cookies.get("_fbp")?.value;
+const fbc = req.cookies.get("_fbc")?.value;
     const session = await auth();
     const body = await req.json();
     const { items, address, couponId, total } = body;
@@ -106,24 +108,28 @@ export async function POST(req: NextRequest) {
     });
 
     try {
-  await sendCAPIEvent({
-    eventName: "Purchase",
-    eventTime: Math.floor(Date.now() / 1000),
-    eventSourceUrl: `${process.env.NEXTAUTH_URL}/order-success`,
-    eventId: `purchase_${order.id}`,
-    userData: {
-      phone: address.phone,
-      firstName: address.fullName.split(" ")[0],
-    },
-    customData: {
-      currency: "BDT",
-      value: total,
-      orderId: order.id,
-      numItems: items.length,
-      contentIds: items.map((i: any) => i.id.split("-")[0]),
-      contentType: "product",
-    },
-  });
+ await sendCAPIEvent({
+  eventName: "Purchase",
+  eventTime: Math.floor(Date.now() / 1000),
+  eventSourceUrl: `${process.env.NEXTAUTH_URL}/order-success`,
+  eventId: `purchase_${order.id}`,
+
+  userData: {
+    phone: address.phone,
+    firstName: address.fullName.split(" ")[0],
+    fbp,
+    fbc,
+  },
+
+  customData: {
+    currency: "BDT",
+    value: total,
+    orderId: order.id,
+    numItems: items.length,
+    contentIds: items.map((i: any) => i.id.split("-")[0]),
+    contentType: "product",
+  },
+});
 } catch (err) {
   console.error("CAPI Purchase error:", err);
 }
