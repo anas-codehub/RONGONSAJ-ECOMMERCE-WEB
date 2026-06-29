@@ -14,19 +14,19 @@ export const pageView = () => {
 };
 
 // Track add to cart
-export const addToCart = (product: {
+export const addToCart = async (product: {
   id: string;
   name: string;
   price: number;
-  currency?: string;
 }) => {
-  if (typeof window !== "undefined" && window.fbq) {
-    window.fbq("track", "AddToCart", {
+  // Browser pixel
+  if (typeof window !== "undefined" && (window as any).fbq) {
+    (window as any).fbq("track", "AddToCart", {
       content_ids: [product.id],
       content_name: product.name,
       content_type: "product",
       value: product.price,
-      currency: product.currency || "BDT",
+      currency: "BDT",
     });
   }
 };

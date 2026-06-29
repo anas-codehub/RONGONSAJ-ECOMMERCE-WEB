@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { Resend } from "resend";
+import { sendCAPIEvent } from "@/lib/meta-capi";
 
 export const dynamic = "force-dynamic";
 
@@ -103,6 +104,29 @@ export async function POST(req: NextRequest) {
 
       return newOrder;
     });
+
+    try {
+  await sendCAPIEvent({
+    eventName: "Purchase",
+    eventTime: Math.floor(Date.now() / 1000),
+    eventSourceUrl: `${process.env.NEXTAUTH_URL}/order-success`,
+    eventId: `purchase_${order.id}`,
+    userData: {
+      phone: address.phone,
+      firstName: address.fullName.split(" ")[0],
+    },
+    customData: {
+      currency: "BDT",
+      value: total,
+      orderId: order.id,
+      numItems: items.length,
+      contentIds: items.map((i: any) => i.id.split("-")[0]),
+      contentType: "product",
+    },
+  });
+} catch (err) {
+  console.error("CAPI Purchase error:", err);
+}
 
     // Save phone to user account if they don't have one
 if (session?.user?.id && address.phone) {
