@@ -87,13 +87,14 @@ export default function AddToCartButton({ product }: { product: Product }) {
   return (
     <div className="space-y-4">
       {/* Size selector */}
+
       {product.sizes.length > 0 && (
         <div>
-          <p className="text-sm font-medium text-foreground mb-2">
+          <p className="text-sm font-extrabold text-foreground mb-3">
             Size
-            {!selectedSize && (
-              <span className="text-destructive ml-1 text-xs">
-                — please select
+            {selectedSize && selectedSize !== "one-size" && (
+              <span className="text-primary ml-2 font-bold">
+                — {selectedSize}
               </span>
             )}
           </p>
@@ -101,20 +102,39 @@ export default function AddToCartButton({ product }: { product: Product }) {
             {product.sizes.map((size) => (
               <button
                 key={size}
+                type="button"
                 onClick={() => setSelectedSize(size)}
-                className={`w-12 h-10 rounded-lg border text-sm font-medium transition-all ${
+                className={`relative px-4 py-2.5 rounded-xl text-sm font-extrabold border-2 transition-all duration-200 ${
                   selectedSize === size
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-card border-border text-foreground hover:border-primary"
+                    ? "border-primary bg-primary text-primary-foreground scale-105 shadow-md"
+                    : "border-border bg-card text-foreground hover:border-primary/50 hover:bg-secondary"
                 }`}
               >
                 {size}
+                {selectedSize === size && (
+                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                    <svg
+                      width="8"
+                      height="8"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="3"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </span>
+                )}
               </button>
             ))}
           </div>
+          {!selectedSize && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Please select a size
+            </p>
+          )}
         </div>
       )}
-
       {/* Color selector */}
       {product.colors.length > 0 && (
         <div>
