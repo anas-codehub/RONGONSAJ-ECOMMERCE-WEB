@@ -33,6 +33,7 @@ interface Props {
     discount: number;
     discountAmount: number;
     stock: number;
+    sku?: string | null;
     images: string[];
     isFeatured: boolean;
     categoryId: string;
@@ -49,7 +50,6 @@ interface Props {
     }[];
   };
 }
-
 export default function ProductForm({ categories, product }: Props) {
   const router = useRouter();
   const isEdit = !!product;
@@ -70,6 +70,7 @@ export default function ProductForm({ categories, product }: Props) {
     stock: product?.stock?.toString() || "",
     categoryId: product?.categoryId || "",
     isFeatured: product?.isFeatured || false,
+    sku: product?.sku || "",
   });
 
   const [uploadedImages, setUploadedImages] = useState<string[]>(
@@ -204,7 +205,7 @@ export default function ProductForm({ categories, product }: Props) {
         images: uploadedImages,
         sizes,
         colors,
-
+        sku: form.sku.trim().toUpperCase() || null, // ← ADD THIS
         coupon: coupon.code
           ? {
               code: coupon.code,
@@ -275,6 +276,23 @@ export default function ProductForm({ categories, product }: Props) {
           <p className="text-xs text-muted-foreground mt-1">
             Auto-generated from name. Used in the URL.
           </p>
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-foreground block mb-1.5">
+            Product code (SKU)
+            <span className="text-xs font-normal text-muted-foreground ml-2">
+              — leave empty to auto-generate (RSJ-001, RSJ-002...)
+            </span>
+          </label>
+          <Input
+            name="sku"
+            value={form.sku}
+            onChange={handleChange}
+            placeholder="e.g. RSJ-001 or leave empty"
+            className="border-border"
+            style={{ textTransform: "uppercase" }}
+          />
         </div>
 
         <div>
@@ -694,14 +712,9 @@ export default function ProductForm({ categories, product }: Props) {
               Select a category
             </option>
             {categories.map((cat: any) => (
-              <optgroup key={cat.id} label={cat.name}>
-                <option value={cat.id}>{cat.name} (main)</option>
-                {cat.children?.map((sub: any) => (
-                  <option key={sub.id} value={sub.id}>
-                    &nbsp;&nbsp;↳ {sub.name}
-                  </option>
-                ))}
-              </optgroup>
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
             ))}
           </select>
         </div>
@@ -724,7 +737,6 @@ export default function ProductForm({ categories, product }: Props) {
           <ImageUpload images={uploadedImages} onChange={setUploadedImages} />
         </div>
 
-        {/* Sizes */}
         {/* Sizes */}
         <div className="border border-border rounded-xl p-4 space-y-4 bg-secondary/50">
           <p className="text-sm font-bold text-foreground">Sizes</p>

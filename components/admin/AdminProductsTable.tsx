@@ -19,6 +19,7 @@ import {
 interface Product {
   id: string;
   name: string;
+  sku: string | null;
   slug: string;
   price: number;
   stock: number;
@@ -111,6 +112,11 @@ export default function AdminProductsTable({
                 <th className="text-left text-xs font-bold text-muted-foreground px-5 py-3 uppercase tracking-wider">
                   Product
                 </th>
+
+                <th className="text-left text-xs font-bold text-muted-foreground px-5 py-3 uppercase tracking-wider">
+                  Code
+                </th>
+
                 <th className="text-left text-xs font-bold text-muted-foreground px-5 py-3 uppercase tracking-wider">
                   Category
                 </th>
@@ -159,6 +165,13 @@ export default function AdminProductsTable({
                         </p>
                       </div>
                     </div>
+                  </td>
+
+                  {/* Code */}
+                  <td className="px-5 py-4">
+                    <span className="font-mono text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-lg">
+                      {product.sku || "—"}
+                    </span>
                   </td>
                   <td className="px-5 py-4">
                     <span className="text-xs font-medium bg-secondary text-foreground px-2.5 py-1 rounded-lg">

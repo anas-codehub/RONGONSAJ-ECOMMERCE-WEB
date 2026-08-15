@@ -44,7 +44,10 @@ interface Order {
     id: string;
     quantity: number;
     price: number;
-    product: { name: string };
+    product: {
+      name: string;
+      sku: string | null;
+    };
   }[];
 }
 
@@ -174,7 +177,7 @@ export default function AdminOrdersTable({ orders }: { orders: Order[] }) {
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-4">
         {/* Search */}
-        <div className="relative flex-1 min-w-[200px]">
+        <div className="relative flex-1 min-w-50]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search by customer or order ID..."
@@ -399,17 +402,24 @@ export default function AdminOrdersTable({ orders }: { orders: Order[] }) {
                       )}
                     </td>
                     <td className="px-5 py-4">
-                      <div className="space-y-1">
+                      <div className="space-y-1.5">
                         {order.items.map((item) => (
-                          <p
+                          <div
                             key={item.id}
-                            className="text-xs text-muted-foreground"
+                            className="flex items-center gap-2"
                           >
-                            {item.product.name} × {item.quantity}
-                            <span className="text-primary font-bold ml-1">
-                              ৳{(item.price * item.quantity).toLocaleString()}
-                            </span>
-                          </p>
+                            {item.product.sku && (
+                              <span className="font-mono text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded shrink-0">
+                                {item.product.sku}
+                              </span>
+                            )}
+                            <p className="text-xs text-muted-foreground">
+                              {item.product.name} × {item.quantity}
+                              <span className="text-primary font-bold ml-1">
+                                ৳{(item.price * item.quantity).toLocaleString()}
+                              </span>
+                            </p>
+                          </div>
                         ))}
                       </div>
                     </td>

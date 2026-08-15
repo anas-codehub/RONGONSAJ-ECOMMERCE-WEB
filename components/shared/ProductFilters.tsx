@@ -2,7 +2,6 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { X } from "lucide-react";
-import { useState } from "react";
 
 interface Category {
   id: string;
@@ -18,8 +17,8 @@ interface Props {
 }
 
 const sortOptions = [
-  { label: "Newest", value: "newest" },
-  { label: "Oldest", value: "oldest" },
+  { label: "Newest first", value: "newest" },
+  { label: "Oldest first", value: "oldest" },
   { label: "Price: low to high", value: "price_asc" },
   { label: "Price: high to low", value: "price_desc" },
 ];
@@ -33,32 +32,11 @@ export default function ProductFilters({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [priceRange, setPriceRange] = useState({
-    min: "",
-    max: "",
-  });
-
   const updateFilter = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
-
     if (value) params.set(key, value);
     else params.delete(key);
-
     params.delete("page");
-    router.push(`/products?${params.toString()}`);
-  };
-
-  const applyPriceFilter = () => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (priceRange.min) params.set("minPrice", priceRange.min);
-    else params.delete("minPrice");
-
-    if (priceRange.max) params.set("maxPrice", priceRange.max);
-    else params.delete("maxPrice");
-
-    params.delete("page");
-
     router.push(`/products?${params.toString()}`);
   };
 
@@ -75,7 +53,6 @@ export default function ProductFilters({
             <p className="text-xs font-bold text-foreground uppercase tracking-wider">
               Active filters
             </p>
-
             <button
               onClick={clearAll}
               className="text-xs text-primary hover:underline flex items-center gap-1 font-semibold"
@@ -83,7 +60,6 @@ export default function ProductFilters({
               <X className="h-3 w-3" /> Clear all
             </button>
           </div>
-
           <div className="flex flex-wrap gap-2">
             {search && (
               <button
@@ -93,13 +69,20 @@ export default function ProductFilters({
                 "{search}" ×
               </button>
             )}
-
             {selectedCategory && (
               <button
                 onClick={() => updateFilter("category", null)}
                 className="text-xs bg-card border border-border text-foreground px-3 py-1 rounded-lg font-medium hover:border-primary"
               >
                 {categories.find((c) => c.slug === selectedCategory)?.name} ×
+              </button>
+            )}
+            {selectedSort && (
+              <button
+                onClick={() => updateFilter("sort", null)}
+                className="text-xs bg-card border border-border text-foreground px-3 py-1 rounded-lg font-medium hover:border-primary"
+              >
+                {sortOptions.find((s) => s.value === selectedSort)?.label} ×
               </button>
             )}
           </div>
@@ -111,11 +94,10 @@ export default function ProductFilters({
         <p className="text-xs font-bold text-foreground mb-3 uppercase tracking-wider">
           Category
         </p>
-
         <div className="flex gap-2 overflow-x-auto pb-2 md:flex-col md:overflow-x-visible scrollbar-hide">
           <button
             onClick={() => updateFilter("category", null)}
-            className={`shrink-0 px-3 py-2 rounded-xl text-sm font-medium ${
+            className={`shrink-0 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
               !selectedCategory
                 ? "bg-primary text-primary-foreground"
                 : "bg-secondary text-muted-foreground hover:bg-primary/10"
@@ -123,12 +105,11 @@ export default function ProductFilters({
           >
             All categories
           </button>
-
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => updateFilter("category", cat.slug)}
-              className={`shrink-0 px-3 py-2 rounded-xl text-sm font-medium ${
+              className={`shrink-0 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                 selectedCategory === cat.slug
                   ? "bg-primary text-primary-foreground"
                   : "bg-secondary text-muted-foreground hover:bg-primary/10"
@@ -140,77 +121,27 @@ export default function ProductFilters({
         </div>
       </div>
 
-      {/* Price Range */}
-      <div className="bg-card border border-border rounded-2xl p-4 space-y-2">
-        <p className="text-xs font-bold text-foreground uppercase tracking-wider">
-          Price range
-        </p>
-
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            placeholder="Min ৳"
-            value={priceRange.min}
-            onChange={(e) =>
-              setPriceRange({ ...priceRange, min: e.target.value })
-            }
-            className="w-full h-9 px-3 rounded-xl border border-border bg-secondary text-sm outline-none focus:border-primary"
-          />
-
-          <span className="text-muted-foreground">—</span>
-
-          <input
-            type="number"
-            placeholder="Max ৳"
-            value={priceRange.max}
-            onChange={(e) =>
-              setPriceRange({ ...priceRange, max: e.target.value })
-            }
-            className="w-full h-9 px-3 rounded-xl border border-border bg-secondary text-sm outline-none focus:border-primary"
-          />
-        </div>
-
-        <div className="flex gap-2">
-          <button
-            onClick={applyPriceFilter}
-            className="w-full bg-primary text-primary-foreground py-2 rounded-xl text-sm font-bold"
-          >
-            Apply
-          </button>
-
-          {(priceRange.min || priceRange.max) && (
-            <button
-              onClick={() => setPriceRange({ min: "", max: "" })}
-              className="text-xs text-primary hover:underline font-medium"
-            >
-              Clear
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Sort */}
+      {/* Sort dropdown */}
       <div className="bg-card border border-border rounded-2xl p-4">
         <p className="text-xs font-bold text-foreground mb-3 uppercase tracking-wider">
           Sort by
         </p>
-
-        <div className="space-y-1">
+        <select
+          value={selectedSort || ""}
+          onChange={(e) => updateFilter("sort", e.target.value || null)}
+          className="w-full h-10 px-3 rounded-xl border border-border text-sm font-medium outline-none focus:border-primary transition-colors cursor-pointer"
+          style={{
+            background: "var(--secondary)",
+            color: "var(--foreground)",
+          }}
+        >
+          <option value="">Default</option>
           {sortOptions.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => updateFilter("sort", opt.value)}
-              className={`w-full text-left text-sm px-3 py-2 rounded-xl font-medium ${
-                selectedSort === opt.value ||
-                (!selectedSort && opt.value === "newest")
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-secondary"
-              }`}
-            >
+            <option key={opt.value} value={opt.value}>
               {opt.label}
-            </button>
+            </option>
           ))}
-        </div>
+        </select>
       </div>
     </div>
   );

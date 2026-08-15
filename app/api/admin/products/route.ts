@@ -28,6 +28,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    let sku = body.sku?.trim().toUpperCase() || null;
+
+if (!sku) {
+  // Auto generate: RSJ-001, RSJ-002 etc
+  const productCount = await db.product.count();
+  sku = `RSJ-${String(productCount + 1).padStart(3, "0")}`;
+}
+
+// Check SKU uniqueness
+if (sku) {
+  const existingSku = await db.product.findUnique({ where: { sku } });
+  if (existingSku) {
+    // Add suffix if duplicate
+    sku = `${sku}-${Date.now().toString().slice(-3)}`;
+  }
+}
+
 const product = await db.product.create({
   data: {
     name,

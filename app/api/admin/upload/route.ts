@@ -40,10 +40,10 @@ export async function POST(req: NextRequest) {
         ? {
             // Slides: always exactly 1920x600, cropped and centered
             width: 1920,
-            height: 600,
+            height: 1080,
             crop: "fill" as const,
             gravity: "center" as const,
-            quality: 95,
+            quality: "auto:good",
             fetch_format: "auto" as const,
           }
         : type === "profile"

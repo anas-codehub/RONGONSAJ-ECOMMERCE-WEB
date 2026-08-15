@@ -13,11 +13,19 @@ export default async function AdminOrdersPage() {
     include: {
       user: { select: { name: true, email: true } },
       address: true,
-      items: { include: { product: true } },
+      items: {
+        include: {
+          product: {
+            select: {
+              name: true,
+              sku: true,
+            },
+          },
+        },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
-
   const unreadCount = orders.filter((o) => !o.isRead).length;
 
   return (
