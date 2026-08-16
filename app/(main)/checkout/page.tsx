@@ -21,7 +21,8 @@ import DistrictInput from "@/components/shared/DistrictInput";
 import { initiateCheckout } from "@/lib/pixel";
 
 export default function CheckoutPage() {
-  const { items, total, clearCart } = useCartStore();
+  const { items, total, clearCart, removeItem, updateQuantity } =
+    useCartStore();
 
   const router = useRouter();
 
@@ -340,11 +341,42 @@ export default function CheckoutPage() {
                       <p className="text-sm font-bold text-foreground line-clamp-1">
                         {item.name}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        Qty: {item.quantity}
+                      <p className="text-xs text-primary font-extrabold">
+                        ৳{item.price.toLocaleString()}
                       </p>
                     </div>
-                    <p className="text-sm font-bold text-foreground shrink-0">
+
+                    {/* Quantity controls */}
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (item.quantity <= 1) {
+                            removeItem(item.id);
+                          } else {
+                            updateQuantity(item.id, item.quantity - 1);
+                          }
+                        }}
+                        className="w-7 h-7 rounded-lg border border-border bg-secondary flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all text-foreground font-bold text-sm"
+                      >
+                        −
+                      </button>
+                      <span className="w-7 text-center text-sm font-extrabold text-foreground">
+                        {item.quantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          updateQuantity(item.id, item.quantity + 1);
+                        }}
+                        className="w-7 h-7 rounded-lg border border-border bg-secondary flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all text-foreground font-bold text-sm"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    {/* Item total */}
+                    <p className="text-sm font-extrabold text-foreground shrink-0 w-16 text-right">
                       ৳{(item.price * item.quantity).toLocaleString()}
                     </p>
                   </div>
