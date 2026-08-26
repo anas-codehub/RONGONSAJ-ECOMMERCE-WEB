@@ -60,6 +60,7 @@ const product = await db.product.create({
     images: images || [],
     sizes: sizes || [],
     colors: colors || [],
+    sku: sku || null,
   },
 });
 

@@ -34,6 +34,7 @@ export async function PATCH(
         images: productData.images,
         sizes: productData.sizes || [],
         colors: productData.colors || [],
+        sku: productData.sku || null,
       },
     });
 
