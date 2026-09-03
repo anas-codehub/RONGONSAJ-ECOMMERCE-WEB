@@ -235,24 +235,6 @@ export default async function ProductDetailPage({ params }: Props) {
 
             <Separator className="bg-border" />
 
-            {/* Trust badges */}
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { icon: Truck, label: "Free delivery", sub: "Over ৳2000" },
-                { icon: RefreshCw, label: "Easy returns", sub: "7 days" },
-                { icon: Shield, label: "Secure pay", sub: "100% safe" },
-              ].map(({ icon: Icon, label, sub }) => (
-                <div
-                  key={label}
-                  className="flex flex-col items-center text-center gap-1 p-3 bg-secondary rounded-xl"
-                >
-                  <Icon className="h-5 w-5 text-primary" />
-                  <p className="text-xs font-medium text-foreground">{label}</p>
-                  <p className="text-xs text-muted-foreground">{sub}</p>
-                </div>
-              ))}
-            </div>
-
             {/* Share buttons */}
             <ShareButtons
               productName={product.name}

@@ -204,7 +204,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
 
         <Button
           onClick={handleOrderNow}
-          className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground py-6 rounded-xl text-base font-bold"
+          className="flex-1 bg-orange-500 hover:bg-orange-300 text-primary-foreground py-6 rounded-xl text-base font-bold"
         >
           <Zap className="h-5 w-5 mr-2" />
           Order Now

@@ -88,12 +88,20 @@ const fbc = req.cookies.get("_fbc")?.value;
           addressId: savedAddress.id,
           ...(couponId && { couponId }),
           items: {
-            create: items.map((item: any) => ({
-              productId: item.id.split("-")[0],
-              quantity: item.quantity,
-              price: item.price,
-            })),
-          },
+  create: items.map((item: any) => {
+    const parts = item.id.split("-");
+    const productId = parts[0];
+    const sizeMatch = item.name.match(/\(([^)]+)\)/);
+    const colorMatch = item.name.match(/ - (.+)$/);
+    return {
+      productId,
+      quantity: item.quantity,
+      price: item.price,
+      size: sizeMatch ? sizeMatch[1] : null,
+      color: colorMatch ? colorMatch[1] : null,
+    };
+  }),
+},
         },
       });
 

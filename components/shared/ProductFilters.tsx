@@ -3,17 +3,17 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { X } from "lucide-react";
 
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-}
-
 interface Props {
   categories: Category[];
   selectedCategory?: string;
   selectedSort?: string;
   search?: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
 }
 
 const sortOptions = [
@@ -41,8 +41,7 @@ export default function ProductFilters({
   };
 
   const clearAll = () => router.push("/products");
-
-  const hasFilters = selectedCategory || selectedSort || search;
+  const hasFilters = selectedSort || search;
 
   return (
     <div className="space-y-4">
@@ -69,14 +68,6 @@ export default function ProductFilters({
                 "{search}" ×
               </button>
             )}
-            {selectedCategory && (
-              <button
-                onClick={() => updateFilter("category", null)}
-                className="text-xs bg-card border border-border text-foreground px-3 py-1 rounded-lg font-medium hover:border-primary"
-              >
-                {categories.find((c) => c.slug === selectedCategory)?.name} ×
-              </button>
-            )}
             {selectedSort && (
               <button
                 onClick={() => updateFilter("sort", null)}
@@ -89,39 +80,7 @@ export default function ProductFilters({
         </div>
       )}
 
-      {/* Categories */}
-      <div className="bg-card border border-border rounded-2xl p-4">
-        <p className="text-xs font-bold text-foreground mb-3 uppercase tracking-wider">
-          Category
-        </p>
-        <div className="flex gap-2 overflow-x-auto pb-2 md:flex-col md:overflow-x-visible scrollbar-hide">
-          <button
-            onClick={() => updateFilter("category", null)}
-            className={`shrink-0 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-              !selectedCategory
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-muted-foreground hover:bg-primary/10"
-            }`}
-          >
-            All categories
-          </button>
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => updateFilter("category", cat.slug)}
-              className={`shrink-0 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-                selectedCategory === cat.slug
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-muted-foreground hover:bg-primary/10"
-              }`}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Sort dropdown */}
+      {/* Sort only */}
       <div className="bg-card border border-border rounded-2xl p-4">
         <p className="text-xs font-bold text-foreground mb-3 uppercase tracking-wider">
           Sort by

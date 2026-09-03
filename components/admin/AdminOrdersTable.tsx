@@ -44,6 +44,8 @@ interface Order {
     id: string;
     quantity: number;
     price: number;
+    size: string | null;
+    color: string | null;
     product: {
       name: string;
       sku: string | null;
@@ -404,21 +406,32 @@ export default function AdminOrdersTable({ orders }: { orders: Order[] }) {
                     <td className="px-5 py-4">
                       <div className="space-y-1.5">
                         {order.items.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex items-center gap-2"
-                          >
-                            {item.product.sku && (
-                              <span className="font-mono text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded shrink-0">
-                                {item.product.sku}
-                              </span>
-                            )}
-                            <p className="text-xs text-muted-foreground">
-                              {item.product.name} × {item.quantity}
-                              <span className="text-primary font-bold ml-1">
+                          <div key={item.id} className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-2">
+                              {item.product.sku && (
+                                <span className="font-mono text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded shrink-0">
+                                  {item.product.sku}
+                                </span>
+                              )}
+                              <p className="text-xs font-bold text-foreground">
+                                {item.product.name} × {item.quantity}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2 ml-0">
+                              {item.size && (
+                                <span className="text-[10px] font-bold bg-secondary border border-border px-1.5 py-0.5 rounded text-foreground">
+                                  Size: {item.size}
+                                </span>
+                              )}
+                              {item.color && (
+                                <span className="text-[10px] font-bold bg-secondary border border-border px-1.5 py-0.5 rounded text-foreground">
+                                  Color: {item.color}
+                                </span>
+                              )}
+                              <span className="text-[10px] text-primary font-bold">
                                 ৳{(item.price * item.quantity).toLocaleString()}
                               </span>
-                            </p>
+                            </div>
                           </div>
                         ))}
                       </div>
