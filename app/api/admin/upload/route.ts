@@ -38,13 +38,13 @@ export async function POST(req: NextRequest) {
     const transformation =
       type === "slide"
         ? {
-            // Slides: always exactly 1920x600, cropped and centered
+            // Slides: always exactly 1200x1600, cropped and centered
             width: 1920,
             height: 1080,
-            crop: "fill" as const,
-            gravity: "center" as const,
+            crop: "fill",
+            gravity: "center",
             quality: "auto:good",
-            fetch_format: "auto" as const,
+            fetch_format: "auto",
           }
         : type === "profile"
         ? {

@@ -22,207 +22,193 @@ export default function HeroSlider({ slides }: { slides: Slide[] }) {
   const goTo = useCallback(
     (index: number) => {
       if (isTransitioning) return;
+
       setIsTransitioning(true);
       setCurrent(index);
-      setTimeout(() => setIsTransitioning(false), 500);
+
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 500);
     },
     [isTransitioning],
   );
 
   const next = useCallback(() => {
+    if (slides.length === 0) return;
+
     goTo(current === slides.length - 1 ? 0 : current + 1);
   }, [current, slides.length, goTo]);
 
   const prev = useCallback(() => {
+    if (slides.length === 0) return;
+
     goTo(current === 0 ? slides.length - 1 : current - 1);
   }, [current, slides.length, goTo]);
 
+  // Auto slide
   useEffect(() => {
     if (slides.length <= 1) return;
-    const timer = setInterval(next, 5000);
+
+    const timer = setInterval(() => {
+      next();
+    }, 5000);
+
     return () => clearInterval(timer);
   }, [next, slides.length]);
 
-  if (slides.length === 0) return null;
+  // Reset current slide if slides change
+  useEffect(() => {
+    if (current >= slides.length && slides.length > 0) {
+      setCurrent(0);
+    }
+  }, [current, slides.length]);
+
+  if (slides.length === 0) {
+    return null;
+  }
 
   return (
-    <div
-      className="w-full relative overflow-hidden"
-      style={{
-        paddingTop: "56.25%", // 16:9 ratio
-        position: "relative",
-      }}
-    >
-      {slides.map((slide, i) => (
-        <div
-          key={slide.id}
-          style={{
-            position: "absolute",
-            inset: 0,
-            opacity: i === current ? 1 : 0,
-            transition: "opacity 0.5s ease",
-            zIndex: i === current ? 1 : 0,
-          }}
-        >
-          {/* Full bleed background image */}
-          <Image
-            src={slide.image}
-            alt={slide.title || "Hero slide"}
-            fill
-            className="object-cover object-center"
-            priority={i === 0}
-            sizes="100vw"
-          />
+    <section className="relative w-full overflow-hidden">
+      {/* SLIDER */}
+      <div className="relative w-full aspect-video">
+        {slides.map((slide, i) => (
+          <div
+            key={slide.id}
+            className="absolute inset-0 transition-opacity duration-500"
+            style={{
+              opacity: i === current ? 1 : 0,
+              zIndex: i === current ? 1 : 0,
+              pointerEvents: i === current ? "auto" : "none",
+            }}
+          >
+            {/* HERO IMAGE */}
+            <Image
+              src={slide.image}
+              alt={slide.title || "Hero slide"}
+              fill
+              priority={i === 0}
+              sizes="100vw"
+              className="w-full h-full object-cover"
+            />
 
-          {/* Text overlay */}
-          {(slide.title || slide.subtitle || slide.buttonText) && (
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)",
-                display: "flex",
-                alignItems: "flex-end",
-                justifyContent: "center",
-                paddingBottom: "8%",
-                zIndex: 2,
-              }}
-            >
+            {/* TEXT OVERLAY */}
+            {(slide.title || slide.subtitle || slide.buttonText) && (
               <div
+                className="absolute inset-0 flex items-end justify-center pb-8 md:pb-14"
                 style={{
-                  textAlign: "center",
-                  padding: "0 16px",
-                  maxWidth: "700px",
+                  background:
+                    "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%)",
+                  zIndex: 3,
                 }}
               >
-                {slide.title && (
-                  <h2
-                    style={{
-                      color: "white",
-                      fontWeight: 900,
-                      fontSize: "clamp(20px, 4vw, 52px)",
-                      marginBottom: "8px",
-                      textShadow: "0 2px 8px rgba(0,0,0,0.5)",
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {slide.title}
-                  </h2>
-                )}
-                {slide.subtitle && (
-                  <p
-                    style={{
-                      color: "rgba(255,255,255,0.9)",
-                      fontSize: "clamp(12px, 2vw, 20px)",
-                      marginBottom: "16px",
-                      textShadow: "0 1px 4px rgba(0,0,0,0.5)",
-                    }}
-                  >
-                    {slide.subtitle}
-                  </p>
-                )}
-                {slide.buttonText && slide.buttonLink && (
-                  <Link href={slide.buttonLink}>
-                    <button
+                <div className="text-center px-4 max-w-2xl">
+                  {slide.title && (
+                    <h2
+                      className="text-white font-extrabold leading-tight mb-2"
                       style={{
-                        background: "var(--primary)",
-                        color: "var(--primary-foreground)",
-                        padding:
-                          "clamp(8px, 1.5vw, 14px) clamp(16px, 3vw, 32px)",
-                        borderRadius: "12px",
-                        fontWeight: 800,
-                        fontSize: "clamp(12px, 1.5vw, 16px)",
-                        border: "none",
-                        cursor: "pointer",
+                        fontSize: "clamp(18px, 4vw, 52px)",
                       }}
                     >
-                      {slide.buttonText}
-                    </button>
-                  </Link>
-                )}
+                      {slide.title}
+                    </h2>
+                  )}
+
+                  {slide.subtitle && (
+                    <p
+                      className="text-white/90 mb-4"
+                      style={{
+                        fontSize: "clamp(12px, 2vw, 20px)",
+                      }}
+                    >
+                      {slide.subtitle}
+                    </p>
+                  )}
+
+                  {slide.buttonText && slide.buttonLink && (
+                    <Link href={slide.buttonLink}>
+                      <button
+                        type="button"
+                        className="font-extrabold rounded-xl hover:opacity-90 hover:scale-105 transition-all"
+                        style={{
+                          background: "var(--primary)",
+                          color: "var(--primary-foreground)",
+                          padding:
+                            "clamp(8px, 1.5vw, 14px) clamp(20px, 3vw, 36px)",
+                          fontSize: "clamp(12px, 1.5vw, 16px)",
+                        }}
+                      >
+                        {slide.buttonText}
+                      </button>
+                    </Link>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      ))}
+            )}
+          </div>
+        ))}
+      </div>
 
-      {/* Left arrow */}
+      {/* NAVIGATION ARROWS */}
       {slides.length > 1 && (
-        <button
-          onClick={prev}
-          style={{
-            position: "absolute",
-            left: "clamp(8px, 2vw, 20px)",
-            top: "50%",
-            transform: "translateY(-50%)",
-            zIndex: 10,
-            width: "clamp(32px, 4vw, 44px)",
-            height: "clamp(32px, 4vw, 44px)",
-            background: "rgba(0,0,0,0.4)",
-            border: "none",
-            borderRadius: "50%",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "white",
-            backdropFilter: "blur(4px)",
-          }}
-        >
-          <ChevronLeft size={20} />
-        </button>
+        <>
+          <button
+            type="button"
+            onClick={prev}
+            aria-label="Previous slide"
+            className="absolute top-1/2 -translate-y-1/2 z-20 flex items-center justify-center rounded-full transition-all hover:scale-110"
+            style={{
+              left: "clamp(8px, 2vw, 24px)",
+              width: "clamp(32px, 4vw, 48px)",
+              height: "clamp(32px, 4vw, 48px)",
+              background: "rgba(0,0,0,0.4)",
+              backdropFilter: "blur(4px)",
+              border: "1px solid rgba(255,255,255,0.2)",
+            }}
+          >
+            <ChevronLeft color="white" size={20} />
+          </button>
+
+          <button
+            type="button"
+            onClick={next}
+            aria-label="Next slide"
+            className="absolute top-1/2 -translate-y-1/2 z-20 flex items-center justify-center rounded-full transition-all hover:scale-110"
+            style={{
+              right: "clamp(8px, 2vw, 24px)",
+              width: "clamp(32px, 4vw, 48px)",
+              height: "clamp(32px, 4vw, 48px)",
+              background: "rgba(0,0,0,0.4)",
+              backdropFilter: "blur(4px)",
+              border: "1px solid rgba(255,255,255,0.2)",
+            }}
+          >
+            <ChevronRight color="white" size={20} />
+          </button>
+        </>
       )}
 
-      {/* Right arrow */}
-      {slides.length > 1 && (
-        <button
-          onClick={next}
-          style={{
-            position: "absolute",
-            right: "clamp(8px, 2vw, 20px)",
-            top: "50%",
-            transform: "translateY(-50%)",
-            zIndex: 10,
-            width: "clamp(32px, 4vw, 44px)",
-            height: "clamp(32px, 4vw, 44px)",
-            background: "rgba(0,0,0,0.4)",
-            border: "none",
-            borderRadius: "50%",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "white",
-            backdropFilter: "blur(4px)",
-          }}
-        >
-          <ChevronRight size={20} />
-        </button>
-      )}
-
-      {/* Dots */}
+      {/* DOTS */}
       {slides.length > 1 && (
         <div
+          className="absolute z-20 flex gap-2"
           style={{
-            position: "absolute",
-            bottom: "clamp(8px, 2vw, 16px)",
+            bottom: "clamp(8px, 2vw, 18px)",
             left: "50%",
             transform: "translateX(-50%)",
-            zIndex: 10,
-            display: "flex",
-            gap: "8px",
           }}
         >
           {slides.map((_, i) => (
             <button
               key={i}
+              type="button"
               onClick={() => goTo(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              aria-current={i === current ? "true" : undefined}
               style={{
                 width: i === current ? "24px" : "8px",
                 height: "8px",
                 borderRadius: "100px",
-                background: i === current ? "white" : "rgba(255,255,255,0.5)",
+                background: i === current ? "white" : "rgba(255,255,255,0.45)",
                 border: "none",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
@@ -232,6 +218,6 @@ export default function HeroSlider({ slides }: { slides: Slide[] }) {
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }

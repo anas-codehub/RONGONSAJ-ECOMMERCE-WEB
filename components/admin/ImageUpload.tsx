@@ -8,9 +8,14 @@ import { X, Loader2, ImagePlus } from "lucide-react";
 interface Props {
   images: string[];
   onChange: (images: string[]) => void;
+  type?: "product" | "slide" | "profile";
 }
 
-export default function ImageUpload({ images, onChange }: Props) {
+export default function ImageUpload({
+  images,
+  onChange,
+  type = "product",
+}: Props) {
   const [uploading, setUploading] = useState(false);
   const [uploadingCount, setUploadingCount] = useState(0);
   const [uploadedCount, setUploadedCount] = useState(0);
@@ -41,7 +46,7 @@ export default function ImageUpload({ images, onChange }: Props) {
 
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("type", "product"); // ← THIS WAS MISSING!
+        formData.append("type", type); // ← THIS WAS MISSING!
 
         try {
           const res = await fetch("/api/admin/upload", {

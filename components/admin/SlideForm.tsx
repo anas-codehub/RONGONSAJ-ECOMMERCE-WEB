@@ -82,7 +82,7 @@ export default function SlideForm() {
             <br />• <span className="font-bold">Tip:</span> Keep important
             content (text/subject) in the center of the image
           </p>
-          <ImageUpload images={images} onChange={setImages} />
+          <ImageUpload images={images} onChange={setImages} type="slide" />
           <p className="text-xs text-muted-foreground mt-1">
             Best size: 1920×600px (landscape). Will be responsive on mobile.
           </p>
